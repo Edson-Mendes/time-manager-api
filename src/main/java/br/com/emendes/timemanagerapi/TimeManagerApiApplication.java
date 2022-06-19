@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class TimeManagerApiApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(TimeManagerApiApplication.class, args);
-	}
+  public static void main(String[] args) {
+    SpringApplication.run(TimeManagerApiApplication.class, args);
+  }
 
 }
