@@ -1,6 +1,7 @@
 package br.com.emendes.timemanagerapi.dto.response;
 
 import br.com.emendes.timemanagerapi.model.Activity;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.LocalDateTime;
