@@ -4,13 +4,16 @@ import br.com.emendes.timemanagerapi.model.Activity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
 public class ActivityRequestBody {
 
+  @NotBlank(message = "name must not be null or blank")
   private String name;
+  @NotBlank(message = "description must not be null or blank")
   private String description;
 
   public Activity toActivity() {
