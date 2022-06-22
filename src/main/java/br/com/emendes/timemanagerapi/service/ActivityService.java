@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +25,7 @@ public class ActivityService {
     return activities.stream().map(ActivityResponseBody::new).toList();
   }
 
-  public Activity findById(long id) {
+  private Activity findById(long id) {
     return activityRepository.findById(id).orElseThrow(
         () -> new ActivityNotFoundException("Activity not found for id: " + id));
   }
@@ -41,5 +40,9 @@ public class ActivityService {
     Activity activityToBeUpdated = findById(id);
     activityToBeUpdated.update(activityRequestBody);
     activityRepository.save(activityToBeUpdated);
+  }
+
+  public void deleteById(long id) {
+    activityRepository.delete(findById(id));
   }
 }

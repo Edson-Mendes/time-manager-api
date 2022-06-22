@@ -30,7 +30,7 @@ class ActivityServiceTest {
   private ActivityService activityService;
 
   @Mock
-  private ActivityRepository activityRepository;
+  private ActivityRepository activityRepositoryMock;
   private final ActivityRequestBody ACTIVITY_REQUEST_BODY =
       new ActivityRequestBody("Finances API", "A simple project for my portfolio");
 
@@ -39,9 +39,9 @@ class ActivityServiceTest {
     Activity activity1 = ActivityCreator.activityWithIdAndName(1L, "Finances API");
     Activity activity2 = ActivityCreator.activityWithIdAndName(2L, "Transaction Analyzer");
 
-    BDDMockito.when(activityRepository.findAll()).thenReturn(List.of(activity1, activity2));
-    BDDMockito.when(activityRepository.save(ArgumentMatchers.any(Activity.class))).thenReturn(activity1);
-    BDDMockito.when(activityRepository.findById(999L)).thenReturn(Optional.empty());
+    BDDMockito.when(activityRepositoryMock.findAll()).thenReturn(List.of(activity1, activity2));
+    BDDMockito.when(activityRepositoryMock.save(ArgumentMatchers.any(Activity.class))).thenReturn(activity1);
+    BDDMockito.when(activityRepositoryMock.findById(999L)).thenReturn(Optional.empty());
   }
 
   @Test
@@ -61,7 +61,7 @@ class ActivityServiceTest {
   @Test
   @DisplayName("findAll must throws ActivitiesNotFoundException when DB hasn't activities")
   void findAll_MustThrowsActivitiesNotFoundException_WhenDBHasntActivities() {
-    BDDMockito.when(activityRepository.findAll()).thenReturn(Collections.EMPTY_LIST);
+    BDDMockito.when(activityRepositoryMock.findAll()).thenReturn(Collections.EMPTY_LIST);
 
     Assertions.assertThatExceptionOfType(ActivityNotFoundException.class)
         .isThrownBy(activityService::findAll)
@@ -91,6 +91,16 @@ class ActivityServiceTest {
 
     Assertions.assertThatExceptionOfType(ActivityNotFoundException.class)
         .isThrownBy(() -> activityService.update(activityId, activityToBeUpdated))
+        .withMessage("Activity not found for id: " + activityId);
+  }
+
+  @Test
+  @DisplayName("delete must throws ActivityNotFoundException when id don't exists")
+  void deleteById_MustThrowsActivityNotFoundException_WhenIdDontExists() {
+    long activityId = 999L;
+
+    Assertions.assertThatExceptionOfType(ActivityNotFoundException.class)
+        .isThrownBy(() -> activityService.deleteById(activityId))
         .withMessage("Activity not found for id: " + activityId);
   }
 

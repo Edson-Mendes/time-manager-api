@@ -45,6 +45,8 @@ class ActivityControllerTest {
     BDDMockito.when(activityServiceMock.create(ACTIVITY_REQUEST_BODY)).thenReturn(activityRB1);
     BDDMockito.doNothing().when(activityServiceMock)
         .update(ArgumentMatchers.anyLong(), ArgumentMatchers.any(ActivityRequestBody.class));
+    BDDMockito.doNothing().when(activityServiceMock)
+        .deleteById(ArgumentMatchers.anyLong());
   }
 
   @Test
@@ -70,7 +72,7 @@ class ActivityControllerTest {
 
   @Test
   @DisplayName("create must return status 201 when created successful")
-  void create_MustReturnsStatus201_WhenCreatedSuccessful(){
+  void create_MustReturnsStatus201_WhenCreatedSuccessful() {
     HttpStatus statusCode = activityController.create(ACTIVITY_REQUEST_BODY, URI_BUILDER)
         .getStatusCode();
 
@@ -89,6 +91,7 @@ class ActivityControllerTest {
     Assertions.assertThat(body.getCreatedAt()).isNotNull();
     Assertions.assertThat(body.isEnabled()).isTrue();
   }
+
   @Test
   @DisplayName("create must returns path /activities/1 when created successful")
   void create_MustReturnsPathActivities1_WhenCreatedSuccessful() {
@@ -102,7 +105,7 @@ class ActivityControllerTest {
 
   @Test
   @DisplayName("update must returns status 204 when updated successful")
-  void update_MustReturnsStatus204_WhenUpdatedSuccessful(){
+  void update_MustReturnsStatus204_WhenUpdatedSuccessful() {
     Long activityId = 1L;
     String newName = "Finances REST API";
     String newDescription = "A simple Restful API for my portfolio";
@@ -112,4 +115,12 @@ class ActivityControllerTest {
     Assertions.assertThat(statusCode).isEqualByComparingTo(HttpStatus.NO_CONTENT);
   }
 
+  @Test
+  @DisplayName("delete must returns status 204 when deleted successful")
+  void delete_MustReturnsStatus204_WhenDeletedSuccessful() {
+    Long activityId = 1L;
+    HttpStatus statusCode = activityController.delete(activityId).getStatusCode();
+
+    Assertions.assertThat(statusCode).isEqualByComparingTo(HttpStatus.NO_CONTENT);
+  }
 }

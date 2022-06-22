@@ -5,14 +5,20 @@
 ![Badge Spring](https://img.shields.io/static/v1?label=Spring&message=v2.6.8&color=brightgreen&style=for-the-badge&logo=spring)
 
 ## :book: Resumo do projeto
+
 Time Manager API é uma aplicação para auxiliar no gerenciamento de tempo gasto em atividades (ex. esse projeto).
 
 ## :hammer: Funcionalidades
+
 - `Atividades`
-    - `cadastrar`: Cadastro de atividade através de um POST para */activities* com as informações de nome e descrição da atividade.
-    - `Buscar`: Buscar TODAS as atividades através de um GET para *activities*.
+    - `cadastrar`: Cadastro de atividade através de um POST para */activities* com as informações de nome e descrição da
+      atividade no body da requisição.
+    - `Buscar`: Buscar TODAS as atividades através de um GET para */activities*.
+    - `Atualizar`: Atualizar atividade através de um PUT para */activities/{id}*, onde {id} é o identificador da atividade.
+    - `Deletar`: Deletar atividade através de um DELETE para */activities/{id}*, onde {id} é o identificador da atividade.
 
 ## :toolbox: Tecnologias
+
 - `Intellij`
 - `Java 17`
 - `Maven`
