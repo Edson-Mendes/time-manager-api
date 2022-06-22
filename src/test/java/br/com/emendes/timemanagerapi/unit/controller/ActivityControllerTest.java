@@ -10,13 +10,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.web.util.UriBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
@@ -30,7 +30,7 @@ class ActivityControllerTest {
   private ActivityController activityController;
   @Mock
   private ActivityService activityServiceMock;
-  private final UriBuilder URI_BUILDER = UriComponentsBuilder.fromHttpUrl("http://localhost:8080");
+  private final UriComponentsBuilder URI_BUILDER = UriComponentsBuilder.fromHttpUrl("http://localhost:8080");
   private final ActivityRequestBody ACTIVITY_REQUEST_BODY =
       new ActivityRequestBody("Finances API", "A simple project for my portfolio");
 
@@ -43,6 +43,8 @@ class ActivityControllerTest {
 
     BDDMockito.when(activityServiceMock.findAll()).thenReturn(List.of(activityRB1, activityRB2));
     BDDMockito.when(activityServiceMock.create(ACTIVITY_REQUEST_BODY)).thenReturn(activityRB1);
+    BDDMockito.doNothing().when(activityServiceMock)
+        .update(ArgumentMatchers.anyLong(), ArgumentMatchers.any(ActivityRequestBody.class));
   }
 
   @Test
@@ -69,9 +71,10 @@ class ActivityControllerTest {
   @Test
   @DisplayName("create must return status 201 when created successful")
   void create_MustReturnsStatus201_WhenCreatedSuccessful(){
-    ResponseEntity<ActivityResponseBody> response = activityController.create(ACTIVITY_REQUEST_BODY, URI_BUILDER);
+    HttpStatus statusCode = activityController.create(ACTIVITY_REQUEST_BODY, URI_BUILDER)
+        .getStatusCode();
 
-    Assertions.assertThat(response.getStatusCode()).isEqualByComparingTo(HttpStatus.CREATED);
+    Assertions.assertThat(statusCode).isEqualByComparingTo(HttpStatus.CREATED);
   }
 
   @Test
@@ -95,6 +98,18 @@ class ActivityControllerTest {
 
     Assertions.assertThat(uri).isNotNull();
     Assertions.assertThat(uri.getPath()).isEqualTo("/activities/1");
+  }
+
+  @Test
+  @DisplayName("update must returns status 204 when updated successful")
+  void update_MustReturnsStatus204_WhenUpdatedSuccessful(){
+    Long activityId = 1L;
+    String newName = "Finances REST API";
+    String newDescription = "A simple Restful API for my portfolio";
+    ActivityRequestBody activityToBeUpdated = new ActivityRequestBody(newName, newDescription);
+    HttpStatus statusCode = activityController.update(activityId, activityToBeUpdated).getStatusCode();
+
+    Assertions.assertThat(statusCode).isEqualByComparingTo(HttpStatus.NO_CONTENT);
   }
 
 }

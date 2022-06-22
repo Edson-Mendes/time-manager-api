@@ -1,7 +1,7 @@
 package br.com.emendes.timemanagerapi.handler;
 
 import br.com.emendes.timemanagerapi.dto.response.BadRequestResponseBody;
-import br.com.emendes.timemanagerapi.exception.ActivitiesNotFoundException;
+import br.com.emendes.timemanagerapi.exception.ActivityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
 @RestControllerAdvice
 public class RestExceptionHandler {
 
-  @ExceptionHandler(ActivitiesNotFoundException.class)
-  public ResponseEntity<BadRequestResponseBody> handle(ActivitiesNotFoundException ex) {
+  @ExceptionHandler(ActivityNotFoundException.class)
+  public ResponseEntity<BadRequestResponseBody> handle(ActivityNotFoundException ex) {
 
     BadRequestResponseBody responseBody = BadRequestResponseBody.builder()
         .title("Bad Request")

@@ -2,7 +2,7 @@ package br.com.emendes.timemanagerapi.unit.service;
 
 import br.com.emendes.timemanagerapi.dto.request.ActivityRequestBody;
 import br.com.emendes.timemanagerapi.dto.response.ActivityResponseBody;
-import br.com.emendes.timemanagerapi.exception.ActivitiesNotFoundException;
+import br.com.emendes.timemanagerapi.exception.ActivityNotFoundException;
 import br.com.emendes.timemanagerapi.model.Activity;
 import br.com.emendes.timemanagerapi.repository.ActivityRepository;
 import br.com.emendes.timemanagerapi.service.ActivityService;
@@ -20,6 +20,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @ExtendWith(SpringExtension.class)
 @DisplayName("Unit tests for ActivityService")
@@ -40,6 +41,7 @@ class ActivityServiceTest {
 
     BDDMockito.when(activityRepository.findAll()).thenReturn(List.of(activity1, activity2));
     BDDMockito.when(activityRepository.save(ArgumentMatchers.any(Activity.class))).thenReturn(activity1);
+    BDDMockito.when(activityRepository.findById(999L)).thenReturn(Optional.empty());
   }
 
   @Test
@@ -58,17 +60,17 @@ class ActivityServiceTest {
 
   @Test
   @DisplayName("findAll must throws ActivitiesNotFoundException when DB hasn't activities")
-  void findAll_MustThrowsActivitiesNotFoundException_WhenDBHasntActivities(){
+  void findAll_MustThrowsActivitiesNotFoundException_WhenDBHasntActivities() {
     BDDMockito.when(activityRepository.findAll()).thenReturn(Collections.EMPTY_LIST);
 
-    Assertions.assertThatExceptionOfType(ActivitiesNotFoundException.class)
+    Assertions.assertThatExceptionOfType(ActivityNotFoundException.class)
         .isThrownBy(activityService::findAll)
         .withMessage("Não possui atividades");
   }
 
   @Test
   @DisplayName("create must returns ActivityResponseBody when created successful")
-  void create_MustReturnsActivityResponseBody_WhenCreatedSuccessful(){
+  void create_MustReturnsActivityResponseBody_WhenCreatedSuccessful() {
     ActivityResponseBody activityResponseBody = activityService.create(ACTIVITY_REQUEST_BODY);
 
     Assertions.assertThat(activityResponseBody.getId())
@@ -78,4 +80,18 @@ class ActivityServiceTest {
         .isNotNull()
         .isEqualTo("Finances API");
   }
+
+  @Test
+  @DisplayName("update must throws ActivityNotFoundException when id don't exists")
+  void update_MustThrowsActivityNotFoundException_WhenIdDontExists() {
+    long activityId = 999L;
+    String newName = "Finances REST API";
+    String newDescription = "A simple Restful API for my portfolio";
+    ActivityRequestBody activityToBeUpdated = new ActivityRequestBody(newName, newDescription);
+
+    Assertions.assertThatExceptionOfType(ActivityNotFoundException.class)
+        .isThrownBy(() -> activityService.update(activityId, activityToBeUpdated))
+        .withMessage("Activity not found for id: " + activityId);
+  }
+
 }

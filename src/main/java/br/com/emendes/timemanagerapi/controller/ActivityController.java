@@ -5,11 +5,10 @@ import br.com.emendes.timemanagerapi.dto.response.ActivityResponseBody;
 import br.com.emendes.timemanagerapi.service.ActivityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.util.UriBuilder;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 
@@ -27,10 +26,19 @@ public class ActivityController {
     return ResponseEntity.ok(activities);
   }
 
-  public ResponseEntity<ActivityResponseBody> create(ActivityRequestBody activityRequestBody, UriBuilder uriBuilder) {
+  @PostMapping
+  public ResponseEntity<ActivityResponseBody> create(
+      @RequestBody @Valid ActivityRequestBody activityRequestBody, UriComponentsBuilder uriBuilder) {
     ActivityResponseBody activityResponseBody = activityService.create(activityRequestBody);
 
     URI uri = uriBuilder.path("/activities/{id}").build(activityResponseBody.getId());
     return ResponseEntity.created(uri).body(activityResponseBody);
+  }
+
+  @PutMapping("/{id}")
+  public ResponseEntity<Void> update(
+      @PathVariable long id, @RequestBody @Valid ActivityRequestBody activityRequestBody) {
+    activityService.update(id, activityRequestBody);
+    return ResponseEntity.noContent().build();
   }
 }

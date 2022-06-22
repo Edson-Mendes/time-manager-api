@@ -1,5 +1,6 @@
 package br.com.emendes.timemanagerapi.model;
 
+import br.com.emendes.timemanagerapi.dto.request.ActivityRequestBody;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,4 +27,8 @@ public class Activity {
   private LocalDateTime createdAt;
   private boolean enabled;
 
+  public void update(ActivityRequestBody activityRequestBody) {
+    this.name = activityRequestBody.getName();
+    this.description = activityRequestBody.getDescription();
+  }
 }
