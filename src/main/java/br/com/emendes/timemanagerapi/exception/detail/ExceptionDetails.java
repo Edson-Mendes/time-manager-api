@@ -1,13 +1,13 @@
-package br.com.emendes.timemanagerapi.dto.response;
+package br.com.emendes.timemanagerapi.exception.detail;
 
-import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
 @Data
-@Builder
-public class BadRequestResponseBody {
+@SuperBuilder
+public class ExceptionDetails {
 
   private String title;
   private int status;
