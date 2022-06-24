@@ -3,10 +3,12 @@ package br.com.emendes.timemanagerapi.dto.response;
 import br.com.emendes.timemanagerapi.model.Activity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Data
+@NoArgsConstructor
 public class ActivityResponseBody {
 
   private Long id;

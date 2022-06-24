@@ -16,4 +16,13 @@ public class ActivityCreator {
         .build();
   }
 
+  public static Activity activityWithoutIdAndWithNameAndDescription(String name, String description){
+    return Activity.builder()
+        .name(name)
+        .description(description)
+        .createdAt(LocalDateTime.now())
+        .enabled(true)
+        .build();
+  }
+
 }
