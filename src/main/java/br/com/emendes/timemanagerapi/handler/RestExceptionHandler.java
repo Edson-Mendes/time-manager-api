@@ -3,10 +3,10 @@ package br.com.emendes.timemanagerapi.handler;
 import br.com.emendes.timemanagerapi.exception.ActivityNotFoundException;
 import br.com.emendes.timemanagerapi.exception.detail.ExceptionDetails;
 import br.com.emendes.timemanagerapi.exception.detail.ValidationExceptionDetails;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -19,11 +19,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
-@Log4j2
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
   @ExceptionHandler(ActivityNotFoundException.class)
-  public ResponseEntity<ExceptionDetails> handle(ActivityNotFoundException ex) {
+  public ResponseEntity<ExceptionDetails> handleActivityNotFound(ActivityNotFoundException ex) {
 
     ExceptionDetails responseBody = ExceptionDetails.builder()
         .title("Bad Request")
@@ -35,6 +34,17 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     return ResponseEntity.badRequest().body(responseBody);
   }
 
+  @Override
+  protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+    ExceptionDetails responseBody = ExceptionDetails.builder()
+        .title("Bad Request")
+        .status(HttpStatus.BAD_REQUEST.value())
+        .timestamp(LocalDateTime.now())
+        .details(ex.getMessage())
+        .build();
+
+    return ResponseEntity.badRequest().body(responseBody);
+  }
 
   @Override
   protected ResponseEntity<Object> handleMethodArgumentNotValid(
