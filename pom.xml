@@ -12,7 +12,7 @@
 	<artifactId>time-manager-api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>time-manager-api</name>
-	<description>Aplicação para gerenciar seu tempo gasto em projetos.</description>
+	<description>Aplicação para gerenciar o tempo gasto em projetos.</description>
 	<properties>
 		<java.version>17</java.version>
 	</properties>
@@ -44,8 +44,8 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
