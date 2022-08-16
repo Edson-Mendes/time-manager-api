@@ -1,6 +1,5 @@
-package br.com.emendes.timemanagerapi.exception.detail;
+package br.com.emendes.timemanagerapi.dto.response.detail;
 
-import br.com.emendes.timemanagerapi.exception.detail.ExceptionDetails;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;

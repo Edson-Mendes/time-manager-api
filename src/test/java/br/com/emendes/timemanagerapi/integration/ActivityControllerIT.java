@@ -2,8 +2,8 @@ package br.com.emendes.timemanagerapi.integration;
 
 import br.com.emendes.timemanagerapi.dto.request.ActivityRequestBody;
 import br.com.emendes.timemanagerapi.dto.response.ActivityResponseBody;
-import br.com.emendes.timemanagerapi.exception.detail.ExceptionDetails;
-import br.com.emendes.timemanagerapi.exception.detail.ValidationExceptionDetails;
+import br.com.emendes.timemanagerapi.dto.response.detail.ExceptionDetails;
+import br.com.emendes.timemanagerapi.dto.response.detail.ValidationExceptionDetails;
 import br.com.emendes.timemanagerapi.model.Activity;
 import br.com.emendes.timemanagerapi.repository.ActivityRepository;
 import br.com.emendes.timemanagerapi.util.creator.ActivityCreator;

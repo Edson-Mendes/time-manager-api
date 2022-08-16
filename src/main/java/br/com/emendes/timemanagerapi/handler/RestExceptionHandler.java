@@ -1,8 +1,8 @@
 package br.com.emendes.timemanagerapi.handler;
 
 import br.com.emendes.timemanagerapi.exception.ActivityNotFoundException;
-import br.com.emendes.timemanagerapi.exception.detail.ExceptionDetails;
-import br.com.emendes.timemanagerapi.exception.detail.ValidationExceptionDetails;
+import br.com.emendes.timemanagerapi.dto.response.detail.ExceptionDetails;
+import br.com.emendes.timemanagerapi.dto.response.detail.ValidationExceptionDetails;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +35,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
   }
 
   @Override
-  protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+  protected ResponseEntity<Object> handleHttpMessageNotReadable(
+      HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
     ExceptionDetails responseBody = ExceptionDetails.builder()
         .title("Bad Request")
         .status(HttpStatus.BAD_REQUEST.value())

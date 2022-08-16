@@ -1,4 +1,4 @@
-package br.com.emendes.timemanagerapi.exception.detail;
+package br.com.emendes.timemanagerapi.dto.response.detail;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
