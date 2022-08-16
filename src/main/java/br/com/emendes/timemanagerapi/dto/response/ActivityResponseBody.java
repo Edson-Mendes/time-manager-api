@@ -1,6 +1,7 @@
 package br.com.emendes.timemanagerapi.dto.response;
 
 import br.com.emendes.timemanagerapi.model.Activity;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,6 +15,7 @@ public class ActivityResponseBody {
   private Long id;
   private String name;
   private String description;
+  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private LocalDateTime createdAt;
   private boolean enabled;
 
