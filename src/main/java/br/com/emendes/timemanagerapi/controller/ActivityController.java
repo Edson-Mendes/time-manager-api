@@ -4,13 +4,16 @@ import br.com.emendes.timemanagerapi.dto.request.ActivityRequestBody;
 import br.com.emendes.timemanagerapi.dto.response.ActivityResponseBody;
 import br.com.emendes.timemanagerapi.service.ActivityService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -20,10 +23,10 @@ public class ActivityController {
   private final ActivityService activityService;
 
   @GetMapping
-  public ResponseEntity<List<ActivityResponseBody>> findAll(){
-    List<ActivityResponseBody> activities = activityService.findAll();
+  public ResponseEntity<Page<ActivityResponseBody>> find(
+      @PageableDefault(direction = Sort.Direction.DESC, sort = "createdAt") Pageable pageable){
 
-    return ResponseEntity.ok(activities);
+    return ResponseEntity.ok(activityService.find(pageable));
   }
 
   @PostMapping

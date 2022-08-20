@@ -14,8 +14,8 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -33,6 +33,7 @@ class ActivityControllerTest {
   private final UriComponentsBuilder URI_BUILDER = UriComponentsBuilder.fromHttpUrl("http://localhost:8080");
   private final ActivityRequestBody ACTIVITY_REQUEST_BODY =
       new ActivityRequestBody("Finances API", "A simple project for my portfolio");
+  private final Pageable PAGEABLE = PageRequest.of(0, 10, Sort.Direction.DESC, "createdAt");
 
   @BeforeEach
   public void setUp() {
@@ -41,7 +42,8 @@ class ActivityControllerTest {
     ActivityResponseBody activityRB2 =
         new ActivityResponseBody(ActivityCreator.activityWithIdAndName(2L, "Transaction Analyzer"));
 
-    BDDMockito.when(activityServiceMock.findAll()).thenReturn(List.of(activityRB1, activityRB2));
+    BDDMockito.when(activityServiceMock.find(PAGEABLE))
+        .thenReturn(new PageImpl(List.of(activityRB1, activityRB2), PAGEABLE, 2));
     BDDMockito.when(activityServiceMock.create(ACTIVITY_REQUEST_BODY)).thenReturn(activityRB1);
     BDDMockito.doNothing().when(activityServiceMock)
         .update(ArgumentMatchers.anyLong(), ArgumentMatchers.any(ActivityRequestBody.class));
@@ -50,24 +52,23 @@ class ActivityControllerTest {
   }
 
   @Test
-  @DisplayName("findAll must returns status 200 when find successfully")
-  void findAll_MustReturnsStatus200_WhenFindSuccessful() {
-    ResponseEntity<List<ActivityResponseBody>> response = activityController.findAll();
-    HttpStatus statusCode = response.getStatusCode();
+  @DisplayName("find must returns status 200 when find successfully")
+  void find_MustReturnsStatus200_WhenFindSuccessful() {
+    HttpStatus statusCode = activityController.find(PAGEABLE).getStatusCode();
 
     Assertions.assertThat(statusCode).isEqualByComparingTo(HttpStatus.OK);
   }
 
   @Test
-  @DisplayName("findAll must returns List<ActivityResponseBody> when find successfully")
-  void findAll_MustReturnsListActivityResponseBody_WhenFindSuccessful() {
-    List<ActivityResponseBody> body = activityController.findAll().getBody();
+  @DisplayName("find must returns Page<ActivityResponseBody> when find successfully")
+  void find_MustReturnsPageActivityResponseBody_WhenFindSuccessful() {
+    Page<ActivityResponseBody> body = activityController.find(PAGEABLE).getBody();
 
     Assertions.assertThat(body).isNotNull().isNotEmpty();
-    Assertions.assertThat(body.get(0).getId()).isEqualTo(1L);
-    Assertions.assertThat(body.get(1).getId()).isEqualTo(2L);
-    Assertions.assertThat(body.get(0).getName()).isEqualTo("Finances API");
-    Assertions.assertThat(body.get(1).getName()).isEqualTo("Transaction Analyzer");
+    Assertions.assertThat(body.getContent().get(0).getId()).isEqualTo(1L);
+    Assertions.assertThat(body.getContent().get(0).getName()).isEqualTo("Finances API");
+    Assertions.assertThat(body.getContent().get(1).getId()).isEqualTo(2L);
+    Assertions.assertThat(body.getContent().get(1).getName()).isEqualTo("Transaction Analyzer");
   }
 
   @Test

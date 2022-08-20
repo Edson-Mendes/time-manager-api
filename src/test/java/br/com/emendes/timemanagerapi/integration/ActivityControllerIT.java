@@ -7,6 +7,7 @@ import br.com.emendes.timemanagerapi.dto.response.detail.ValidationExceptionDeta
 import br.com.emendes.timemanagerapi.model.Activity;
 import br.com.emendes.timemanagerapi.repository.ActivityRepository;
 import br.com.emendes.timemanagerapi.util.creator.ActivityCreator;
+import br.com.emendes.timemanagerapi.util.wrapper.PageableResponse;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,14 +15,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-
-import java.util.List;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -37,7 +37,7 @@ class ActivityControllerIT {
   private final String ACTIVITIES_URI = "/activities";
 
   @Test
-  @DisplayName("get for /activities must returns List<ActivitiesResponseBody> when find successfully>")
+  @DisplayName("get for /activities must returns Page<ActivitiesResponseBody> when find successfully>")
   void getForActivities_MustReturnsListActivityResponseBody_WhenFindSuccessfully() {
     Activity activityToBeSaved1 = ActivityCreator.activityWithoutIdAndWithNameAndDescription(
         "Finances API", "A simple project");
@@ -48,28 +48,24 @@ class ActivityControllerIT {
     activityRepository.save(activityToBeSaved2);
 
 
-    ResponseEntity<List<ActivityResponseBody>> responseEntity = testRestTemplate.exchange(
-        ACTIVITIES_URI, HttpMethod.GET, null,
-        new ParameterizedTypeReference<>() {
-        });
+    ResponseEntity<PageableResponse<ActivityResponseBody>> responseEntity = testRestTemplate.exchange(
+        ACTIVITIES_URI, HttpMethod.GET, null, new ParameterizedTypeReference<>() {});
     HttpStatus responseStatus = responseEntity.getStatusCode();
-    List<ActivityResponseBody> responseBody = responseEntity.getBody();
+    Page<ActivityResponseBody> responseBody = responseEntity.getBody();
 
     Assertions.assertThat(responseStatus).isEqualByComparingTo(HttpStatus.OK);
     Assertions.assertThat(responseBody).isNotNull().hasSize(2);
-    Assertions.assertThat(responseBody.get(0).getName()).isEqualTo("Finances API");
-    Assertions.assertThat(responseBody.get(1).getName()).isEqualTo("Transaction Analyzer");
-    Assertions.assertThat(responseBody.get(0).getDescription()).isEqualTo("A simple project");
-    Assertions.assertThat(responseBody.get(1).getDescription()).isEqualTo("A simple project");
+    Assertions.assertThat(responseBody.getContent().get(0).getName()).isEqualTo("Finances API");
+    Assertions.assertThat(responseBody.getContent().get(1).getName()).isEqualTo("Transaction Analyzer");
+    Assertions.assertThat(responseBody.getContent().get(0).getDescription()).isEqualTo("A simple project");
+    Assertions.assertThat(responseBody.getContent().get(1).getDescription()).isEqualTo("A simple project");
   }
 
   @Test
   @DisplayName("get for /activities must returns ExceptionDetails when hasn't activities>")
   void getForActivities_MustReturnsExceptionDetails_WhenHasntActivities() {
     ResponseEntity<ExceptionDetails> responseEntity = testRestTemplate.exchange(
-        ACTIVITIES_URI, HttpMethod.GET, null,
-        new ParameterizedTypeReference<>() {
-        });
+        ACTIVITIES_URI, HttpMethod.GET, null, new ParameterizedTypeReference<>() {});
 
     HttpStatus responseStatus = responseEntity.getStatusCode();
     ExceptionDetails responseBody = responseEntity.getBody();

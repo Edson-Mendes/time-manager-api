@@ -10,7 +10,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 
-// TODO: Pesquisar se há um nome melhor para representar o intervalo onde é trabalho na atividade.
+// TODO: Pesquisar se há um nome melhor para representar o intervalo que é trabalhado na atividade.
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/activities/{activityId}/intervals")

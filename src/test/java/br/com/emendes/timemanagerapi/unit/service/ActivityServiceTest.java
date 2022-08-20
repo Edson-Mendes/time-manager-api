@@ -16,9 +16,9 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.data.domain.*;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,37 +34,41 @@ class ActivityServiceTest {
   private final ActivityRequestBody ACTIVITY_REQUEST_BODY =
       new ActivityRequestBody("Finances API", "A simple project for my portfolio");
 
+  private final Pageable PAGEABLE = PageRequest.of(0, 10, Sort.Direction.DESC, "createdAt");
+
   @BeforeEach
   public void setUp() {
     Activity activity1 = ActivityCreator.activityWithIdAndName(1L, "Finances API");
     Activity activity2 = ActivityCreator.activityWithIdAndName(2L, "Transaction Analyzer");
+    Page<Activity> activitiesPage = new PageImpl(List.of(activity1, activity2), PAGEABLE, 2);
 
-    BDDMockito.when(activityRepositoryMock.findAll()).thenReturn(List.of(activity1, activity2));
+    BDDMockito.when(activityRepositoryMock.findAll(PAGEABLE)).thenReturn(activitiesPage);
     BDDMockito.when(activityRepositoryMock.save(ArgumentMatchers.any(Activity.class))).thenReturn(activity1);
     BDDMockito.when(activityRepositoryMock.findById(999L)).thenReturn(Optional.empty());
   }
 
   @Test
-  @DisplayName("findAll must returns List<ActivityResponse> when DB has Activities")
-  void findAll_MustReturnsListActivityResponseBody_WhenDBHasActivities() {
-    List<ActivityResponseBody> activitiesResponse = activityService.findAll();
+  @DisplayName("find must returns Page<ActivityResponseBody> when DB has Activities")
+  void find_MustReturnsPageActivityResponseBody_WhenDBHasActivities() {
+    Page<ActivityResponseBody> activitiesResponse = activityService.find(PAGEABLE);
+    List<ActivityResponseBody> listActivityRB = activitiesResponse.getContent();
 
     Assertions.assertThat(activitiesResponse)
         .isNotEmpty()
         .hasSize(2);
-    Assertions.assertThat(activitiesResponse.get(0).getId()).isEqualTo(1L);
-    Assertions.assertThat(activitiesResponse.get(1).getId()).isEqualTo(2L);
-    Assertions.assertThat(activitiesResponse.get(0).getName()).isEqualTo("Finances API");
-    Assertions.assertThat(activitiesResponse.get(1).getName()).isEqualTo("Transaction Analyzer");
+    Assertions.assertThat(listActivityRB.get(0).getId()).isEqualTo(1L);
+    Assertions.assertThat(listActivityRB.get(1).getId()).isEqualTo(2L);
+    Assertions.assertThat(listActivityRB.get(0).getName()).isEqualTo("Finances API");
+    Assertions.assertThat(listActivityRB.get(1).getName()).isEqualTo("Transaction Analyzer");
   }
 
   @Test
-  @DisplayName("findAll must throws ActivitiesNotFoundException when DB hasn't activities")
-  void findAll_MustThrowsActivitiesNotFoundException_WhenDBHasntActivities() {
-    BDDMockito.when(activityRepositoryMock.findAll()).thenReturn(Collections.EMPTY_LIST);
+  @DisplayName("find must throws ActivitiesNotFoundException when DB hasn't activities")
+  void find_MustThrowsActivitiesNotFoundException_WhenDBHasntActivities() {
+    BDDMockito.when(activityRepositoryMock.findAll(PAGEABLE)).thenReturn(Page.empty());
 
     Assertions.assertThatExceptionOfType(ActivityNotFoundException.class)
-        .isThrownBy(activityService::findAll)
+        .isThrownBy(() -> activityService.find(PAGEABLE))
         .withMessage("Não possui atividades");
   }
 

@@ -6,9 +6,9 @@ import br.com.emendes.timemanagerapi.exception.ActivityNotFoundException;
 import br.com.emendes.timemanagerapi.model.Activity;
 import br.com.emendes.timemanagerapi.repository.ActivityRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -16,13 +16,13 @@ public class ActivityService {
 
   private final ActivityRepository activityRepository;
 
-  public List<ActivityResponseBody> findAll() {
-    List<Activity> activities = activityRepository.findAll();
-    if (activities.isEmpty()) {
+  public Page<ActivityResponseBody> find(Pageable pageable) {
+    Page<Activity> activitiesPage = activityRepository.findAll(pageable);
+    if (activitiesPage.getTotalElements() == 0) {
       throw new ActivityNotFoundException("Não possui atividades");
     }
 
-    return activities.stream().map(ActivityResponseBody::new).toList();
+    return activitiesPage.map(ActivityResponseBody::new);
   }
 
   private Activity findById(long id) {
