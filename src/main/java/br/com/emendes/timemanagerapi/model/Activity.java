@@ -40,7 +40,7 @@ public class Activity {
   @Column(nullable = false)
   private boolean enabled;
 
-  @OneToMany(fetch = FetchType.EAGER, mappedBy = "activity")
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "activity")
   private List<Interval> intervals;
 
   public void update(ActivityRequestBody activityRequestBody) {

@@ -25,7 +25,7 @@ public class ActivityService {
     return activitiesPage.map(ActivityResponseBody::new);
   }
 
-  private Activity findById(long id) {
+  public Activity findById(long id) {
     return activityRepository.findById(id).orElseThrow(
         () -> new ActivityNotFoundException("Activity not found for id: " + id));
   }
@@ -45,4 +45,5 @@ public class ActivityService {
   public void deleteById(long id) {
     activityRepository.delete(findById(id));
   }
+
 }
