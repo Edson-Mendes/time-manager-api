@@ -25,4 +25,14 @@ public class ActivityCreator {
         .build();
   }
 
+  public static Activity activityForTests(){
+    return Activity.builder()
+        .id(1L)
+        .name("Lorem Ipsum Activity")
+        .description("A simple project for my portfolio")
+        .createdAt(LocalDateTime.now())
+        .enabled(true)
+        .build();
+  }
+
 }

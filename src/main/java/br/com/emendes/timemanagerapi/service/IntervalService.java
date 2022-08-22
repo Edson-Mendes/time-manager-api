@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 public class IntervalService {
 
   private final ActivityService activityService;
-
   private final IntervalRepository intervalRepository;
 
   public IntervalResponseBody create(long activityId, IntervalRequestBody requestBody){

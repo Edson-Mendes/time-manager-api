@@ -28,13 +28,13 @@ class ActivityServiceTest {
 
   @InjectMocks
   private ActivityService activityService;
-
   @Mock
   private ActivityRepository activityRepositoryMock;
+
   private final ActivityRequestBody ACTIVITY_REQUEST_BODY =
       new ActivityRequestBody("Finances API", "A simple project for my portfolio");
-
   private final Pageable PAGEABLE = PageRequest.of(0, 10, Sort.Direction.DESC, "createdAt");
+  private final long NONEXISTING_ACTIVITY_ID = 9999L;
 
   @BeforeEach
   public void setUp() {
@@ -44,7 +44,7 @@ class ActivityServiceTest {
 
     BDDMockito.when(activityRepositoryMock.findAll(PAGEABLE)).thenReturn(activitiesPage);
     BDDMockito.when(activityRepositoryMock.save(ArgumentMatchers.any(Activity.class))).thenReturn(activity1);
-    BDDMockito.when(activityRepositoryMock.findById(999L)).thenReturn(Optional.empty());
+    BDDMockito.when(activityRepositoryMock.findById(NONEXISTING_ACTIVITY_ID)).thenReturn(Optional.empty());
   }
 
   @Test
@@ -73,6 +73,29 @@ class ActivityServiceTest {
   }
 
   @Test
+  @DisplayName("findById must returns Activity when found successful")
+  void findById_MustReturnsActivity_WhenFoundSuccessful(){
+    long activityId = 1L;
+    Activity activityToBeFound = ActivityCreator.activityWithIdAndName(activityId, "Finances API");
+    BDDMockito.when(activityRepositoryMock.findById(activityId)).thenReturn(Optional.of(activityToBeFound));
+
+    Activity activityFound = activityService.findById(activityId);
+
+    Assertions.assertThat(activityFound).isNotNull().isEqualTo(activityToBeFound);
+  }
+
+  @Test
+  @DisplayName("findById must throws ActivityNotFoundException when activityId doesn't exist")
+  void findById_MustThrowsActivityNotFoundException_WhenActivityIdDoesntExist(){
+    Activity activityToBeFound = ActivityCreator.activityWithIdAndName(NONEXISTING_ACTIVITY_ID, "Finances API");
+    BDDMockito.when(activityRepositoryMock.findById(NONEXISTING_ACTIVITY_ID)).thenReturn(Optional.empty());
+
+    Assertions.assertThatExceptionOfType(ActivityNotFoundException.class)
+        .isThrownBy(() -> activityService.findById(NONEXISTING_ACTIVITY_ID))
+        .withMessage("Activity not found for id: " + NONEXISTING_ACTIVITY_ID);
+  }
+
+  @Test
   @DisplayName("create must returns ActivityResponseBody when created successful")
   void create_MustReturnsActivityResponseBody_WhenCreatedSuccessful() {
     ActivityResponseBody activityResponseBody = activityService.create(ACTIVITY_REQUEST_BODY);
@@ -88,24 +111,21 @@ class ActivityServiceTest {
   @Test
   @DisplayName("update must throws ActivityNotFoundException when id don't exists")
   void update_MustThrowsActivityNotFoundException_WhenIdDontExists() {
-    long activityId = 999L;
     String newName = "Finances REST API";
     String newDescription = "A simple Restful API for my portfolio";
     ActivityRequestBody activityToBeUpdated = new ActivityRequestBody(newName, newDescription);
 
     Assertions.assertThatExceptionOfType(ActivityNotFoundException.class)
-        .isThrownBy(() -> activityService.update(activityId, activityToBeUpdated))
-        .withMessage("Activity not found for id: " + activityId);
+        .isThrownBy(() -> activityService.update(NONEXISTING_ACTIVITY_ID, activityToBeUpdated))
+        .withMessage("Activity not found for id: " + NONEXISTING_ACTIVITY_ID);
   }
 
   @Test
   @DisplayName("delete must throws ActivityNotFoundException when id don't exists")
   void deleteById_MustThrowsActivityNotFoundException_WhenIdDontExists() {
-    long activityId = 999L;
-
     Assertions.assertThatExceptionOfType(ActivityNotFoundException.class)
-        .isThrownBy(() -> activityService.deleteById(activityId))
-        .withMessage("Activity not found for id: " + activityId);
+        .isThrownBy(() -> activityService.deleteById(NONEXISTING_ACTIVITY_ID))
+        .withMessage("Activity not found for id: " + NONEXISTING_ACTIVITY_ID);
   }
 
 }

@@ -1,10 +1,7 @@
 package br.com.emendes.timemanagerapi.model;
 
 import br.com.emendes.timemanagerapi.dto.request.ActivityRequestBody;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -24,6 +21,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 @Builder
 @Entity(name = "tb_activity")
 public class Activity {
