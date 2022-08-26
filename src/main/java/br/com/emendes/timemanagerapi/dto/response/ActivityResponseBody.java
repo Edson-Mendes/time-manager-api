@@ -4,17 +4,18 @@ import br.com.emendes.timemanagerapi.model.Activity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 
 import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
 public class ActivityResponseBody {
 
-  private Long id;
+  private long id;
   private String name;
   private String description;
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")

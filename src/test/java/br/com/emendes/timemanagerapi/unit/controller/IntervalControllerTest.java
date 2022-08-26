@@ -11,6 +11,7 @@ import br.com.emendes.timemanagerapi.util.creator.IntervalResponseBodyCreator;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
@@ -20,6 +21,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @ExtendWith(SpringExtension.class)
 @DisplayName("Unit tests for IntervalController")
@@ -40,23 +44,31 @@ class IntervalControllerTest {
     BDDMockito.when(intervalServiceMock.create(ACTIVITY_ID, IntervalRequestBodyCreator.validIntervalRequest()))
         .thenReturn(IntervalResponseBodyCreator.intervalRBForTests());
     BDDMockito.when(activityServiceMock.findById(ACTIVITY_ID))
-        .thenReturn(ActivityCreator.activityWithIdAndName(ACTIVITY_ID, "Lorem Ipsum Activity"));
+        .thenReturn(ActivityCreator.withIdAndName(ACTIVITY_ID, "Lorem Ipsum Activity"));
   }
 
-  @Test
-  @DisplayName("create must returns status 201 when created successful")
-  void create_MustReturnsStatus201_WhenCreatedSuccessful() {
-    IntervalRequestBody requestBody = IntervalRequestBodyCreator.validIntervalRequest();
-    ResponseEntity<IntervalResponseBody> response = intervalController.create(ACTIVITY_ID, requestBody, URI_BUILDER);
+  @Nested
+  @DisplayName("tests for create method")
+  class CreateMethod {
 
-    HttpStatus statusCode = response.getStatusCode();
-    IntervalResponseBody responseBody = response.getBody();
+    @Test
+    @DisplayName("create must returns status 201 when created successful")
+    void create_MustReturnsStatus201_WhenCreatedSuccessful() {
+      IntervalRequestBody requestBody = new IntervalRequestBody(
+          LocalDateTime.of(2022, 8, 16, 15, 7, 0),
+          LocalTime.of(0,30,0));
 
-    Assertions.assertThat(statusCode).isEqualByComparingTo(HttpStatus.CREATED);
-    Assertions.assertThat(responseBody).isNotNull();
-    Assertions.assertThat(responseBody.getId()).isEqualTo(100L);
-    Assertions.assertThat(responseBody.getStartedAt()).isEqualTo("2022-08-16T15:07:00");
-    Assertions.assertThat(responseBody.getElapsedTime()).isEqualTo("00:30:00");
+      ResponseEntity<IntervalResponseBody> response = intervalController.create(ACTIVITY_ID, requestBody, URI_BUILDER);
+      HttpStatus actualStatusCode = response.getStatusCode();
+      IntervalResponseBody actualResponseBody = response.getBody();
+
+      Assertions.assertThat(actualStatusCode).isEqualByComparingTo(HttpStatus.CREATED);
+      Assertions.assertThat(actualResponseBody).isNotNull();
+      Assertions.assertThat(actualResponseBody.getId()).isPositive();
+      Assertions.assertThat(actualResponseBody.getStartedAt()).isEqualTo("2022-08-16T15:07:00");
+      Assertions.assertThat(actualResponseBody.getElapsedTime()).isEqualTo("00:30:00");
+    }
+
   }
 
 }

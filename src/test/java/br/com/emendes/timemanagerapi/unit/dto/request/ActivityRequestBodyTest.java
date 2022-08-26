@@ -3,7 +3,10 @@ package br.com.emendes.timemanagerapi.unit.dto.request;
 import br.com.emendes.timemanagerapi.dto.request.ActivityRequestBody;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -14,94 +17,99 @@ import java.util.Set;
 class ActivityRequestBodyTest {
 
   private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-  private final String DESCRIPTION = "A simple project for my portfolio";
-  private final String NAME = "Finances API";
+  private final String VALID_DESCRIPTION = "A simple project for my portfolio";
+  private final String VALID_NAME = "Finances API";
 
-  @Test
-  @DisplayName("name must not returns violations when name is valid")
-  void name_MustNotReturnsViolations_WhenNameIsValid(){
-    String nameActivity = "Finances API";
-    ActivityRequestBody activityRequestBody =
-        new ActivityRequestBody(nameActivity, DESCRIPTION);
+  @Nested
+  @DisplayName("tests for name validation")
+  class NameValidation {
 
-    Set<ConstraintViolation<ActivityRequestBody>> violations = validator.validate(activityRequestBody);
+    @ParameterizedTest
+    @ValueSource(strings = {"Finances API", "F", "Lorem Ipsum Project"})
+    @DisplayName("validate name must not returns violations when name is valid")
+    void validateName_MustNotReturnsViolations_WhenNameIsValid(String activityName){
+      ActivityRequestBody activityRequestBody =
+          new ActivityRequestBody(activityName, VALID_DESCRIPTION);
 
-    Assertions.assertThat(violations).isEmpty();
+      Set<ConstraintViolation<ActivityRequestBody>> violations = validator.validate(activityRequestBody);
+
+      Assertions.assertThat(violations).isEmpty();
+    }
+
+    @Test
+    @DisplayName("validate name must returns violations when name is null")
+    void validateName_MustReturnsViolations_WhenNameIsNull(){
+      ActivityRequestBody activityRequestBody =
+          new ActivityRequestBody(null, VALID_DESCRIPTION);
+
+      Set<ConstraintViolation<ActivityRequestBody>> violations = validator.validate(activityRequestBody);
+
+      Assertions.assertThat(violations)
+          .isNotEmpty()
+          .hasSize(1);
+      Assertions.assertThat(violations.stream().findFirst().get().getMessage())
+          .isEqualTo("name must not be null or blank");
+    }
+
+    @Test
+    @DisplayName("validate name must returns violations when name is empty")
+    void validateName_MustReturnsViolations_WhenNameIsEmpty(){
+      ActivityRequestBody activityRequestBody =
+          new ActivityRequestBody("", VALID_DESCRIPTION);
+
+      Set<ConstraintViolation<ActivityRequestBody>> violations = validator.validate(activityRequestBody);
+
+      Assertions.assertThat(violations).isNotEmpty().hasSize(1);
+      Assertions.assertThat(violations.stream().findFirst().get().getMessage())
+          .isEqualTo("name must not be null or blank");
+    }
+
   }
 
-  @Test
-  @DisplayName("name must returns violations when name is null")
-  void name_MustReturnsViolations_WhenNameIsNull(){
-    String nameActivity = null;
-    ActivityRequestBody activityRequestBody =
-        new ActivityRequestBody(nameActivity, DESCRIPTION);
+  @Nested
+  @DisplayName("tests for description validation")
+  class DescriptionValidation {
 
-    Set<ConstraintViolation<ActivityRequestBody>> violations = validator.validate(activityRequestBody);
+    @ParameterizedTest
+    @ValueSource(strings = {"A simple project for my portfolio", "description", "d"})
+    @DisplayName("validate description must not returns violations when name is valid")
+    void validateDescription_MustNotReturnsViolations_WhenDescriptionIsValid(String description){
+      ActivityRequestBody activityRequestBody =
+          new ActivityRequestBody(VALID_NAME, description);
 
-    Assertions.assertThat(violations)
-        .isNotEmpty()
-        .hasSize(1);
-    Assertions.assertThat(violations.stream().findFirst().get().getMessage())
-        .isEqualTo("name must not be null or blank");
-  }
+      Set<ConstraintViolation<ActivityRequestBody>> violations = validator.validate(activityRequestBody);
 
-  @Test
-  @DisplayName("name must returns violations when name is empty")
-  void name_MustReturnsViolations_WhenNameIsEmpty(){
-    String nameActivity = "";
-    ActivityRequestBody activityRequestBody =
-        new ActivityRequestBody(nameActivity, DESCRIPTION);
+      Assertions.assertThat(violations).isEmpty();
+    }
 
-    Set<ConstraintViolation<ActivityRequestBody>> violations = validator.validate(activityRequestBody);
+    @Test
+    @DisplayName("validate description must returns violations when description is null")
+    void validateDescription_MustReturnsViolations_WhenDescriptionIsNull(){
+      ActivityRequestBody activityRequestBody =
+          new ActivityRequestBody(VALID_NAME, null);
 
-    Assertions.assertThat(violations)
-        .isNotEmpty()
-        .hasSize(1);
-    Assertions.assertThat(violations.stream().findFirst().get().getMessage())
-        .isEqualTo("name must not be null or blank");
-  }
-  @Test
-  @DisplayName("description must not returns violations when name is valid")
-  void description_MustNotReturnsViolations_WhenDescriptionIsValid(){
-    String description = "A simple project for my portfolio";
-    ActivityRequestBody activityRequestBody =
-        new ActivityRequestBody(NAME, description);
+      Set<ConstraintViolation<ActivityRequestBody>> violations = validator.validate(activityRequestBody);
 
-    Set<ConstraintViolation<ActivityRequestBody>> violations = validator.validate(activityRequestBody);
+      Assertions.assertThat(violations).isNotEmpty().hasSize(1);
+      Assertions.assertThat(violations.stream().findFirst().get().getMessage())
+          .isEqualTo("description must not be null or blank");
+    }
 
-    Assertions.assertThat(violations).isEmpty();
-  }
+    @Test
+    @DisplayName("validate description must returns violations when description is empty")
+    void validateDescription_MustReturnsViolations_WhenDescriptionIsEmpty(){
+      ActivityRequestBody activityRequestBody =
+          new ActivityRequestBody(VALID_NAME, "");
 
-  @Test
-  @DisplayName("description must returns violations when description is null")
-  void description_MustReturnsViolations_WhenDescriptionIsNull(){
-    String description = null;
-    ActivityRequestBody activityRequestBody =
-        new ActivityRequestBody(NAME, description);
+      Set<ConstraintViolation<ActivityRequestBody>> violations = validator.validate(activityRequestBody);
 
-    Set<ConstraintViolation<ActivityRequestBody>> violations = validator.validate(activityRequestBody);
+      Assertions.assertThat(violations)
+          .isNotEmpty()
+          .hasSize(1);
+      Assertions.assertThat(violations.stream().findFirst().get().getMessage())
+          .isEqualTo("description must not be null or blank");
+    }
 
-    Assertions.assertThat(violations)
-        .isNotEmpty()
-        .hasSize(1);
-    Assertions.assertThat(violations.stream().findFirst().get().getMessage())
-        .isEqualTo("description must not be null or blank");
-  }
-
-  @Test
-  @DisplayName("description must returns violations when description is empty")
-  void description_MustReturnsViolations_WhenDescriptionIsEmpty(){
-    String description = "";
-    ActivityRequestBody activityRequestBody =
-        new ActivityRequestBody(NAME, description);
-
-    Set<ConstraintViolation<ActivityRequestBody>> violations = validator.validate(activityRequestBody);
-
-    Assertions.assertThat(violations)
-        .isNotEmpty()
-        .hasSize(1);
-    Assertions.assertThat(violations.stream().findFirst().get().getMessage())
-        .isEqualTo("description must not be null or blank");
   }
 
 }

@@ -4,10 +4,11 @@ import br.com.emendes.timemanagerapi.controller.ActivityController;
 import br.com.emendes.timemanagerapi.dto.request.ActivityRequestBody;
 import br.com.emendes.timemanagerapi.dto.response.ActivityResponseBody;
 import br.com.emendes.timemanagerapi.service.ActivityService;
-import br.com.emendes.timemanagerapi.util.creator.ActivityCreator;
+import br.com.emendes.timemanagerapi.util.creator.ActivityResponseBodyCreator;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
@@ -31,97 +32,130 @@ class ActivityControllerTest {
   @Mock
   private ActivityService activityServiceMock;
   private final UriComponentsBuilder URI_BUILDER = UriComponentsBuilder.fromHttpUrl("http://localhost:8080");
-  private final ActivityRequestBody ACTIVITY_REQUEST_BODY =
+  private final ActivityRequestBody VALID_ACTIVITY_REQUEST_BODY =
       new ActivityRequestBody("Finances API", "A simple project for my portfolio");
-  private final Pageable PAGEABLE = PageRequest.of(0, 10, Sort.Direction.DESC, "createdAt");
+  private final Pageable DEFAULT_PAGEABLE = PageRequest.of(0, 10, Sort.Direction.DESC, "createdAt");
 
+//  Mocks de métodos/actions de activityServiceMock
   @BeforeEach
   public void setUp() {
-    ActivityResponseBody activityRB1 =
-        new ActivityResponseBody(ActivityCreator.activityWithIdAndName(1L, "Finances API"));
-    ActivityResponseBody activityRB2 =
-        new ActivityResponseBody(ActivityCreator.activityWithIdAndName(2L, "Transaction Analyzer"));
+    List<ActivityResponseBody> listActivityRespBody =
+        List.of(ActivityResponseBodyCreator.withIdAndName(1L, "Finances API"),
+            ActivityResponseBodyCreator.withIdAndName(2L, "Transaction Analyzer"));
 
-    BDDMockito.when(activityServiceMock.find(PAGEABLE))
-        .thenReturn(new PageImpl(List.of(activityRB1, activityRB2), PAGEABLE, 2));
-    BDDMockito.when(activityServiceMock.create(ACTIVITY_REQUEST_BODY)).thenReturn(activityRB1);
+    BDDMockito.when(activityServiceMock.find(DEFAULT_PAGEABLE))
+        .thenReturn(new PageImpl(listActivityRespBody, DEFAULT_PAGEABLE, 2));
+
+    BDDMockito.when(activityServiceMock.create(VALID_ACTIVITY_REQUEST_BODY))
+        .thenReturn(ActivityResponseBodyCreator
+            .withIdNameAndDescription(1L, "Finances API", "A simple project for my portfolio"));
+
     BDDMockito.doNothing().when(activityServiceMock)
         .update(ArgumentMatchers.anyLong(), ArgumentMatchers.any(ActivityRequestBody.class));
+
     BDDMockito.doNothing().when(activityServiceMock)
         .deleteById(ArgumentMatchers.anyLong());
   }
 
-  @Test
-  @DisplayName("find must returns status 200 when find successfully")
-  void find_MustReturnsStatus200_WhenFindSuccessful() {
-    HttpStatus statusCode = activityController.find(PAGEABLE).getStatusCode();
+  @Nested
+  @DisplayName("tests for find method")
+  class FindMethod {
 
-    Assertions.assertThat(statusCode).isEqualByComparingTo(HttpStatus.OK);
+    @Test
+    @DisplayName("find must returns status 200 when find successfully")
+    void find_MustReturnsStatus200_WhenFindSuccessfully() {
+      HttpStatus actualStatusCode = activityController.find(DEFAULT_PAGEABLE).getStatusCode();
+
+      Assertions.assertThat(actualStatusCode).isEqualByComparingTo(HttpStatus.OK);
+    }
+
+    @Test
+    @DisplayName("find must returns Page<ActivityResponseBody> when find successfully")
+    void find_MustReturnsPageActivityResponseBody_WhenFindSuccessful() {
+      Page<ActivityResponseBody> actualBody = activityController.find(DEFAULT_PAGEABLE).getBody();
+
+      ActivityResponseBody expectedActivityRespBody1 = ActivityResponseBodyCreator
+          .withIdAndName(1L, "Finances API");
+      ActivityResponseBody expectedActivityRespBody2 = ActivityResponseBodyCreator
+          .withIdAndName(2L, "Transaction Analyzer");
+
+      Assertions.assertThat(actualBody).isNotNull().isNotEmpty().hasSize(2);
+      Assertions.assertThat(actualBody.getContent())
+          .contains(expectedActivityRespBody1).contains(expectedActivityRespBody2);
+    }
+
   }
 
-  @Test
-  @DisplayName("find must returns Page<ActivityResponseBody> when find successfully")
-  void find_MustReturnsPageActivityResponseBody_WhenFindSuccessful() {
-    Page<ActivityResponseBody> body = activityController.find(PAGEABLE).getBody();
+  @Nested
+  @DisplayName("tests for create method")
+  class CreateMethod {
 
-    Assertions.assertThat(body).isNotNull().isNotEmpty();
-    Assertions.assertThat(body.getContent().get(0).getId()).isEqualTo(1L);
-    Assertions.assertThat(body.getContent().get(0).getName()).isEqualTo("Finances API");
-    Assertions.assertThat(body.getContent().get(1).getId()).isEqualTo(2L);
-    Assertions.assertThat(body.getContent().get(1).getName()).isEqualTo("Transaction Analyzer");
+    @Test
+    @DisplayName("create must return status 201 when created successful")
+    void create_MustReturnsStatus201_WhenCreatedSuccessful() {
+      HttpStatus actualStatusCode = activityController.create(VALID_ACTIVITY_REQUEST_BODY, URI_BUILDER)
+          .getStatusCode();
+
+      Assertions.assertThat(actualStatusCode).isEqualByComparingTo(HttpStatus.CREATED);
+    }
+
+    @Test
+    @DisplayName("create must returns ActivityResponseBody when created successful")
+    void create_MustReturnsActivityResponseBody_WhenCreatedSuccessful() {
+      ActivityResponseBody actualBody = activityController.create(VALID_ACTIVITY_REQUEST_BODY, URI_BUILDER).getBody();
+
+      Assertions.assertThat(actualBody).isNotNull();
+      Assertions.assertThat(actualBody.getId()).isEqualTo(1L);
+      Assertions.assertThat(actualBody.getName()).isEqualTo("Finances API");
+      Assertions.assertThat(actualBody.getDescription()).isEqualTo("A simple project for my portfolio");
+      Assertions.assertThat(actualBody.getCreatedAt()).isNotNull();
+      Assertions.assertThat(actualBody.isEnabled()).isTrue();
+    }
+
+    @Test
+    @DisplayName("create must returns path /activities/1 when created successful")
+    void create_MustReturnsPathActivities1_WhenCreatedSuccessful() {
+      URI actualUri = activityController.create(VALID_ACTIVITY_REQUEST_BODY, URI_BUILDER)
+          .getHeaders()
+          .getLocation();
+
+      Assertions.assertThat(actualUri).isNotNull();
+      Assertions.assertThat(actualUri.getPath()).isEqualTo("/activities/1");
+    }
+
   }
 
-  @Test
-  @DisplayName("create must return status 201 when created successful")
-  void create_MustReturnsStatus201_WhenCreatedSuccessful() {
-    HttpStatus statusCode = activityController.create(ACTIVITY_REQUEST_BODY, URI_BUILDER)
-        .getStatusCode();
+  @Nested
+  @DisplayName("tests for update method")
+  class UpdateMethod {
 
-    Assertions.assertThat(statusCode).isEqualByComparingTo(HttpStatus.CREATED);
+    @Test
+    @DisplayName("update must returns status 204 when updated successful")
+    void update_MustReturnsStatus204_WhenUpdatedSuccessful() {
+      ActivityRequestBody activityToBeUpdated = new ActivityRequestBody(
+          "Finances REST API", "A simple Restful API for my portfolio");
+
+      HttpStatus actualStatusCode = activityController.update(1L, activityToBeUpdated).getStatusCode();
+
+      Assertions.assertThat(actualStatusCode).isEqualByComparingTo(HttpStatus.NO_CONTENT);
+    }
+
   }
 
-  @Test
-  @DisplayName("create must returns ActivityResponseBody when created successful")
-  void create_MustReturnsActivityResponseBody_WhenCreatedSuccessful() {
-    ActivityResponseBody body = activityController.create(ACTIVITY_REQUEST_BODY, URI_BUILDER).getBody();
+  @Nested
+  @DisplayName("tests for delete method")
+  class DeleteMethod {
 
-    Assertions.assertThat(body).isNotNull();
-    Assertions.assertThat(body.getId()).isEqualTo(1L);
-    Assertions.assertThat(body.getName()).isEqualTo("Finances API");
-    Assertions.assertThat(body.getDescription()).isEqualTo("A simple project for my portfolio");
-    Assertions.assertThat(body.getCreatedAt()).isNotNull();
-    Assertions.assertThat(body.isEnabled()).isTrue();
+    @Test
+    @DisplayName("delete must returns status 204 when deleted successful")
+    void delete_MustReturnsStatus204_WhenDeletedSuccessful() {
+      long activityId = 1L;
+
+      HttpStatus actualStatusCode = activityController.delete(activityId).getStatusCode();
+
+      Assertions.assertThat(actualStatusCode).isEqualByComparingTo(HttpStatus.NO_CONTENT);
+    }
+
   }
 
-  @Test
-  @DisplayName("create must returns path /activities/1 when created successful")
-  void create_MustReturnsPathActivities1_WhenCreatedSuccessful() {
-    URI uri = activityController.create(ACTIVITY_REQUEST_BODY, URI_BUILDER)
-        .getHeaders()
-        .getLocation();
-
-    Assertions.assertThat(uri).isNotNull();
-    Assertions.assertThat(uri.getPath()).isEqualTo("/activities/1");
-  }
-
-  @Test
-  @DisplayName("update must returns status 204 when updated successful")
-  void update_MustReturnsStatus204_WhenUpdatedSuccessful() {
-    Long activityId = 1L;
-    String newName = "Finances REST API";
-    String newDescription = "A simple Restful API for my portfolio";
-    ActivityRequestBody activityToBeUpdated = new ActivityRequestBody(newName, newDescription);
-    HttpStatus statusCode = activityController.update(activityId, activityToBeUpdated).getStatusCode();
-
-    Assertions.assertThat(statusCode).isEqualByComparingTo(HttpStatus.NO_CONTENT);
-  }
-
-  @Test
-  @DisplayName("delete must returns status 204 when deleted successful")
-  void delete_MustReturnsStatus204_WhenDeletedSuccessful() {
-    Long activityId = 1L;
-    HttpStatus statusCode = activityController.delete(activityId).getStatusCode();
-
-    Assertions.assertThat(statusCode).isEqualByComparingTo(HttpStatus.NO_CONTENT);
-  }
 }

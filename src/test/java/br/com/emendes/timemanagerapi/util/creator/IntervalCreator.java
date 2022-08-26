@@ -4,22 +4,22 @@ import br.com.emendes.timemanagerapi.model.Interval;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-
+// TODO: Não está sendo mais utilizado
 public class IntervalCreator {
-  public static Interval intervalToBeSavedTest() {
+  public static Interval withActivityIdStartedAtAndElapsedTime(long activityId, String startedAt, String elapsedTime) {
     return Interval.builder()
-        .activity(ActivityCreator.activityForTests())
-        .startedAt(LocalDateTime.of(2022, 8, 16, 15, 7, 0))
-        .elapsedTime(LocalTime.of(0,30,0))
+        .activity(ActivityCreator.withIdAndName(activityId, "Lorem Ipsum Activity"))
+        .startedAt(LocalDateTime.parse(startedAt))
+        .elapsedTime(LocalTime.parse(elapsedTime))
         .build();
   }
 
-  public static Interval intervalSavedTest() {
+  public static Interval withIdActivityIdStartedAtAndElapsedTime(long id, long activityId, String startedAt, String elapsedTime) {
     return Interval.builder()
-        .id(100L)
-        .startedAt(LocalDateTime.of(2022, 8, 16, 15, 7, 0))
-        .elapsedTime(LocalTime.of(0,30,0))
-        .activity(ActivityCreator.activityForTests())
+        .id(id)
+        .activity(ActivityCreator.withIdAndName(activityId, "Lorem Ipsum Activity"))
+        .startedAt(LocalDateTime.parse(startedAt))
+        .elapsedTime(LocalTime.parse(elapsedTime))
         .build();
   }
 }

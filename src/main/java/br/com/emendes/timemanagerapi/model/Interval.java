@@ -1,9 +1,6 @@
 package br.com.emendes.timemanagerapi.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -20,6 +17,7 @@ import java.time.LocalTime;
  */
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 @Builder
 @Data
 @Entity(name = "tb_interval")

@@ -6,17 +6,30 @@ import java.time.LocalDateTime;
 
 public class ActivityCreator {
 
-  public static Activity activityWithIdAndName(Long id, String name){
+  private static final LocalDateTime FIXED_DATE_TIME = LocalDateTime
+      .of(2022, 8, 23, 10,40,21);
+
+  public static Activity withIdAndName(Long id, String name){
     return Activity.builder()
         .id(id)
         .name(name)
         .description("A simple project for my portfolio")
-        .createdAt(LocalDateTime.now())
+        .createdAt(FIXED_DATE_TIME)
         .enabled(true)
         .build();
   }
 
-  public static Activity activityWithoutIdAndWithNameAndDescription(String name, String description){
+  public static Activity withIdNameAndDescription(long id, String name, String description) {
+    return Activity.builder()
+        .id(id)
+        .name(name)
+        .description(description)
+        .createdAt(FIXED_DATE_TIME)
+        .enabled(true)
+        .build();
+  }
+
+  public static Activity withoutIdAndWithNameAndDescription(String name, String description){
     return Activity.builder()
         .name(name)
         .description(description)

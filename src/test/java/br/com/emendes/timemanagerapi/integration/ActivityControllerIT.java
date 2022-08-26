@@ -39,9 +39,9 @@ class ActivityControllerIT {
   @Test
   @DisplayName("get for /activities must returns Page<ActivitiesResponseBody> when find successfully>")
   void getForActivities_MustReturnsListActivityResponseBody_WhenFindSuccessfully() {
-    Activity activityToBeSaved1 = ActivityCreator.activityWithoutIdAndWithNameAndDescription(
+    Activity activityToBeSaved1 = ActivityCreator.withoutIdAndWithNameAndDescription(
         "Finances API", "A simple project");
-    Activity activityToBeSaved2 = ActivityCreator.activityWithoutIdAndWithNameAndDescription(
+    Activity activityToBeSaved2 = ActivityCreator.withoutIdAndWithNameAndDescription(
         "Transaction Analyzer", "A simple project");
 
     activityRepository.save(activityToBeSaved1);
@@ -127,7 +127,7 @@ class ActivityControllerIT {
   void putForActivitiesId_MustReturnsStatus204_WhenUpdateSuccessfully() {
     Long id = 1L;
     String uri = ACTIVITIES_URI + "/" + id;
-    Activity activityToBeSaved = ActivityCreator.activityWithoutIdAndWithNameAndDescription(
+    Activity activityToBeSaved = ActivityCreator.withoutIdAndWithNameAndDescription(
         "Finances API", "A simple project");
     activityRepository.save(activityToBeSaved);
 
@@ -210,7 +210,7 @@ class ActivityControllerIT {
   void deleteForActivitiesId_MustReturnsStatus204AndDeleteActivity_WhenDeleteSuccessfully(){
     Long id = 1L;
     String uri = ACTIVITIES_URI + "/" + id;
-    Activity activityToBeSaved = ActivityCreator.activityWithoutIdAndWithNameAndDescription(
+    Activity activityToBeSaved = ActivityCreator.withoutIdAndWithNameAndDescription(
         "Finances API", "A simple project");
     activityRepository.save(activityToBeSaved);
 
