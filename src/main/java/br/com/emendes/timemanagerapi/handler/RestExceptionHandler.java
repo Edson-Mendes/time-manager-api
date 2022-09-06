@@ -3,6 +3,7 @@ package br.com.emendes.timemanagerapi.handler;
 import br.com.emendes.timemanagerapi.exception.ActivityNotFoundException;
 import br.com.emendes.timemanagerapi.dto.response.detail.ExceptionDetails;
 import br.com.emendes.timemanagerapi.dto.response.detail.ValidationExceptionDetails;
+import br.com.emendes.timemanagerapi.exception.IntervalNotFoundException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,13 +24,14 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
   @ExceptionHandler(ActivityNotFoundException.class)
   public ResponseEntity<ExceptionDetails> handleActivityNotFound(ActivityNotFoundException ex) {
+    ExceptionDetails responseBody = generateExceptionDetails(ex.getMessage());
 
-    ExceptionDetails responseBody = ExceptionDetails.builder()
-        .title("Bad Request")
-        .status(HttpStatus.BAD_REQUEST.value())
-        .timestamp(LocalDateTime.now())
-        .details(ex.getMessage())
-        .build();
+    return ResponseEntity.badRequest().body(responseBody);
+  }
+
+  @ExceptionHandler(IntervalNotFoundException.class)
+  public ResponseEntity<ExceptionDetails> handleIntervalNotFound(IntervalNotFoundException ex) {
+    ExceptionDetails responseBody = generateExceptionDetails(ex.getMessage());
 
     return ResponseEntity.badRequest().body(responseBody);
   }
@@ -37,12 +39,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
   @Override
   protected ResponseEntity<Object> handleHttpMessageNotReadable(
       HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-    ExceptionDetails responseBody = ExceptionDetails.builder()
-        .title("Bad Request")
-        .status(HttpStatus.BAD_REQUEST.value())
-        .timestamp(LocalDateTime.now())
-        .details(ex.getMessage())
-        .build();
+    ExceptionDetails responseBody = generateExceptionDetails(ex.getMessage());
 
     return ResponseEntity.badRequest().body(responseBody);
   }
@@ -67,4 +64,14 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     return ResponseEntity.badRequest().body(responseBody);
   }
+
+  private ExceptionDetails generateExceptionDetails(String ex) {
+    return ExceptionDetails.builder()
+        .title("Bad Request")
+        .status(HttpStatus.BAD_REQUEST.value())
+        .timestamp(LocalDateTime.now())
+        .details(ex)
+        .build();
+  }
+
 }

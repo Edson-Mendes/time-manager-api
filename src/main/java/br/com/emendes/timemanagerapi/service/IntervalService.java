@@ -2,6 +2,7 @@ package br.com.emendes.timemanagerapi.service;
 
 import br.com.emendes.timemanagerapi.dto.request.IntervalRequestBody;
 import br.com.emendes.timemanagerapi.dto.response.IntervalResponseBody;
+import br.com.emendes.timemanagerapi.exception.IntervalNotFoundException;
 import br.com.emendes.timemanagerapi.model.Interval;
 import br.com.emendes.timemanagerapi.repository.IntervalRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,4 +29,15 @@ public class IntervalService {
         activityService.findById(activityId), pageable);
     return intervalPage.map(IntervalResponseBody::new);
   }
+
+  public void delete(long activityId, long intervalId) {
+    activityService.findById(activityId);
+    intervalRepository.delete(findById(intervalId));
+  }
+
+  private Interval findById(long id){
+    return intervalRepository.findById(id).orElseThrow(
+        () -> new IntervalNotFoundException("Interval not found for id: " + id));
+  }
+
 }
