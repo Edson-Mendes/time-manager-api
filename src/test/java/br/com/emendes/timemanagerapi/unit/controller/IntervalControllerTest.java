@@ -136,5 +136,7 @@ class IntervalControllerTest {
 
       Assertions.assertThat(actualBody).isEmpty();
     }
+
   }
+
 }

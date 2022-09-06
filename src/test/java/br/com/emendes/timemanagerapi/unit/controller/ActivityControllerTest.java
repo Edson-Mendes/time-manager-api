@@ -33,22 +33,22 @@ class ActivityControllerTest {
   private ActivityService activityServiceMock;
   private final UriComponentsBuilder URI_BUILDER = UriComponentsBuilder.fromHttpUrl("http://localhost:8080");
   private final ActivityRequestBody VALID_ACTIVITY_REQUEST_BODY =
-      new ActivityRequestBody("Finances API", "A simple project for my portfolio");
+      new ActivityRequestBody("Lorem Ipsum Activity", "A simple project for my portfolio");
   private final Pageable DEFAULT_PAGEABLE = PageRequest.of(0, 10, Sort.Direction.DESC, "createdAt");
 
 //  Mocks de métodos/actions de activityServiceMock
   @BeforeEach
   public void setUp() {
     List<ActivityResponseBody> listActivityRespBody =
-        List.of(ActivityResponseBodyCreator.withIdAndName(1L, "Finances API"),
-            ActivityResponseBodyCreator.withIdAndName(2L, "Transaction Analyzer"));
+        List.of(ActivityResponseBodyCreator.withIdAndName(1L, "Lorem Ipsum Activity"),
+            ActivityResponseBodyCreator.withIdAndName(2L, "XPTO Activity"));
 
     BDDMockito.when(activityServiceMock.find(DEFAULT_PAGEABLE))
-        .thenReturn(new PageImpl(listActivityRespBody, DEFAULT_PAGEABLE, 2));
+        .thenReturn(new PageImpl<>(listActivityRespBody, DEFAULT_PAGEABLE, 2));
 
     BDDMockito.when(activityServiceMock.create(VALID_ACTIVITY_REQUEST_BODY))
         .thenReturn(ActivityResponseBodyCreator
-            .withIdNameAndDescription(1L, "Finances API", "A simple project for my portfolio"));
+            .withIdNameAndDescription(1L, "Lorem Ipsum Activity", "A simple project for my portfolio"));
 
     BDDMockito.doNothing().when(activityServiceMock)
         .update(ArgumentMatchers.anyLong(), ArgumentMatchers.any(ActivityRequestBody.class));
@@ -62,22 +62,22 @@ class ActivityControllerTest {
   class FindMethod {
 
     @Test
-    @DisplayName("find must returns status 200 when find successfully")
-    void find_MustReturnsStatus200_WhenFindSuccessfully() {
+    @DisplayName("find must returns status 200 when found successfully")
+    void find_MustReturnsStatus200_WhenFoundSuccessfully() {
       HttpStatus actualStatusCode = activityController.find(DEFAULT_PAGEABLE).getStatusCode();
 
       Assertions.assertThat(actualStatusCode).isEqualByComparingTo(HttpStatus.OK);
     }
 
     @Test
-    @DisplayName("find must returns Page<ActivityResponseBody> when find successfully")
-    void find_MustReturnsPageActivityResponseBody_WhenFindSuccessful() {
+    @DisplayName("find must returns Page<ActivityResponseBody> when found successfully")
+    void find_MustReturnsPageActivityResponseBody_WhenFoundSuccessfully() {
       Page<ActivityResponseBody> actualBody = activityController.find(DEFAULT_PAGEABLE).getBody();
 
       ActivityResponseBody expectedActivityRespBody1 = ActivityResponseBodyCreator
-          .withIdAndName(1L, "Finances API");
+          .withIdAndName(1L, "Lorem Ipsum Activity");
       ActivityResponseBody expectedActivityRespBody2 = ActivityResponseBodyCreator
-          .withIdAndName(2L, "Transaction Analyzer");
+          .withIdAndName(2L, "XPTO Activity");
 
       Assertions.assertThat(actualBody).isNotNull().isNotEmpty().hasSize(2);
       Assertions.assertThat(actualBody.getContent())
@@ -91,8 +91,8 @@ class ActivityControllerTest {
   class CreateMethod {
 
     @Test
-    @DisplayName("create must return status 201 when created successful")
-    void create_MustReturnsStatus201_WhenCreatedSuccessful() {
+    @DisplayName("create must return status 201 when created successfully")
+    void create_MustReturnsStatus201_WhenCreatedSuccessfully() {
       HttpStatus actualStatusCode = activityController.create(VALID_ACTIVITY_REQUEST_BODY, URI_BUILDER)
           .getStatusCode();
 
@@ -100,21 +100,21 @@ class ActivityControllerTest {
     }
 
     @Test
-    @DisplayName("create must returns ActivityResponseBody when created successful")
-    void create_MustReturnsActivityResponseBody_WhenCreatedSuccessful() {
+    @DisplayName("create must returns ActivityResponseBody when created successfully")
+    void create_MustReturnsActivityResponseBody_WhenCreatedSuccessfully() {
       ActivityResponseBody actualBody = activityController.create(VALID_ACTIVITY_REQUEST_BODY, URI_BUILDER).getBody();
 
       Assertions.assertThat(actualBody).isNotNull();
       Assertions.assertThat(actualBody.getId()).isEqualTo(1L);
-      Assertions.assertThat(actualBody.getName()).isEqualTo("Finances API");
+      Assertions.assertThat(actualBody.getName()).isEqualTo("Lorem Ipsum Activity");
       Assertions.assertThat(actualBody.getDescription()).isEqualTo("A simple project for my portfolio");
       Assertions.assertThat(actualBody.getCreatedAt()).isNotNull();
       Assertions.assertThat(actualBody.isEnabled()).isTrue();
     }
 
     @Test
-    @DisplayName("create must returns path /activities/1 when created successful")
-    void create_MustReturnsPathActivities1_WhenCreatedSuccessful() {
+    @DisplayName("create must returns path /activities/1 when created successfully")
+    void create_MustReturnsPathActivities1_WhenCreatedSuccessfully() {
       URI actualUri = activityController.create(VALID_ACTIVITY_REQUEST_BODY, URI_BUILDER)
           .getHeaders()
           .getLocation();
@@ -130,8 +130,8 @@ class ActivityControllerTest {
   class UpdateMethod {
 
     @Test
-    @DisplayName("update must returns status 204 when updated successful")
-    void update_MustReturnsStatus204_WhenUpdatedSuccessful() {
+    @DisplayName("update must returns status 204 when updated successfully")
+    void update_MustReturnsStatus204_WhenUpdatedSuccessfully() {
       ActivityRequestBody activityToBeUpdated = new ActivityRequestBody(
           "Finances REST API", "A simple Restful API for my portfolio");
 
@@ -147,8 +147,8 @@ class ActivityControllerTest {
   class DeleteMethod {
 
     @Test
-    @DisplayName("delete must returns status 204 when deleted successful")
-    void delete_MustReturnsStatus204_WhenDeletedSuccessful() {
+    @DisplayName("delete must returns status 204 when deleted successfully")
+    void delete_MustReturnsStatus204_WhenDeletedSuccessfully() {
       long activityId = 1L;
 
       HttpStatus actualStatusCode = activityController.delete(activityId).getStatusCode();

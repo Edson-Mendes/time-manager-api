@@ -34,7 +34,7 @@ class ActivityServiceTest {
   private ActivityRepository activityRepositoryMock;
 
   private final ActivityRequestBody VALID_ACTIVITY_REQUEST_BODY =
-      new ActivityRequestBody("Finances API", "A simple project for my portfolio");
+      new ActivityRequestBody("Lorem Ipsum Activity", "A simple project for my portfolio");
   private final Pageable DEFAULT_PAGEABLE = PageRequest.of(0, 10, Sort.Direction.DESC, "createdAt");
   private final long NONEXISTENT_ACTIVITY_ID = 9999L;
 
@@ -42,15 +42,15 @@ class ActivityServiceTest {
   @BeforeEach
   public void setUp() {
     List<Activity> activities = List.of(
-        ActivityCreator.withIdAndName(1L, "Finances API"),
-        ActivityCreator.withIdAndName(2L, "Transaction Analyzer"));
+        ActivityCreator.withIdAndName(1L, "Lorem Ipsum Activity"),
+        ActivityCreator.withIdAndName(2L, "XPTO Activity"));
     Page<Activity> activitiesPage = new PageImpl<>(activities, DEFAULT_PAGEABLE, 2);
 
     BDDMockito.when(activityRepositoryMock.findAll(DEFAULT_PAGEABLE)).thenReturn(activitiesPage);
 
     BDDMockito.when(activityRepositoryMock.save(ArgumentMatchers.any(Activity.class)))
         .thenReturn(ActivityCreator
-            .withIdNameAndDescription(1L, "Finances API", "A simple project for my portfolio"));
+            .withIdNameAndDescription(1L, "Lorem Ipsum Activity", "A simple project for my portfolio"));
 
     BDDMockito.when(activityRepositoryMock.findById(NONEXISTENT_ACTIVITY_ID)).thenReturn(Optional.empty());
   }
@@ -69,8 +69,8 @@ class ActivityServiceTest {
           .isNotEmpty()
           .hasSize(2);
       Assertions.assertThat(actualListActivityResponse)
-          .contains(ActivityResponseBodyCreator.withIdAndName(1L, "Finances API"))
-          .contains(ActivityResponseBodyCreator.withIdAndName(2L, "Transaction Analyzer"));
+          .contains(ActivityResponseBodyCreator.withIdAndName(1L, "Lorem Ipsum Activity"))
+          .contains(ActivityResponseBodyCreator.withIdAndName(2L, "XPTO Activity"));
     }
 
     @Test
@@ -92,11 +92,11 @@ class ActivityServiceTest {
     @Test
     @DisplayName("findById must returns Activity when found successful")
     void findById_MustReturnsActivity_WhenFoundSuccessful(){
-      Activity activityToBeFound = ActivityCreator.withIdAndName(1L, "Finances API");
+      Activity activityToBeFound = ActivityCreator.withIdAndName(1L, "Lorem Ipsum Activity");
       BDDMockito.when(activityRepositoryMock.findById(1L)).thenReturn(Optional.of(activityToBeFound));
 
       Activity actualActivityFound = activityService.findById(1L);
-      Activity expectedActivityFound = ActivityCreator.withIdAndName(1L, "Finances API");
+      Activity expectedActivityFound = ActivityCreator.withIdAndName(1L, "Lorem Ipsum Activity");
 
       Assertions.assertThat(actualActivityFound).isNotNull().isEqualTo(expectedActivityFound);
     }
@@ -126,7 +126,7 @@ class ActivityServiceTest {
           .isEqualTo(1L);
       Assertions.assertThat(actualActivityResponseBody.getName())
           .isNotNull()
-          .isEqualTo("Finances API");
+          .isEqualTo("Lorem Ipsum Activity");
     }
 
   }
