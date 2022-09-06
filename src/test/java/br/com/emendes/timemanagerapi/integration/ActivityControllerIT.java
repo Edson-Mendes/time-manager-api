@@ -26,7 +26,7 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@DisplayName("Integrations tests for /activities")
+@DisplayName("Integration tests for /activities")
 class ActivityControllerIT {
 
   @Autowired
@@ -49,83 +49,85 @@ class ActivityControllerIT {
 
 
     ResponseEntity<PageableResponse<ActivityResponseBody>> responseEntity = testRestTemplate.exchange(
-        ACTIVITIES_URI, HttpMethod.GET, null, new ParameterizedTypeReference<>() {});
-    HttpStatus responseStatus = responseEntity.getStatusCode();
-    Page<ActivityResponseBody> responseBody = responseEntity.getBody();
+        ACTIVITIES_URI, HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+        });
+    HttpStatus actualStatus = responseEntity.getStatusCode();
+    Page<ActivityResponseBody> actualBody = responseEntity.getBody();
 
-    Assertions.assertThat(responseStatus).isEqualByComparingTo(HttpStatus.OK);
-    Assertions.assertThat(responseBody).isNotNull().hasSize(2);
-    Assertions.assertThat(responseBody.getContent().get(0).getName()).isEqualTo("Finances API");
-    Assertions.assertThat(responseBody.getContent().get(1).getName()).isEqualTo("Transaction Analyzer");
-    Assertions.assertThat(responseBody.getContent().get(0).getDescription()).isEqualTo("A simple project");
-    Assertions.assertThat(responseBody.getContent().get(1).getDescription()).isEqualTo("A simple project");
+    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.OK);
+    Assertions.assertThat(actualBody).isNotNull().hasSize(2);
+    Assertions.assertThat(actualBody.getContent().get(0).getName()).isEqualTo("Finances API");
+    Assertions.assertThat(actualBody.getContent().get(1).getName()).isEqualTo("Transaction Analyzer");
+    Assertions.assertThat(actualBody.getContent().get(0).getDescription()).isEqualTo("A simple project");
+    Assertions.assertThat(actualBody.getContent().get(1).getDescription()).isEqualTo("A simple project");
   }
 
   @Test
   @DisplayName("get for /activities must returns ExceptionDetails when hasn't activities>")
   void getForActivities_MustReturnsExceptionDetails_WhenHasntActivities() {
     ResponseEntity<ExceptionDetails> responseEntity = testRestTemplate.exchange(
-        ACTIVITIES_URI, HttpMethod.GET, null, new ParameterizedTypeReference<>() {});
+        ACTIVITIES_URI, HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+        });
 
-    HttpStatus responseStatus = responseEntity.getStatusCode();
-    ExceptionDetails responseBody = responseEntity.getBody();
+    HttpStatus actualStatus = responseEntity.getStatusCode();
+    ExceptionDetails actualBody = responseEntity.getBody();
 
-    Assertions.assertThat(responseStatus).isEqualByComparingTo(HttpStatus.BAD_REQUEST);
-    Assertions.assertThat(responseBody).isNotNull();
-    Assertions.assertThat(responseBody.getStatus()).isEqualTo(400);
-    Assertions.assertThat(responseBody.getTitle()).isEqualTo("Bad Request");
-    Assertions.assertThat(responseBody.getDetails()).isEqualTo("Não possui atividades");
+    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.BAD_REQUEST);
+    Assertions.assertThat(actualBody).isNotNull();
+    Assertions.assertThat(actualBody.getStatus()).isEqualTo(400);
+    Assertions.assertThat(actualBody.getTitle()).isEqualTo("Bad Request");
+    Assertions.assertThat(actualBody.getDetails()).isEqualTo("Não possui atividades");
   }
 
   @Test
   @DisplayName("post for /activities must returns ActivityResponseBody when save successfully")
   void postForActivities_MustReturnsActivityResponseBody_WhenSaveSuccessfully() {
     ActivityRequestBody body = new ActivityRequestBody("Finances API", "A simple project");
-    HttpEntity requestEntity = new HttpEntity(body);
+    HttpEntity<ActivityRequestBody> requestEntity = new HttpEntity<>(body);
     ResponseEntity<ActivityResponseBody> responseEntity = testRestTemplate.exchange(
         ACTIVITIES_URI, HttpMethod.POST,
         requestEntity, new ParameterizedTypeReference<>() {
         });
 
-    HttpStatus responseStatus = responseEntity.getStatusCode();
-    ActivityResponseBody responseBody = responseEntity.getBody();
+    HttpStatus actualStatus = responseEntity.getStatusCode();
+    ActivityResponseBody actualBody = responseEntity.getBody();
 
-    Assertions.assertThat(responseStatus).isEqualByComparingTo(HttpStatus.CREATED);
-    Assertions.assertThat(responseBody).isNotNull();
-    Assertions.assertThat(responseBody.getId()).isNotNull().isEqualTo(1L);
-    Assertions.assertThat(responseBody.getName()).isEqualTo("Finances API");
-    Assertions.assertThat(responseBody.getDescription()).isEqualTo("A simple project");
-    Assertions.assertThat(responseBody.isEnabled()).isTrue();
+    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.CREATED);
+    Assertions.assertThat(actualBody).isNotNull();
+    Assertions.assertThat(actualBody.getId()).isEqualTo(1L);
+    Assertions.assertThat(actualBody.getName()).isEqualTo("Finances API");
+    Assertions.assertThat(actualBody.getDescription()).isEqualTo("A simple project");
+    Assertions.assertThat(actualBody.isEnabled()).isTrue();
   }
 
   @Test
   @DisplayName("post for /activities must returns ValidationExceptionDetails when save fails")
   void postForActivities_MustReturnsValidationExceptionDetails_WhenSaveFails() {
     ActivityRequestBody body = new ActivityRequestBody("", null);
-    HttpEntity requestEntity = new HttpEntity(body);
+    HttpEntity<ActivityRequestBody> requestEntity = new HttpEntity<>(body);
     ResponseEntity<ValidationExceptionDetails> responseEntity = testRestTemplate.exchange(
         ACTIVITIES_URI, HttpMethod.POST,
         requestEntity, new ParameterizedTypeReference<>() {
         });
 
-    HttpStatus responseStatus = responseEntity.getStatusCode();
-    ValidationExceptionDetails responseBody = responseEntity.getBody();
+    HttpStatus actualStatus = responseEntity.getStatusCode();
+    ValidationExceptionDetails actualBody = responseEntity.getBody();
 
-    Assertions.assertThat(responseStatus).isEqualByComparingTo(HttpStatus.BAD_REQUEST);
-    Assertions.assertThat(responseBody).isNotNull();
-    Assertions.assertThat(responseBody.getTitle()).isEqualTo("Bad Request");
-    Assertions.assertThat(responseBody.getDetails()).isEqualTo("Invalid field(s)");
-    Assertions.assertThat(responseBody.getStatus()).isEqualTo(400);
-    Assertions.assertThat(responseBody.getFields()).contains("name");
-    Assertions.assertThat(responseBody.getFields()).contains("description");
-    Assertions.assertThat(responseBody.getMessages()).contains("name must not be null or blank");
-    Assertions.assertThat(responseBody.getMessages()).contains("description must not be null or blank");
+    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.BAD_REQUEST);
+    Assertions.assertThat(actualBody).isNotNull();
+    Assertions.assertThat(actualBody.getTitle()).isEqualTo("Bad Request");
+    Assertions.assertThat(actualBody.getDetails()).isEqualTo("Invalid field(s)");
+    Assertions.assertThat(actualBody.getStatus()).isEqualTo(400);
+    Assertions.assertThat(actualBody.getFields()).contains("name");
+    Assertions.assertThat(actualBody.getFields()).contains("description");
+    Assertions.assertThat(actualBody.getMessages()).contains("name must not be null or blank");
+    Assertions.assertThat(actualBody.getMessages()).contains("description must not be null or blank");
   }
 
   @Test
   @DisplayName("put for /activities/{id} must returns status 204 when update successfully")
   void putForActivitiesId_MustReturnsStatus204_WhenUpdateSuccessfully() {
-    Long id = 1L;
+    long id = 1L;
     String uri = ACTIVITIES_URI + "/" + id;
     Activity activityToBeSaved = ActivityCreator.withoutIdAndWithNameAndDescription(
         "Finances API", "A simple project");
@@ -135,80 +137,80 @@ class ActivityControllerIT {
     String activityDescription = "A simple project";
     ActivityRequestBody activityToBeUpdated = new ActivityRequestBody(activityName, activityDescription);
 
-    HttpEntity<ActivityRequestBody> requestEntity = new HttpEntity(activityToBeUpdated);
+    HttpEntity<ActivityRequestBody> requestEntity = new HttpEntity<>(activityToBeUpdated);
 
     ResponseEntity<Void> response = testRestTemplate.exchange(
         uri, HttpMethod.PUT, requestEntity,
-        new ParameterizedTypeReference<>() {});
+        new ParameterizedTypeReference<>() {
+        });
 
-    HttpStatus responseStatus = response.getStatusCode();
+    HttpStatus actualStatus = response.getStatusCode();
 
-    Assertions.assertThat(responseStatus).isEqualByComparingTo(HttpStatus.NO_CONTENT);
+    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.NO_CONTENT);
     Assertions.assertThat(response.getBody()).isNull();
   }
 
   @Test
   @DisplayName("put for /activities/{id} must returns ExceptionDetails when activity don't exists")
   void putForActivitiesId_MustReturnsExceptionDetails_WhenActivityDontExists() {
-    Long id = 999L;
+    long id = 999L;
     String uri = ACTIVITIES_URI + "/" + id;
 
     String activityName = "Finances Rest API";
     String activityDescription = "A simple project";
     ActivityRequestBody activityToBeUpdated = new ActivityRequestBody(activityName, activityDescription);
 
-    HttpEntity<ActivityRequestBody> requestEntity = new HttpEntity(activityToBeUpdated);
+    HttpEntity<ActivityRequestBody> requestEntity = new HttpEntity<>(activityToBeUpdated);
 
     ResponseEntity<ExceptionDetails> response = testRestTemplate.exchange(
         uri, HttpMethod.PUT, requestEntity,
-        new ParameterizedTypeReference<>() {});
+        new ParameterizedTypeReference<>() {
+        });
 
-    HttpStatus responseStatus = response.getStatusCode();
-    ExceptionDetails responseBody = response.getBody();
+    HttpStatus actualStatus = response.getStatusCode();
+    ExceptionDetails actualBody = response.getBody();
 
-    Assertions.assertThat(responseStatus).isEqualByComparingTo(HttpStatus.BAD_REQUEST);
-    Assertions.assertThat(responseBody).isNotNull();
-    Assertions.assertThat(responseBody.getTitle()).isEqualTo("Bad Request");
-    Assertions.assertThat(responseBody.getStatus()).isEqualTo(400);
-    Assertions.assertThat(responseBody.getDetails()).isEqualTo("Activity not found for id: " + id);
+    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.BAD_REQUEST);
+    Assertions.assertThat(actualBody).isNotNull();
+    Assertions.assertThat(actualBody.getTitle()).isEqualTo("Bad Request");
+    Assertions.assertThat(actualBody.getStatus()).isEqualTo(400);
+    Assertions.assertThat(actualBody.getDetails()).isEqualTo("Activity not found for id: " + id);
   }
 
   @Test
   @DisplayName("put for /activities/{id} must returns ValidationExceptionDetails when request body is invalid")
   void putForActivitiesId_MustReturnsValidationExceptionDetails_WhenRequestBodyIsInvalid() {
-    Long id = 999L;
+    long id = 999L;
     String uri = ACTIVITIES_URI + "/" + id;
+    ActivityRequestBody activityToBeUpdated = new ActivityRequestBody("", null);
 
-    String activityName = "";
-    String activityDescription = null;
-    ActivityRequestBody activityToBeUpdated = new ActivityRequestBody(activityName, activityDescription);
-
-    HttpEntity<ActivityRequestBody> requestEntity = new HttpEntity(activityToBeUpdated);
+    HttpEntity<ActivityRequestBody> requestEntity = new HttpEntity<>(activityToBeUpdated);
 
     ResponseEntity<ValidationExceptionDetails> response = testRestTemplate.exchange(
         uri, HttpMethod.PUT, requestEntity,
-        new ParameterizedTypeReference<>() {});
+        new ParameterizedTypeReference<>() {
+        });
 
-    HttpStatus responseStatus = response.getStatusCode();
-    ValidationExceptionDetails responseBody = response.getBody();
+    HttpStatus actualStatus = response.getStatusCode();
+    ValidationExceptionDetails actualBody = response.getBody();
 
-    Assertions.assertThat(responseStatus).isEqualByComparingTo(HttpStatus.BAD_REQUEST);
-    Assertions.assertThat(responseBody).isNotNull();
-    Assertions.assertThat(responseBody.getTitle()).isEqualTo("Bad Request");
-    Assertions.assertThat(responseBody.getStatus()).isEqualTo(400);
-    Assertions.assertThat(responseBody.getDetails()).isEqualTo("Invalid field(s)");
-    Assertions.assertThat(responseBody.getFields())
+    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.BAD_REQUEST);
+    Assertions.assertThat(actualBody).isNotNull();
+    Assertions.assertThat(actualBody.getTitle()).isEqualTo("Bad Request");
+    Assertions.assertThat(actualBody.getStatus()).isEqualTo(400);
+    Assertions.assertThat(actualBody.getDetails()).isEqualTo("Invalid field(s)");
+    Assertions.assertThat(actualBody.getFields())
         .contains("name")
         .contains("description");
-    Assertions.assertThat(responseBody.getMessages())
+    Assertions.assertThat(actualBody.getMessages())
         .contains("name must not be null or blank")
         .contains("description must not be null or blank");
   }
 
   @Test
   @DisplayName("delete for /activities/{id} must returns status 204 and delete activity when delete successfully")
-  void deleteForActivitiesId_MustReturnsStatus204AndDeleteActivity_WhenDeleteSuccessfully(){
-    Long id = 1L;
+  void deleteForActivitiesId_MustReturnsStatus204AndDeleteActivity_WhenDeleteSuccessfully() {
+    long id = 1L;
     String uri = ACTIVITIES_URI + "/" + id;
     Activity activityToBeSaved = ActivityCreator.withoutIdAndWithNameAndDescription(
         "Finances API", "A simple project");
@@ -216,32 +218,34 @@ class ActivityControllerIT {
 
     ResponseEntity<Void> response = testRestTemplate.exchange(
         uri, HttpMethod.DELETE, null,
-        new ParameterizedTypeReference<>() {});
+        new ParameterizedTypeReference<>() {
+        });
 
-    HttpStatus responseStatus = response.getStatusCode();
+    HttpStatus actualStatus = response.getStatusCode();
 
-    Assertions.assertThat(responseStatus).isEqualByComparingTo(HttpStatus.NO_CONTENT);
+    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.NO_CONTENT);
     Assertions.assertThat(response.getBody()).isNull();
   }
 
   @Test
   @DisplayName("delete for /activities/{id} must returns ExceptionDetails when activity don't exists")
   void deleteForActivitiesId_MustReturnsExceptionDetails_WhenActivityDontExists() {
-    Long id = 999L;
+    long id = 999L;
     String uri = ACTIVITIES_URI + "/" + id;
 
     ResponseEntity<ExceptionDetails> response = testRestTemplate.exchange(
         uri, HttpMethod.DELETE, null,
-        new ParameterizedTypeReference<>() {});
+        new ParameterizedTypeReference<>() {
+        });
 
-    HttpStatus responseStatus = response.getStatusCode();
-    ExceptionDetails responseBody = response.getBody();
+    HttpStatus actualStatus = response.getStatusCode();
+    ExceptionDetails actualBody = response.getBody();
 
-    Assertions.assertThat(responseStatus).isEqualByComparingTo(HttpStatus.BAD_REQUEST);
-    Assertions.assertThat(responseBody).isNotNull();
-    Assertions.assertThat(responseBody.getTitle()).isEqualTo("Bad Request");
-    Assertions.assertThat(responseBody.getStatus()).isEqualTo(400);
-    Assertions.assertThat(responseBody.getDetails()).isEqualTo("Activity not found for id: " + id);
+    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.BAD_REQUEST);
+    Assertions.assertThat(actualBody).isNotNull();
+    Assertions.assertThat(actualBody.getTitle()).isEqualTo("Bad Request");
+    Assertions.assertThat(actualBody.getStatus()).isEqualTo(400);
+    Assertions.assertThat(actualBody.getDetails()).isEqualTo("Activity not found for id: " + id);
   }
 
 }

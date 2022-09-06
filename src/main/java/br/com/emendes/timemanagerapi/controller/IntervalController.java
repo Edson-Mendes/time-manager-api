@@ -4,8 +4,17 @@ import br.com.emendes.timemanagerapi.dto.request.IntervalRequestBody;
 import br.com.emendes.timemanagerapi.dto.response.IntervalResponseBody;
 import br.com.emendes.timemanagerapi.service.IntervalService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
@@ -17,6 +26,13 @@ import java.net.URI;
 public class IntervalController {
 
   private final IntervalService intervalService;
+
+  @GetMapping
+  public ResponseEntity<Page<IntervalResponseBody>> find(
+      @PathVariable long activityId,
+      @PageableDefault(direction = Sort.Direction.DESC, sort = "startedAt") Pageable pageable){
+    return ResponseEntity.ok(intervalService.find(activityId, pageable));
+  }
 
   //  TODO: Fazer um handler para lidar com tentativa de converter algo que não seja long para long.
   @PostMapping

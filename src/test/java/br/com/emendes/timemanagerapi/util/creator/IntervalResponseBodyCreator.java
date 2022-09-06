@@ -13,4 +13,8 @@ public class IntervalResponseBodyCreator {
         LocalTime.of(0, 30, 0));
   }
 
+  public static IntervalResponseBody withIdAndStartedAtAndElapsedTime(long id, String startedAt, String elapsedTime){
+    return new IntervalResponseBody(id, LocalDateTime.parse(startedAt), LocalTime.parse(elapsedTime));
+  }
+
 }

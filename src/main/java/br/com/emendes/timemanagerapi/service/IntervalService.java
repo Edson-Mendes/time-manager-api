@@ -5,6 +5,8 @@ import br.com.emendes.timemanagerapi.dto.response.IntervalResponseBody;
 import br.com.emendes.timemanagerapi.model.Interval;
 import br.com.emendes.timemanagerapi.repository.IntervalRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -21,4 +23,9 @@ public class IntervalService {
     return new IntervalResponseBody(intervalSaved);
   }
 
+  public Page<IntervalResponseBody> find(long activityId, Pageable pageable) {
+    Page<Interval> intervalPage = intervalRepository.findByActivity(
+        activityService.findById(activityId), pageable);
+    return intervalPage.map(IntervalResponseBody::new);
+  }
 }

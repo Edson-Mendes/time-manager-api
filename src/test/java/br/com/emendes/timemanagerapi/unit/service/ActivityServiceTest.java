@@ -44,7 +44,7 @@ class ActivityServiceTest {
     List<Activity> activities = List.of(
         ActivityCreator.withIdAndName(1L, "Finances API"),
         ActivityCreator.withIdAndName(2L, "Transaction Analyzer"));
-    Page<Activity> activitiesPage = new PageImpl(activities, DEFAULT_PAGEABLE, 2);
+    Page<Activity> activitiesPage = new PageImpl<>(activities, DEFAULT_PAGEABLE, 2);
 
     BDDMockito.when(activityRepositoryMock.findAll(DEFAULT_PAGEABLE)).thenReturn(activitiesPage);
 
