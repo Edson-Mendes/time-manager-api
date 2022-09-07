@@ -30,6 +30,7 @@ public class IntervalService {
     return intervalPage.map(IntervalResponseBody::new);
   }
 
+  //  TODO: Pensar em por as três queries abaixo em uma única query.
   public void delete(long activityId, long intervalId) {
     activityService.findById(activityId);
     intervalRepository.delete(findById(intervalId));

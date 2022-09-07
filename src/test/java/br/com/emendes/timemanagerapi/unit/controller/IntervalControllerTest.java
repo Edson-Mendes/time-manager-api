@@ -40,6 +40,7 @@ class IntervalControllerTest {
 
   private final UriComponentsBuilder URI_BUILDER = UriComponentsBuilder.fromHttpUrl("http://localhost:8080");
   private final long EXISTENT_ACTIVITY_ID = 1L;
+  private final long EXISTENT_INTERVAL_ID = 1000000L;
   private final Pageable DEFAULT_PAGEABLE = PageRequest.of(0, 10, Sort.Direction.DESC, "startedAt");
 
   @BeforeEach
@@ -52,6 +53,7 @@ class IntervalControllerTest {
         .thenReturn(IntervalResponseBodyCreator.intervalRBForTests());
     BDDMockito.when(intervalServiceMock.find(EXISTENT_ACTIVITY_ID, DEFAULT_PAGEABLE))
             .thenReturn(intervalRespBodyPage);
+    BDDMockito.doNothing().when(intervalServiceMock).delete(EXISTENT_ACTIVITY_ID, EXISTENT_INTERVAL_ID);
 
     BDDMockito.when(activityServiceMock.findById(EXISTENT_ACTIVITY_ID))
         .thenReturn(ActivityCreator.withIdAndName(EXISTENT_ACTIVITY_ID, "Lorem Ipsum Activity"));
@@ -100,7 +102,7 @@ class IntervalControllerTest {
 
     @Test
     @DisplayName("find must returns status 200 when found successfully")
-    void find_MustReturnsStatus200_WhenFoundIntervalsSuccessfully(){
+    void find_MustReturnsStatus200_WhenFoundSuccessfully(){
       ResponseEntity<Page<IntervalResponseBody>> response = intervalController
           .find(EXISTENT_ACTIVITY_ID, DEFAULT_PAGEABLE);
       HttpStatus actualStatusCode = response.getStatusCode();
@@ -110,7 +112,7 @@ class IntervalControllerTest {
 
     @Test
     @DisplayName("find must returns ResponseEntity<Page<IntervalResponseBody>> when found successfuly")
-    void find_MustReturnsResponseEntityPageIntervalResponseBody_WhenFoundIntervalsSuccessfully(){
+    void find_MustReturnsResponseEntityPageIntervalResponseBody_WhenFoundSuccessfully(){
       ResponseEntity<Page<IntervalResponseBody>> response = intervalController
           .find(EXISTENT_ACTIVITY_ID, DEFAULT_PAGEABLE);
       Page<IntervalResponseBody> actualBody = response.getBody();
@@ -135,6 +137,22 @@ class IntervalControllerTest {
       Page<IntervalResponseBody> actualBody = response.getBody();
 
       Assertions.assertThat(actualBody).isEmpty();
+    }
+
+  }
+
+  @Nested
+  @DisplayName("tests for delete method")
+  class DeleteMethod {
+
+    @Test
+    @DisplayName("delete must returns status 204 when deleted successfully")
+    void delete_MustReturnsStatus204_WhenDeletedSuccessfully(){
+      ResponseEntity<Void> response = intervalController
+          .delete(EXISTENT_ACTIVITY_ID, EXISTENT_INTERVAL_ID);
+      HttpStatus actualStatusCode = response.getStatusCode();
+
+      Assertions.assertThat(actualStatusCode).isEqualByComparingTo(HttpStatus.NO_CONTENT);
     }
 
   }
