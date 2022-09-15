@@ -2,7 +2,8 @@
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/time-manager-db
+#    url: jdbc:postgresql://localhost:5432/time-manager-db
+    url: ${DB_DEV_URL}
     username: ${DB_DEV_USERNAME}
     password: ${DB_DEV_PASSWORD}
 
