@@ -15,6 +15,7 @@ import java.util.List;
  *   <li>description - descrição da atividade</li>
  *   <li>createAt - data da criação da atividade</li>
  *   <li>enabled - boolean que indica se a atividade foi deletada</li>
+ *   <li>concluded - boolean que indica se a atividade foi concluída</li>
  *   <li>intervals - lista de intervalos em que usuário trabalhou na atividade</li>
  * </ul>
  */
@@ -37,6 +38,8 @@ public class Activity {
   private LocalDateTime createdAt;
   @Column(nullable = false)
   private boolean enabled;
+  @Column(nullable = false)
+  private boolean concluded;
 
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "activity")
   private List<Interval> intervals;

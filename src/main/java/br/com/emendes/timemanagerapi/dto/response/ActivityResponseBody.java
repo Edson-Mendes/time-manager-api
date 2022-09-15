@@ -2,10 +2,7 @@ package br.com.emendes.timemanagerapi.dto.response;
 
 import br.com.emendes.timemanagerapi.model.Activity;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -13,6 +10,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
+@Builder
 public class ActivityResponseBody {
 
   private long id;
@@ -21,6 +19,7 @@ public class ActivityResponseBody {
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private LocalDateTime createdAt;
   private boolean enabled;
+  private boolean concluded;
 
   public ActivityResponseBody(Activity activity){
     this.id = activity.getId();
@@ -28,6 +27,7 @@ public class ActivityResponseBody {
     this.description = activity.getDescription();
     this.createdAt = activity.getCreatedAt();
     this.enabled = activity.isEnabled();
+    this.concluded = activity.isConcluded();
   }
 
 }

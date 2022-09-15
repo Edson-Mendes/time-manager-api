@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -24,7 +24,10 @@ public class ActivityController {
 
   @GetMapping
   public ResponseEntity<Page<ActivityResponseBody>> find(
-      @PageableDefault(direction = Sort.Direction.DESC, sort = "createdAt") Pageable pageable){
+      @SortDefault.SortDefaults({
+          @SortDefault(sort = "concluded", direction = Sort.Direction.ASC),
+          @SortDefault(sort = "createdAt", direction = Sort.Direction.DESC)
+      }) Pageable pageable){
 
     return ResponseEntity.ok(activityService.find(pageable));
   }

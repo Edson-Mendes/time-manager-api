@@ -26,6 +26,7 @@ public class ActivityRequestBody {
         .description(this.description)
         .createdAt(LocalDateTime.now())
         .enabled(true)
+        .concluded(false)
         .build();
   }
 }
