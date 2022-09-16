@@ -45,5 +45,11 @@ public class ActivityService {
   public void deleteById(long id) {
     activityRepository.delete(findById(id));
   }
-
+  
+  public void disableActivityById(long id){
+    Activity activityToDisable = findById(id);
+    activityToDisable.setEnabled(false);
+    activityRepository.save(activityToDisable);
+  }
+  
 }

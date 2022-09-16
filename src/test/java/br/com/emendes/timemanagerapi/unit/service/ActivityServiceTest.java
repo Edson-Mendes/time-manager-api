@@ -162,4 +162,18 @@ class ActivityServiceTest {
 
   }
 
+  @Nested
+  @DisplayName("tests for disableActivityById method")
+  class DisableActivityByIdMethod {
+
+    @Test
+    @DisplayName("disableActivityById must throws ActivityNotFoundException when id don't exists")
+    void disableActivityById_MustThrowsActivityNotFoundException_WhenIdDontExists() {
+      Assertions.assertThatExceptionOfType(ActivityNotFoundException.class)
+          .isThrownBy(() -> activityService.disableActivityById(NONEXISTENT_ACTIVITY_ID))
+          .withMessage("Activity not found for id: " + NONEXISTENT_ACTIVITY_ID);
+    }
+
+  }
+
 }

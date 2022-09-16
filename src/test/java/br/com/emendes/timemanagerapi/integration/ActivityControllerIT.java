@@ -278,6 +278,26 @@ class ActivityControllerIT {
   }
 
   @Test
+  @DisplayName("delete for /activities/{id} must disable activity when deleted successfully")
+  void deleteForActivitiesId_MustDisableActivity_WhenDeletedSuccessfully() {
+    String uri = ACTIVITIES_URI + "/" + 1L;
+    Activity activityToBeSaved = ActivityCreator.withoutIdAndWithNameAndDescription(
+        "Finances API", "A simple project");
+    activityRepository.save(activityToBeSaved);
+
+//    Deletando
+    testRestTemplate.exchange(
+        uri, HttpMethod.DELETE, null,
+        new ParameterizedTypeReference<>() {
+        });
+//    Buscando activity desativada.
+    Activity disabledActivity = activityRepository.findById(1L).orElseThrow();
+    boolean actualEnabled= disabledActivity.isEnabled();
+
+    Assertions.assertThat(actualEnabled).isFalse();
+  }
+
+  @Test
   @DisplayName("delete for /activities/{id} must returns ExceptionDetails when activity don't exist")
   void deleteForActivitiesId_MustReturnsExceptionDetails_WhenActivityDontExists() {
     long id = 999L;

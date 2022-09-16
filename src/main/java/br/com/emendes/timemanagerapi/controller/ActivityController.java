@@ -28,7 +28,6 @@ public class ActivityController {
           @SortDefault(sort = "concluded", direction = Sort.Direction.ASC),
           @SortDefault(sort = "createdAt", direction = Sort.Direction.DESC)
       }) Pageable pageable){
-
     return ResponseEntity.ok(activityService.find(pageable));
   }
 
@@ -50,7 +49,8 @@ public class ActivityController {
 
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> delete(@PathVariable long id) {
-    activityService.deleteById(id);
+//    activityService.deleteById(id);
+    activityService.disableActivityById(id);
     return ResponseEntity.noContent().build();
   }
 }
