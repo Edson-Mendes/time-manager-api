@@ -17,7 +17,7 @@ public class ActivityService {
   private final ActivityRepository activityRepository;
 
   public Page<ActivityResponseBody> find(Pageable pageable) {
-    Page<Activity> activitiesPage = activityRepository.findAll(pageable);
+    Page<Activity> activitiesPage = activityRepository.findByEnabled(pageable, true);
     if (activitiesPage.getTotalElements() == 0) {
       throw new ActivityNotFoundException("Não possui atividades");
     }

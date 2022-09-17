@@ -35,6 +35,7 @@ class ActivityServiceTest {
 
   private final ActivityRequestBody VALID_ACTIVITY_REQUEST_BODY =
       new ActivityRequestBody("Lorem Ipsum Activity", "A simple project for my portfolio");
+//  FIXME: DEFAULT_PAGEABLE não está de acordo com o real pageable default.
   private final Pageable DEFAULT_PAGEABLE = PageRequest.of(0, 10, Sort.Direction.DESC, "createdAt");
   private final long NONEXISTENT_ACTIVITY_ID = 9999L;
 
@@ -46,7 +47,7 @@ class ActivityServiceTest {
         ActivityCreator.withIdAndName(2L, "XPTO Activity"));
     Page<Activity> activitiesPage = new PageImpl<>(activities, DEFAULT_PAGEABLE, 2);
 
-    BDDMockito.when(activityRepositoryMock.findAll(DEFAULT_PAGEABLE)).thenReturn(activitiesPage);
+    BDDMockito.when(activityRepositoryMock.findByEnabled(DEFAULT_PAGEABLE, true)).thenReturn(activitiesPage);
 
     BDDMockito.when(activityRepositoryMock.save(ArgumentMatchers.any(Activity.class)))
         .thenReturn(ActivityCreator
@@ -76,7 +77,7 @@ class ActivityServiceTest {
     @Test
     @DisplayName("find must throws ActivitiesNotFoundException when DB hasn't activities")
     void find_MustThrowsActivitiesNotFoundException_WhenDBHasntActivities() {
-      BDDMockito.when(activityRepositoryMock.findAll(DEFAULT_PAGEABLE)).thenReturn(Page.empty());
+      BDDMockito.when(activityRepositoryMock.findByEnabled(DEFAULT_PAGEABLE, true)).thenReturn(Page.empty());
 
       Assertions.assertThatExceptionOfType(ActivityNotFoundException.class)
           .isThrownBy(() -> activityService.find(DEFAULT_PAGEABLE))

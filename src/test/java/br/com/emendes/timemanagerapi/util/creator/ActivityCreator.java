@@ -16,6 +16,7 @@ public class ActivityCreator {
         .description("A simple project for my portfolio")
         .createdAt(FIXED_DATE_TIME)
         .enabled(true)
+        .concluded(false)
         .build();
   }
 
@@ -26,6 +27,7 @@ public class ActivityCreator {
         .description(description)
         .createdAt(FIXED_DATE_TIME)
         .enabled(true)
+        .concluded(false)
         .build();
   }
 
@@ -35,16 +37,7 @@ public class ActivityCreator {
         .description(description)
         .createdAt(LocalDateTime.now())
         .enabled(true)
-        .build();
-  }
-
-  public static Activity activityForTests(){
-    return Activity.builder()
-        .id(1L)
-        .name("Lorem Ipsum Activity")
-        .description("A simple project for my portfolio")
-        .createdAt(LocalDateTime.now())
-        .enabled(true)
+        .concluded(false)
         .build();
   }
 

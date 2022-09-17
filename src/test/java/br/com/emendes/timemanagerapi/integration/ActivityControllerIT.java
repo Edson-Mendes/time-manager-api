@@ -77,6 +77,29 @@ class ActivityControllerIT {
   }
 
   @Test
+  @DisplayName("get for /activities must returns only enabled activities when exists activities disabled")
+  void getForActivities_MustReturnsOnlyEnabledActivities_WhenExistsActivitiesDisabled(){
+    Activity activityToBeSaved1 = ActivityCreator.withoutIdAndWithNameAndDescription(
+        "Finances API", "A simple project");
+    Activity activityToBeSaved2 = ActivityCreator.withoutIdAndWithNameAndDescription(
+        "Transaction Analyzer", "A simple project");
+    activityToBeSaved2.setEnabled(false);
+    activityRepository.save(activityToBeSaved1);
+    activityRepository.save(activityToBeSaved2);
+
+    ResponseEntity<PageableResponse<ActivityResponseBody>> responseEntity = testRestTemplate.exchange(
+        ACTIVITIES_URI, HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+        });
+    Page<ActivityResponseBody> actualBody = responseEntity.getBody();
+    ActivityResponseBody actualActivityRespBody = actualBody.getContent().get(0);
+
+    Assertions.assertThat(actualBody).isNotNull().hasSize(1);
+    Assertions.assertThat(actualActivityRespBody.getName()).isEqualTo("Finances API");
+    Assertions.assertThat(actualActivityRespBody.getDescription()).isEqualTo("A simple project");
+    Assertions.assertThat(actualActivityRespBody.isEnabled()).isTrue();
+  }
+
+  @Test
   @DisplayName("get for /activities must returns status 400 when doesn't have activities")
   void getForActivities_MustReturnsStatus400_WhenDoesntHaveActivities() {
     ResponseEntity<ExceptionDetails> responseEntity = testRestTemplate.exchange(
