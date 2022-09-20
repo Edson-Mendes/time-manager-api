@@ -3,6 +3,7 @@ package br.com.emendes.timemanagerapi.unit.controller;
 import br.com.emendes.timemanagerapi.controller.ActivityController;
 import br.com.emendes.timemanagerapi.dto.request.ActivityRequestBody;
 import br.com.emendes.timemanagerapi.dto.response.ActivityResponseBody;
+import br.com.emendes.timemanagerapi.model.Status;
 import br.com.emendes.timemanagerapi.service.ActivityService;
 import br.com.emendes.timemanagerapi.util.creator.ActivityResponseBodyCreator;
 import org.assertj.core.api.Assertions;
@@ -109,7 +110,7 @@ class ActivityControllerTest {
       Assertions.assertThat(actualBody.getName()).isEqualTo("Lorem Ipsum Activity");
       Assertions.assertThat(actualBody.getDescription()).isEqualTo("A simple project for my portfolio");
       Assertions.assertThat(actualBody.getCreatedAt()).isNotNull();
-      Assertions.assertThat(actualBody.isEnabled()).isTrue();
+      Assertions.assertThat(actualBody.getStatus()).isEqualByComparingTo(Status.ACTIVE);
     }
 
     @Test

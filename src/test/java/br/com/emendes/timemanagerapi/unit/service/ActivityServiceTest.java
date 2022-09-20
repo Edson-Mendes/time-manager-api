@@ -4,6 +4,7 @@ import br.com.emendes.timemanagerapi.dto.request.ActivityRequestBody;
 import br.com.emendes.timemanagerapi.dto.response.ActivityResponseBody;
 import br.com.emendes.timemanagerapi.exception.ActivityNotFoundException;
 import br.com.emendes.timemanagerapi.model.Activity;
+import br.com.emendes.timemanagerapi.model.Status;
 import br.com.emendes.timemanagerapi.repository.ActivityRepository;
 import br.com.emendes.timemanagerapi.service.ActivityService;
 import br.com.emendes.timemanagerapi.util.creator.ActivityCreator;
@@ -47,7 +48,7 @@ class ActivityServiceTest {
         ActivityCreator.withIdAndName(2L, "XPTO Activity"));
     Page<Activity> activitiesPage = new PageImpl<>(activities, DEFAULT_PAGEABLE, 2);
 
-    BDDMockito.when(activityRepositoryMock.findByEnabled(DEFAULT_PAGEABLE, true)).thenReturn(activitiesPage);
+    BDDMockito.when(activityRepositoryMock.findByStatusIsNot(DEFAULT_PAGEABLE, Status.DELETED)).thenReturn(activitiesPage);
 
     BDDMockito.when(activityRepositoryMock.save(ArgumentMatchers.any(Activity.class)))
         .thenReturn(ActivityCreator
@@ -77,7 +78,8 @@ class ActivityServiceTest {
     @Test
     @DisplayName("find must throws ActivitiesNotFoundException when DB hasn't activities")
     void find_MustThrowsActivitiesNotFoundException_WhenDBHasntActivities() {
-      BDDMockito.when(activityRepositoryMock.findByEnabled(DEFAULT_PAGEABLE, true)).thenReturn(Page.empty());
+      BDDMockito.when(activityRepositoryMock.findByStatusIsNot(DEFAULT_PAGEABLE, Status.DELETED))
+          .thenReturn(Page.empty());
 
       Assertions.assertThatExceptionOfType(ActivityNotFoundException.class)
           .isThrownBy(() -> activityService.find(DEFAULT_PAGEABLE))

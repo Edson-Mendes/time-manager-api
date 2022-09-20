@@ -1,6 +1,7 @@
 package br.com.emendes.timemanagerapi.util.creator;
 
 import br.com.emendes.timemanagerapi.model.Activity;
+import br.com.emendes.timemanagerapi.model.Status;
 
 import java.time.LocalDateTime;
 
@@ -15,8 +16,7 @@ public class ActivityCreator {
         .name(name)
         .description("A simple project for my portfolio")
         .createdAt(FIXED_DATE_TIME)
-        .enabled(true)
-        .concluded(false)
+        .status(Status.ACTIVE)
         .build();
   }
 
@@ -26,8 +26,7 @@ public class ActivityCreator {
         .name(name)
         .description(description)
         .createdAt(FIXED_DATE_TIME)
-        .enabled(true)
-        .concluded(false)
+        .status(Status.ACTIVE)
         .build();
   }
 
@@ -36,8 +35,7 @@ public class ActivityCreator {
         .name(name)
         .description(description)
         .createdAt(LocalDateTime.now())
-        .enabled(true)
-        .concluded(false)
+        .status(Status.ACTIVE)
         .build();
   }
 

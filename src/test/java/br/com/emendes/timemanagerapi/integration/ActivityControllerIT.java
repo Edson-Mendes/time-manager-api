@@ -5,6 +5,7 @@ import br.com.emendes.timemanagerapi.dto.response.ActivityResponseBody;
 import br.com.emendes.timemanagerapi.dto.response.detail.ExceptionDetails;
 import br.com.emendes.timemanagerapi.dto.response.detail.ValidationExceptionDetails;
 import br.com.emendes.timemanagerapi.model.Activity;
+import br.com.emendes.timemanagerapi.model.Status;
 import br.com.emendes.timemanagerapi.repository.ActivityRepository;
 import br.com.emendes.timemanagerapi.util.creator.ActivityCreator;
 import br.com.emendes.timemanagerapi.util.wrapper.PageableResponse;
@@ -83,7 +84,7 @@ class ActivityControllerIT {
         "Finances API", "A simple project");
     Activity activityToBeSaved2 = ActivityCreator.withoutIdAndWithNameAndDescription(
         "Transaction Analyzer", "A simple project");
-    activityToBeSaved2.setEnabled(false);
+    activityToBeSaved2.setStatus(Status.DELETED);
     activityRepository.save(activityToBeSaved1);
     activityRepository.save(activityToBeSaved2);
 
@@ -96,7 +97,7 @@ class ActivityControllerIT {
     Assertions.assertThat(actualBody).isNotNull().hasSize(1);
     Assertions.assertThat(actualActivityRespBody.getName()).isEqualTo("Finances API");
     Assertions.assertThat(actualActivityRespBody.getDescription()).isEqualTo("A simple project");
-    Assertions.assertThat(actualActivityRespBody.isEnabled()).isTrue();
+    Assertions.assertThat(actualActivityRespBody.getStatus()).isEqualByComparingTo(Status.ACTIVE);
   }
 
   @Test
@@ -157,7 +158,7 @@ class ActivityControllerIT {
     Assertions.assertThat(actualBody.getId()).isEqualTo(1L);
     Assertions.assertThat(actualBody.getName()).isEqualTo("Finances API");
     Assertions.assertThat(actualBody.getDescription()).isEqualTo("A simple project");
-    Assertions.assertThat(actualBody.isEnabled()).isTrue();
+    Assertions.assertThat(actualBody.getStatus()).isEqualByComparingTo(Status.ACTIVE);
   }
 
   @Test
@@ -315,9 +316,9 @@ class ActivityControllerIT {
         });
 //    Buscando activity desativada.
     Activity disabledActivity = activityRepository.findById(1L).orElseThrow();
-    boolean actualEnabled= disabledActivity.isEnabled();
+    Status actualStatus = disabledActivity.getStatus();
 
-    Assertions.assertThat(actualEnabled).isFalse();
+    Assertions.assertThat(actualStatus).isEqualByComparingTo(Status.DELETED);
   }
 
   @Test
