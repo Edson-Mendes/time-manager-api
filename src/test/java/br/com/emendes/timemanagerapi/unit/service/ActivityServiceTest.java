@@ -137,8 +137,8 @@ class ActivityServiceTest {
   class UpdateMethod {
 
     @Test
-    @DisplayName("update must throws ActivityNotFoundException when id don't exists")
-    void update_MustThrowsActivityNotFoundException_WhenIdDontExists() {
+    @DisplayName("update must throws ActivityNotFoundException when id doesn't exist")
+    void update_MustThrowsActivityNotFoundException_WhenIdDoesntExist() {
       ActivityRequestBody activityToBeUpdated =
           new ActivityRequestBody("Finances REST API", "A simple Restful API for my portfolio");
 
@@ -154,8 +154,8 @@ class ActivityServiceTest {
   class DeleteByIdMethod {
 
     @Test
-    @DisplayName("deleteById must throws ActivityNotFoundException when id don't exists")
-    void deleteById_MustThrowsActivityNotFoundException_WhenIdDontExists() {
+    @DisplayName("deleteById must throws ActivityNotFoundException when id doesn't exist")
+    void deleteById_MustThrowsActivityNotFoundException_WhenIdDoesntExist() {
       Assertions.assertThatExceptionOfType(ActivityNotFoundException.class)
           .isThrownBy(() -> activityService.deleteById(NONEXISTENT_ACTIVITY_ID))
           .withMessage("Activity not found for id: " + NONEXISTENT_ACTIVITY_ID);
@@ -168,11 +168,26 @@ class ActivityServiceTest {
   class DisableActivityByIdMethod {
 
     @Test
-    @DisplayName("disableActivityById must throws ActivityNotFoundException when id don't exists")
-    void disableActivityById_MustThrowsActivityNotFoundException_WhenIdDontExists() {
+    @DisplayName("disableActivityById must throws ActivityNotFoundException when id doesn't exist")
+    void disableActivityById_MustThrowsActivityNotFoundException_WhenIdDoesntExist() {
       Assertions.assertThatExceptionOfType(ActivityNotFoundException.class)
           .isThrownBy(() -> activityService.disableActivityById(NONEXISTENT_ACTIVITY_ID))
           .withMessage("Activity not found for id: " + NONEXISTENT_ACTIVITY_ID);
+    }
+
+  }
+
+  @Nested
+  @DisplayName("tests for concludeActivityById")
+  class ConcludeActivityById {
+
+    @Test
+    @DisplayName("concludeActivityById must throws ActivityNotFoundException when id doesn't exist")
+    void concludeActivityById_MustThrowsActivityNotFoundException_WhenIdDoesntExist() {
+      Assertions.assertThatExceptionOfType(ActivityNotFoundException.class)
+          .isThrownBy(() -> activityService.concludeActivityById(NONEXISTENT_ACTIVITY_ID, true))
+          .withMessage("Activity not found for id: " + NONEXISTENT_ACTIVITY_ID);
+
     }
 
   }

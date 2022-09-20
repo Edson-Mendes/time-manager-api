@@ -21,7 +21,6 @@ public class ActivityService {
     if (activitiesPage.getTotalElements() == 0) {
       throw new ActivityNotFoundException("Não possui atividades");
     }
-
     return activitiesPage.map(ActivityResponseBody::new);
   }
 
@@ -51,5 +50,10 @@ public class ActivityService {
     activityToDisable.setEnabled(false);
     activityRepository.save(activityToDisable);
   }
-  
+
+  public void concludeActivityById(long id, boolean status) {
+    Activity activityToSwitchConcluded = findById(id);
+    activityToSwitchConcluded.setConcluded(status);
+    activityRepository.save(activityToSwitchConcluded);
+  }
 }
