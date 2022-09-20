@@ -25,7 +25,7 @@ public class ActivityController {
   @GetMapping
   public ResponseEntity<Page<ActivityResponseBody>> find(
       @SortDefault.SortDefaults({
-          @SortDefault(sort = "concluded", direction = Sort.Direction.ASC),
+          @SortDefault(sort = "status", direction = Sort.Direction.ASC),
           @SortDefault(sort = "createdAt", direction = Sort.Direction.DESC)
       }) Pageable pageable){
     return ResponseEntity.ok(activityService.find(pageable));
@@ -49,8 +49,7 @@ public class ActivityController {
 
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> delete(@PathVariable long id) {
-//    activityService.deleteById(id);
-    activityService.disableActivityById(id);
+    activityService.deleteActivityById(id);
     return ResponseEntity.noContent().build();
   }
 }

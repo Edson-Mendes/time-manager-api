@@ -37,9 +37,8 @@ public class Activity {
   @Column(nullable = false)
   private LocalDateTime createdAt;
   @Column(nullable = false)
-  private boolean enabled;
-  @Column(nullable = false)
-  private boolean concluded;
+  @Enumerated(EnumType.STRING)
+  private Status status;
 
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "activity")
   private List<Interval> intervals;

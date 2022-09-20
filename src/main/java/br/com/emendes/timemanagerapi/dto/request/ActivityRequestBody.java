@@ -1,6 +1,7 @@
 package br.com.emendes.timemanagerapi.dto.request;
 
 import br.com.emendes.timemanagerapi.model.Activity;
+import br.com.emendes.timemanagerapi.model.Status;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -28,8 +29,7 @@ public class ActivityRequestBody {
         .name(this.name)
         .description(this.description)
         .createdAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
-        .enabled(true)
-        .concluded(false)
+        .status(Status.ACTIVE)
         .build();
   }
 }

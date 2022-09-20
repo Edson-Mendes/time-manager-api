@@ -1,6 +1,7 @@
 package br.com.emendes.timemanagerapi.dto.response;
 
 import br.com.emendes.timemanagerapi.model.Activity;
+import br.com.emendes.timemanagerapi.model.Status;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
@@ -18,16 +19,14 @@ public class ActivityResponseBody {
   private String description;
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private LocalDateTime createdAt;
-  private boolean enabled;
-  private boolean concluded;
+  private Status status;
 
   public ActivityResponseBody(Activity activity){
     this.id = activity.getId();
     this.name = activity.getName();
     this.description = activity.getDescription();
     this.createdAt = activity.getCreatedAt();
-    this.enabled = activity.isEnabled();
-    this.concluded = activity.isConcluded();
+    this.status = activity.getStatus();
   }
 
 }

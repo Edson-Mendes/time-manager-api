@@ -171,7 +171,7 @@ class ActivityServiceTest {
     @DisplayName("disableActivityById must throws ActivityNotFoundException when id doesn't exist")
     void disableActivityById_MustThrowsActivityNotFoundException_WhenIdDoesntExist() {
       Assertions.assertThatExceptionOfType(ActivityNotFoundException.class)
-          .isThrownBy(() -> activityService.disableActivityById(NONEXISTENT_ACTIVITY_ID))
+          .isThrownBy(() -> activityService.deleteActivityById(NONEXISTENT_ACTIVITY_ID))
           .withMessage("Activity not found for id: " + NONEXISTENT_ACTIVITY_ID);
     }
 
@@ -185,7 +185,7 @@ class ActivityServiceTest {
     @DisplayName("concludeActivityById must throws ActivityNotFoundException when id doesn't exist")
     void concludeActivityById_MustThrowsActivityNotFoundException_WhenIdDoesntExist() {
       Assertions.assertThatExceptionOfType(ActivityNotFoundException.class)
-          .isThrownBy(() -> activityService.concludeActivityById(NONEXISTENT_ACTIVITY_ID, true))
+          .isThrownBy(() -> activityService.concludeActivityById(NONEXISTENT_ACTIVITY_ID))
           .withMessage("Activity not found for id: " + NONEXISTENT_ACTIVITY_ID);
 
     }

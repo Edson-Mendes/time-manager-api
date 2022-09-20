@@ -4,6 +4,7 @@ import br.com.emendes.timemanagerapi.dto.request.ActivityRequestBody;
 import br.com.emendes.timemanagerapi.dto.response.ActivityResponseBody;
 import br.com.emendes.timemanagerapi.exception.ActivityNotFoundException;
 import br.com.emendes.timemanagerapi.model.Activity;
+import br.com.emendes.timemanagerapi.model.Status;
 import br.com.emendes.timemanagerapi.repository.ActivityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,7 +18,8 @@ public class ActivityService {
   private final ActivityRepository activityRepository;
 
   public Page<ActivityResponseBody> find(Pageable pageable) {
-    Page<Activity> activitiesPage = activityRepository.findByEnabled(pageable, true);
+//  TODO: Fazer um find by status.
+    Page<Activity> activitiesPage = activityRepository.findAll(pageable);
     if (activitiesPage.getTotalElements() == 0) {
       throw new ActivityNotFoundException("Não possui atividades");
     }
@@ -42,18 +44,21 @@ public class ActivityService {
   }
 
   public void deleteById(long id) {
+//    TODO: Não é usado na aplicação, buscar e deletar todos os testes.
     activityRepository.delete(findById(id));
   }
-  
-  public void disableActivityById(long id){
-    Activity activityToDisable = findById(id);
-    activityToDisable.setEnabled(false);
-    activityRepository.save(activityToDisable);
+
+  public void deleteActivityById(long id){
+    changeStatusById(id, Status.DELETED);
   }
 
-  public void concludeActivityById(long id, boolean status) {
-    Activity activityToSwitchConcluded = findById(id);
-    activityToSwitchConcluded.setConcluded(status);
-    activityRepository.save(activityToSwitchConcluded);
+  public void concludeActivityById(long id) {
+    changeStatusById(id, Status.CONCLUDED);
+  }
+
+  private void changeStatusById(long id, Status status){
+    Activity activityToChangeStatus = findById(id);
+    activityToChangeStatus.setStatus(status);
+    activityRepository.save(activityToChangeStatus);
   }
 }
