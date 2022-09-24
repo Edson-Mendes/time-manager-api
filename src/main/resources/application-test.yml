@@ -1,25 +1,23 @@
 # datasource
 spring:
   datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/time-manager-db-test
-    username: ${DB_TEST_USERNAME}
-    password: ${DB_TEST_PASSWORD}
+    url: jdbc:tc:postgresql:11.1:///time-manager-db
 
 # sql
   sql:
     init:
-      mode: never
+      mode: always
 
 # jpa
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: create-drop
     show-sql: true
     properties:
       hibernate:
+        show_sql: true
         format-sql: true
+        use_sql_comments: true
     defer-datasource-initialization: true
 
 # log
@@ -27,5 +25,7 @@ logging:
   level:
     org:
       hibernate:
-        sql: DEBUG
-        type: trace
+        SQL: DEBUG
+        type:
+          descriptor:
+            sql: trace
