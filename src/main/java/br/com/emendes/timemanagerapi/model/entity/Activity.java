@@ -1,6 +1,7 @@
-package br.com.emendes.timemanagerapi.model;
+package br.com.emendes.timemanagerapi.model.entity;
 
 import br.com.emendes.timemanagerapi.dto.request.ActivityRequestBody;
+import br.com.emendes.timemanagerapi.model.Status;
 import lombok.*;
 
 import javax.persistence.*;

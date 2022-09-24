@@ -1,6 +1,6 @@
 package br.com.emendes.timemanagerapi.util.creator;
 
-import br.com.emendes.timemanagerapi.model.Interval;
+import br.com.emendes.timemanagerapi.model.entity.Interval;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;

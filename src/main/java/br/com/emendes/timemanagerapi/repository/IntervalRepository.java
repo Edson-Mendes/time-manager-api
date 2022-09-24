@@ -1,7 +1,7 @@
 package br.com.emendes.timemanagerapi.repository;
 
-import br.com.emendes.timemanagerapi.model.Activity;
-import br.com.emendes.timemanagerapi.model.Interval;
+import br.com.emendes.timemanagerapi.model.entity.Activity;
+import br.com.emendes.timemanagerapi.model.entity.Interval;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

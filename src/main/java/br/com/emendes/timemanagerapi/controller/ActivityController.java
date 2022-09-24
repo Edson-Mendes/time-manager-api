@@ -1,6 +1,7 @@
 package br.com.emendes.timemanagerapi.controller;
 
 import br.com.emendes.timemanagerapi.dto.request.ActivityRequestBody;
+import br.com.emendes.timemanagerapi.dto.request.UpdateStatusRequest;
 import br.com.emendes.timemanagerapi.dto.response.ActivityResponseBody;
 import br.com.emendes.timemanagerapi.service.ActivityService;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +45,13 @@ public class ActivityController {
   public ResponseEntity<Void> update(
       @PathVariable long id, @RequestBody @Valid ActivityRequestBody activityRequestBody) {
     activityService.update(id, activityRequestBody);
+    return ResponseEntity.noContent().build();
+  }
+
+  @PatchMapping("/{id}")
+  public ResponseEntity<Void> updateStatus(
+      @PathVariable long id, @RequestBody @Valid UpdateStatusRequest updateStatusRequest) {
+    activityService.updateStatusById(id, updateStatusRequest);
     return ResponseEntity.noContent().build();
   }
 

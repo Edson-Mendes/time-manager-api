@@ -3,7 +3,7 @@ package br.com.emendes.timemanagerapi.unit.service;
 import br.com.emendes.timemanagerapi.dto.request.ActivityRequestBody;
 import br.com.emendes.timemanagerapi.dto.response.ActivityResponseBody;
 import br.com.emendes.timemanagerapi.exception.ActivityNotFoundException;
-import br.com.emendes.timemanagerapi.model.Activity;
+import br.com.emendes.timemanagerapi.model.entity.Activity;
 import br.com.emendes.timemanagerapi.model.Status;
 import br.com.emendes.timemanagerapi.repository.ActivityRepository;
 import br.com.emendes.timemanagerapi.service.ActivityService;

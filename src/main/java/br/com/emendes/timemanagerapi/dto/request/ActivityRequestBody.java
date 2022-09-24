@@ -1,6 +1,6 @@
 package br.com.emendes.timemanagerapi.dto.request;
 
-import br.com.emendes.timemanagerapi.model.Activity;
+import br.com.emendes.timemanagerapi.model.entity.Activity;
 import br.com.emendes.timemanagerapi.model.Status;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,7 +16,6 @@ import java.time.temporal.ChronoUnit;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-@Log4j2
 public class ActivityRequestBody {
 
   @NotBlank(message = "name must not be null or blank")

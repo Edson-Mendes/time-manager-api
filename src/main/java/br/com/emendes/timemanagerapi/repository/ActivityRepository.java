@@ -1,6 +1,6 @@
 package br.com.emendes.timemanagerapi.repository;
 
-import br.com.emendes.timemanagerapi.model.Activity;
+import br.com.emendes.timemanagerapi.model.entity.Activity;
 import br.com.emendes.timemanagerapi.model.Status;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

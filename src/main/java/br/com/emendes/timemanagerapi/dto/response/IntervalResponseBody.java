@@ -1,6 +1,6 @@
 package br.com.emendes.timemanagerapi.dto.response;
 
-import br.com.emendes.timemanagerapi.model.Interval;
+import br.com.emendes.timemanagerapi.model.entity.Interval;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

@@ -1,6 +1,6 @@
 package br.com.emendes.timemanagerapi.util.creator;
 
-import br.com.emendes.timemanagerapi.model.Activity;
+import br.com.emendes.timemanagerapi.model.entity.Activity;
 import br.com.emendes.timemanagerapi.model.Status;
 
 import java.time.LocalDateTime;

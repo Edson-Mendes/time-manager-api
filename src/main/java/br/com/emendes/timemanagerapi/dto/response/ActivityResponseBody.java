@@ -1,6 +1,6 @@
 package br.com.emendes.timemanagerapi.dto.response;
 
-import br.com.emendes.timemanagerapi.model.Activity;
+import br.com.emendes.timemanagerapi.model.entity.Activity;
 import br.com.emendes.timemanagerapi.model.Status;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;

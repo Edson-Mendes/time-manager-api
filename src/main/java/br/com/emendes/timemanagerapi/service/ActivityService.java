@@ -1,9 +1,10 @@
 package br.com.emendes.timemanagerapi.service;
 
 import br.com.emendes.timemanagerapi.dto.request.ActivityRequestBody;
+import br.com.emendes.timemanagerapi.dto.request.UpdateStatusRequest;
 import br.com.emendes.timemanagerapi.dto.response.ActivityResponseBody;
 import br.com.emendes.timemanagerapi.exception.ActivityNotFoundException;
-import br.com.emendes.timemanagerapi.model.Activity;
+import br.com.emendes.timemanagerapi.model.entity.Activity;
 import br.com.emendes.timemanagerapi.model.Status;
 import br.com.emendes.timemanagerapi.repository.ActivityRepository;
 import lombok.RequiredArgsConstructor;
@@ -48,14 +49,19 @@ public class ActivityService {
   }
 
   public void deleteActivityById(long id){
-    changeStatusById(id, Status.DELETED);
+    updateStatusById(id, Status.DELETED);
   }
 
   public void concludeActivityById(long id) {
-    changeStatusById(id, Status.CONCLUDED);
+//    TODO: Não é usado na aplicação, buscar e deletar todos os testes.
+    updateStatusById(id, Status.CONCLUDED);
   }
 
-  private void changeStatusById(long id, Status status){
+  public void updateStatusById(long id, UpdateStatusRequest updateStatusRequest){
+    updateStatusById(id, updateStatusRequest.toStatus());
+  }
+
+  private void updateStatusById(long id, Status status){
     Activity activityToChangeStatus = findById(id);
     activityToChangeStatus.setStatus(status);
     activityRepository.save(activityToChangeStatus);
