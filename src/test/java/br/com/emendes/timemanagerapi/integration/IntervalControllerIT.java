@@ -1,8 +1,6 @@
 package br.com.emendes.timemanagerapi.integration;
 
-import br.com.emendes.timemanagerapi.dto.request.ActivityRequestBody;
 import br.com.emendes.timemanagerapi.dto.request.IntervalRequestBody;
-import br.com.emendes.timemanagerapi.dto.response.ActivityResponseBody;
 import br.com.emendes.timemanagerapi.dto.response.IntervalResponseBody;
 import br.com.emendes.timemanagerapi.dto.response.detail.ExceptionDetails;
 import br.com.emendes.timemanagerapi.model.entity.Activity;
@@ -29,7 +27,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-
+//  TODO: Não esquecer de refatorar esses testes!
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -192,6 +190,79 @@ class IntervalControllerIT {
     ResponseEntity<ExceptionDetails> responseEntity = testRestTemplate.exchange(
         URI, HttpMethod.POST,
         requestEntity, new ParameterizedTypeReference<>() {
+        });
+
+    ExceptionDetails actualBody = responseEntity.getBody();
+
+    Assertions.assertThat(actualBody).isNotNull();
+    Assertions.assertThat(actualBody.getTitle()).isEqualTo("Bad Request");
+    Assertions.assertThat(actualBody.getDetails()).isEqualTo("Activity not found for id: 100");
+  }
+
+  @Test
+  @DisplayName("delete for /activities/{activityId}/intervals/{id} must returns status 204 when deleted successfully")
+  void deleteForIntervalsId_MustReturnsStatus204_WhenDeletedSuccessfully(){
+    final String URI = "/activities/1/intervals/1";
+
+    Activity activityToBeSaved = ActivityCreator.withoutIdAndWithNameAndDescription(
+        "Lorem Ipsum Activity", "A simple project for my portfolio");
+    Activity activitySaved = activityRepository.save(activityToBeSaved);
+    Interval interval = IntervalCreator.withActivityStartedAtAndElapsedTime(
+        activitySaved, "2022-09-25T10:32:57", "00:30:00"
+    );
+    intervalRepository.save(interval);
+
+    ResponseEntity<Void> responseEntity = testRestTemplate.exchange(
+        URI, HttpMethod.DELETE, null, new ParameterizedTypeReference<>() {
+        });
+    HttpStatus actualStatus = responseEntity.getStatusCode();
+
+    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.NO_CONTENT);
+  }
+
+  @Test
+  @DisplayName("delete for /activities/{activityId}/intervals/{id} must returns null request body when deleted successfully")
+  void deleteForIntervalsId_MustReturnsNullRequestBody_WhenDeletedSuccessfully(){
+    final String URI = "/activities/1/intervals/1";
+
+    Activity activityToBeSaved = ActivityCreator.withoutIdAndWithNameAndDescription(
+        "Lorem Ipsum Activity", "A simple project for my portfolio");
+    Activity activitySaved = activityRepository.save(activityToBeSaved);
+    Interval interval = IntervalCreator.withActivityStartedAtAndElapsedTime(
+        activitySaved, "2022-09-25T10:32:57", "00:30:00"
+    );
+    intervalRepository.save(interval);
+
+    ResponseEntity<Void> responseEntity = testRestTemplate.exchange(
+        URI, HttpMethod.DELETE, null, new ParameterizedTypeReference<>() {
+        });
+
+    Assertions.assertThat(responseEntity.getBody()).isNull();
+  }
+
+  @Test
+  @DisplayName("delete for /activities/{activityId}/intervals/{id} must returns status 400 when Activity doesn't exist")
+  void deleteForIntervalsId_MustReturnsStatus400_WhenActivityDoesntExist(){
+    final String URI = "/activities/100/intervals/1";
+
+    ResponseEntity<ExceptionDetails> responseEntity = testRestTemplate.exchange(
+        URI, HttpMethod.DELETE,
+        null, new ParameterizedTypeReference<>() {
+        });
+
+    HttpStatus actualStatus = responseEntity.getStatusCode();
+
+    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.BAD_REQUEST);
+  }
+
+  @Test
+  @DisplayName("delete for /activities/{activityId}/intervals/{id} must returns ExceptionDetails when Activity doesn't exist")
+  void deleteForIntervalsId_MustReturnsExceptionDetails_WhenActivityDoesntExist(){
+    final String URI = "/activities/100/intervals/1";
+
+    ResponseEntity<ExceptionDetails> responseEntity = testRestTemplate.exchange(
+        URI, HttpMethod.DELETE,
+        null, new ParameterizedTypeReference<>() {
         });
 
     ExceptionDetails actualBody = responseEntity.getBody();
