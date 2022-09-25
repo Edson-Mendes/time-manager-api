@@ -11,11 +11,15 @@ Time Manager API é uma aplicação para auxiliar no gerenciamento de tempo gast
 ## :hammer: Funcionalidades
 
 - `Atividades`
-    - `cadastrar`: Cadastro de atividade através de um POST para */activities* com as informações de nome e descrição da
-      atividade no body da requisição.
-    - `Buscar`: Buscar TODAS as atividades através de um GET para */activities*.
-    - `Atualizar`: Atualizar atividade através de um PUT para */activities/{id}*, onde {id} é o identificador da atividade.
-    - `Deletar`: Deletar atividade através de um DELETE para */activities/{id}*, onde {id} é o identificador da atividade.
+    - `cadastrar`: Cadastro de atividade através de um POST para **/activities** com as informações de nome e descrição da
+      atividade no corpo da requisição.
+    - `Buscar`: Busca paginada de atividades através de um GET para **/activities**.
+    - `Atualizar`: Atualizar atividade através de um PUT para **/activities/{ID}**, onde *{ID}* é o identificador da atividade.
+    - `Deletar`: Deletar atividade através de um DELETE para **/activities/{ID}**, onde *{ID}* é o identificador da atividade.
+- `Intervals`
+  - `cadastrar`: Cadastro de intervalo de execução de uma atividade através de POST para **/activities/{activityID}/intervals**, onde *{activityID}* é o identificador da ativiadade.
+  - `Buscar`: Busca paginada dos intervals de determinada atividade através de um GET para **/activities/{activityID}/intervals**, onde *{activityID}* é o identificador da ativiadade..
+  - `Deletar`: Deletar interval através de um DELETE para **/activities/{activityID}/intervals/{activityID}**, onde *{activityID}* é o identificador da atividade e *{intervalID}* é o identificador do intervalo.
 
 ## :toolbox: Tecnologias
 
@@ -23,8 +27,11 @@ Time Manager API é uma aplicação para auxiliar no gerenciamento de tempo gast
 - `Java 17`
 - `Maven`
 - `Spring Boot, Spring MVC, Spring Data JPA`
-- `H2 database`
+- `Docker`
+- `PostgreSQL`
 - `Lombok`
 - `Bean Validation`
+- `Postman`
 - `JUnit 5`
 - `Mockito`
+- `TestContainer`

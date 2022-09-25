@@ -1,6 +1,7 @@
 package br.com.emendes.timemanagerapi.unit.service;
 
 import br.com.emendes.timemanagerapi.dto.request.ActivityRequestBody;
+import br.com.emendes.timemanagerapi.dto.request.UpdateStatusRequest;
 import br.com.emendes.timemanagerapi.dto.response.ActivityResponseBody;
 import br.com.emendes.timemanagerapi.exception.ActivityNotFoundException;
 import br.com.emendes.timemanagerapi.model.entity.Activity;
@@ -152,26 +153,12 @@ class ActivityServiceTest {
   }
 
   @Nested
-  @DisplayName("tests for deleteById method")
-  class DeleteByIdMethod {
+  @DisplayName("tests for deleteActivityById method")
+  class DeleteActivityByIdMethod {
 
     @Test
-    @DisplayName("deleteById must throws ActivityNotFoundException when id doesn't exist")
-    void deleteById_MustThrowsActivityNotFoundException_WhenIdDoesntExist() {
-      Assertions.assertThatExceptionOfType(ActivityNotFoundException.class)
-          .isThrownBy(() -> activityService.deleteById(NONEXISTENT_ACTIVITY_ID))
-          .withMessage("Activity not found for id: " + NONEXISTENT_ACTIVITY_ID);
-    }
-
-  }
-
-  @Nested
-  @DisplayName("tests for disableActivityById method")
-  class DisableActivityByIdMethod {
-
-    @Test
-    @DisplayName("disableActivityById must throws ActivityNotFoundException when id doesn't exist")
-    void disableActivityById_MustThrowsActivityNotFoundException_WhenIdDoesntExist() {
+    @DisplayName("deleteActivityById must throws ActivityNotFoundException when id doesn't exist")
+    void deleteActivityById_MustThrowsActivityNotFoundException_WhenIdDoesntExist() {
       Assertions.assertThatExceptionOfType(ActivityNotFoundException.class)
           .isThrownBy(() -> activityService.deleteActivityById(NONEXISTENT_ACTIVITY_ID))
           .withMessage("Activity not found for id: " + NONEXISTENT_ACTIVITY_ID);
@@ -180,16 +167,17 @@ class ActivityServiceTest {
   }
 
   @Nested
-  @DisplayName("tests for concludeActivityById")
-  class ConcludeActivityById {
+  @DisplayName("tests for updateStatusById method")
+  class UpdateStatusByIdMethod {
 
     @Test
-    @DisplayName("concludeActivityById must throws ActivityNotFoundException when id doesn't exist")
-    void concludeActivityById_MustThrowsActivityNotFoundException_WhenIdDoesntExist() {
-      Assertions.assertThatExceptionOfType(ActivityNotFoundException.class)
-          .isThrownBy(() -> activityService.concludeActivityById(NONEXISTENT_ACTIVITY_ID))
-          .withMessage("Activity not found for id: " + NONEXISTENT_ACTIVITY_ID);
+    @DisplayName("updateStatusById must throws ActivityNotFoundException when id doesn't exist")
+    void updateStatusById_MustThrowsActivityNotFoundException_WhenIdDoesntExist() {
+      UpdateStatusRequest updateStatusRequest = new UpdateStatusRequest("CONCLUDED");
 
+      Assertions.assertThatExceptionOfType(ActivityNotFoundException.class)
+          .isThrownBy(() -> activityService.updateStatusById(NONEXISTENT_ACTIVITY_ID, updateStatusRequest))
+          .withMessage("Activity not found for id: " + NONEXISTENT_ACTIVITY_ID);
     }
 
   }

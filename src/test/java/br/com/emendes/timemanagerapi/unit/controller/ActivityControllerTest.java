@@ -2,6 +2,7 @@ package br.com.emendes.timemanagerapi.unit.controller;
 
 import br.com.emendes.timemanagerapi.controller.ActivityController;
 import br.com.emendes.timemanagerapi.dto.request.ActivityRequestBody;
+import br.com.emendes.timemanagerapi.dto.request.UpdateStatusRequest;
 import br.com.emendes.timemanagerapi.dto.response.ActivityResponseBody;
 import br.com.emendes.timemanagerapi.model.Status;
 import br.com.emendes.timemanagerapi.service.ActivityService;
@@ -21,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 
@@ -55,7 +57,10 @@ class ActivityControllerTest {
         .update(ArgumentMatchers.anyLong(), ArgumentMatchers.any(ActivityRequestBody.class));
 
     BDDMockito.doNothing().when(activityServiceMock)
-        .deleteById(ArgumentMatchers.anyLong());
+        .updateStatusById(1L, new UpdateStatusRequest("CONCLUDED"));
+
+    BDDMockito.doNothing().when(activityServiceMock)
+        .deleteActivityById(1L);
   }
 
   @Nested
@@ -137,6 +142,23 @@ class ActivityControllerTest {
           "Finances REST API", "A simple Restful API for my portfolio");
 
       HttpStatus actualStatusCode = activityController.update(1L, activityToBeUpdated).getStatusCode();
+
+      Assertions.assertThat(actualStatusCode).isEqualByComparingTo(HttpStatus.NO_CONTENT);
+    }
+
+  }
+
+  @Nested
+  @DisplayName("tests for updateStatus method")
+  class UpdateStatusMethod {
+
+    @Test
+    @DisplayName("updateStatus must returns status 204 when update status successfully")
+    void updateStatus_MustReturnsStatus204_WhenUpdateStatusSuccessfully() {
+      long activityId = 1L;
+      UpdateStatusRequest updateStatusRequest = new UpdateStatusRequest("Concluded");
+
+      HttpStatus actualStatusCode = activityController.updateStatus(activityId, updateStatusRequest).getStatusCode();
 
       Assertions.assertThat(actualStatusCode).isEqualByComparingTo(HttpStatus.NO_CONTENT);
     }

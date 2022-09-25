@@ -43,18 +43,8 @@ public class ActivityService {
     activityRepository.save(activityToBeUpdated);
   }
 
-  public void deleteById(long id) {
-//    TODO: Não é usado na aplicação, buscar e deletar todos os testes.
-    activityRepository.delete(findById(id));
-  }
-
   public void deleteActivityById(long id){
     updateStatusById(id, Status.DELETED);
-  }
-
-  public void concludeActivityById(long id) {
-//    TODO: Não é usado na aplicação, buscar e deletar todos os testes.
-    updateStatusById(id, Status.CONCLUDED);
   }
 
   public void updateStatusById(long id, UpdateStatusRequest updateStatusRequest){

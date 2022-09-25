@@ -19,4 +19,19 @@ public class UpdateStatusRequest {
     return Status.valueOf(this.status.toUpperCase());
   }
 
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    UpdateStatusRequest that = (UpdateStatusRequest) o;
+
+    return status != null ? status.equalsIgnoreCase(that.status) : that.status == null;
+  }
+
+  @Override
+  public int hashCode() {
+    return status != null ? status.hashCode() : 0;
+  }
 }
