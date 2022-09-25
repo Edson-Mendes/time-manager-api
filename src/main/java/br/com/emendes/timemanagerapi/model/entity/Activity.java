@@ -40,7 +40,7 @@ public class Activity {
   @Column(nullable = false)
   @Enumerated(EnumType.STRING)
   private Status status;
-
+//  TODO: Ver se vale a pena mudar para SET
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "activity")
   private List<Interval> intervals;
 
