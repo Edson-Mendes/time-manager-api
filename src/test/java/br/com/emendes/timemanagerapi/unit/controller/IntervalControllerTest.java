@@ -1,7 +1,7 @@
 package br.com.emendes.timemanagerapi.unit.controller;
 
 import br.com.emendes.timemanagerapi.controller.IntervalController;
-import br.com.emendes.timemanagerapi.dto.request.IntervalRequestBody;
+import br.com.emendes.timemanagerapi.dto.request.IntervalRequest;
 import br.com.emendes.timemanagerapi.dto.response.IntervalResponseBody;
 import br.com.emendes.timemanagerapi.service.ActivityService;
 import br.com.emendes.timemanagerapi.service.IntervalService;
@@ -66,9 +66,8 @@ class IntervalControllerTest {
     @Test
     @DisplayName("create must returns status 201 when created successfully")
     void create_MustReturnsStatus201_WhenCreatedSuccessful() {
-      IntervalRequestBody requestBody = new IntervalRequestBody(
-          LocalDateTime.of(2022, 8, 16, 15, 7, 0),
-          LocalTime.of(0,30,0));
+      IntervalRequest requestBody = new IntervalRequest(
+          "2022-08-16T15:07:00", "00:30:00");
 
       ResponseEntity<IntervalResponseBody> response = intervalController
           .create(EXISTENT_ACTIVITY_ID, requestBody, URI_BUILDER);
@@ -80,9 +79,8 @@ class IntervalControllerTest {
     @Test
     @DisplayName("create must returns ResponseEntity<IntervalResponseBody> when created successfully")
     void create_MustReturnsResponseEntityIntervalResponseBody_WhenCreatedSuccessful() {
-      IntervalRequestBody requestBody = new IntervalRequestBody(
-          LocalDateTime.of(2022, 8, 16, 15, 7, 0),
-          LocalTime.of(0,30,0));
+      IntervalRequest requestBody = new IntervalRequest(
+          "2022-08-16T15:07:00", "00:30:00");
 
       ResponseEntity<IntervalResponseBody> response = intervalController
           .create(EXISTENT_ACTIVITY_ID, requestBody, URI_BUILDER);

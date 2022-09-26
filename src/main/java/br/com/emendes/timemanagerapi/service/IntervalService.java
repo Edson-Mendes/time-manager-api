@@ -1,6 +1,6 @@
 package br.com.emendes.timemanagerapi.service;
 
-import br.com.emendes.timemanagerapi.dto.request.IntervalRequestBody;
+import br.com.emendes.timemanagerapi.dto.request.IntervalRequest;
 import br.com.emendes.timemanagerapi.dto.response.IntervalResponseBody;
 import br.com.emendes.timemanagerapi.exception.IntervalNotFoundException;
 import br.com.emendes.timemanagerapi.model.entity.Interval;
@@ -17,7 +17,7 @@ public class IntervalService {
   private final ActivityService activityService;
   private final IntervalRepository intervalRepository;
 
-  public IntervalResponseBody create(long activityId, IntervalRequestBody requestBody){
+  public IntervalResponseBody create(long activityId, IntervalRequest requestBody){
     Interval intervalToBeSaved = requestBody.toInterval(activityService.findById(activityId));
     Interval intervalSaved = intervalRepository.save(intervalToBeSaved);
 

@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import lombok.extern.log4j.Log4j2;
 
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;

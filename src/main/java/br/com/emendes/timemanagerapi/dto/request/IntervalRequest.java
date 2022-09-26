@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
@@ -14,16 +15,18 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-public class IntervalRequestBody {
+public class IntervalRequest {
 
-  private LocalDateTime startedAt;
-  private LocalTime elapsedTime;
+  @NotBlank(message = "startedAt must not be null or blank")
+  private String startedAt;
+  @NotBlank(message = "elapsedTime must not be null or blank")
+  private String elapsedTime;
 
   public Interval toInterval(Activity activity){
     return Interval.builder()
         .activity(activity)
-        .startedAt(startedAt)
-        .elapsedTime(elapsedTime)
+        .startedAt(LocalDateTime.parse(startedAt))
+        .elapsedTime(LocalTime.parse(elapsedTime))
         .build();
   }
 }

@@ -1,6 +1,6 @@
 package br.com.emendes.timemanagerapi.controller;
 
-import br.com.emendes.timemanagerapi.dto.request.IntervalRequestBody;
+import br.com.emendes.timemanagerapi.dto.request.IntervalRequest;
 import br.com.emendes.timemanagerapi.dto.response.IntervalResponseBody;
 import br.com.emendes.timemanagerapi.service.IntervalService;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +33,7 @@ public class IntervalController {
   //  TODO: Fazer um handler para lidar com tentativa de converter algo que não seja long para long.
   @PostMapping
   public ResponseEntity<IntervalResponseBody> create(
-      @PathVariable long activityId, @RequestBody IntervalRequestBody requestBody, UriComponentsBuilder uriBuilder) {
+      @PathVariable long activityId, @RequestBody IntervalRequest requestBody, UriComponentsBuilder uriBuilder) {
     IntervalResponseBody intervalResponseBody = intervalService.create(activityId, requestBody);
 
     URI uri = uriBuilder.path("/activities/{activityId}/intervals/{id}").build(activityId, intervalResponseBody.getId());

@@ -1,6 +1,6 @@
 package br.com.emendes.timemanagerapi.unit.service;
 
-import br.com.emendes.timemanagerapi.dto.request.IntervalRequestBody;
+import br.com.emendes.timemanagerapi.dto.request.IntervalRequest;
 import br.com.emendes.timemanagerapi.dto.response.IntervalResponseBody;
 import br.com.emendes.timemanagerapi.exception.ActivityNotFoundException;
 import br.com.emendes.timemanagerapi.exception.IntervalNotFoundException;
@@ -84,10 +84,7 @@ class IntervalServiceTest {
     @DisplayName("create must returns IntervalResponseBody when created successfully")
     void create_MustReturnsIntervalResponseBody_WhenCreatedSuccessfully(){
       IntervalResponseBody actualIntervalRespBody = intervalService.create(
-          EXISTENT_ACTIVITY_ID,
-          new IntervalRequestBody(
-              LocalDateTime.of(2022, 8, 16, 15, 7, 0),
-              LocalTime.of(0,30,0)));
+          EXISTENT_ACTIVITY_ID, new IntervalRequest("2022-08-16T15:07:00", "00:30:00"));
 
       Assertions.assertThat(actualIntervalRespBody).isNotNull();
       Assertions.assertThat(actualIntervalRespBody.getId()).isEqualTo(100L);
@@ -98,13 +95,12 @@ class IntervalServiceTest {
     @Test
     @DisplayName("create must throws ActivityNotFoundException when activityId doesn't exist")
     void create_MustThrowsActivityNotFoundException_WhenActivityIdDoesntExist() {
-      IntervalRequestBody validIntervalRequestBody = new IntervalRequestBody(
-          LocalDateTime.of(2022, 8, 16, 15, 7, 0),
-          LocalTime.of(0,30,0));
+      IntervalRequest validIntervalRequest = new IntervalRequest(
+          "2022-08-16T15:07:00", "00:30:00");
 
       Assertions.assertThatExceptionOfType(ActivityNotFoundException.class)
           .isThrownBy(() -> intervalService.create(
-              NONEXISTENT_ACTIVITY_ID, validIntervalRequestBody))
+              NONEXISTENT_ACTIVITY_ID, validIntervalRequest))
           .withMessage("Activity not found for id: "+NONEXISTENT_ACTIVITY_ID);
     }
 

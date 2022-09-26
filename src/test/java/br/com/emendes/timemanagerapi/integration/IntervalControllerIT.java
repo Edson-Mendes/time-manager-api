@@ -1,6 +1,6 @@
 package br.com.emendes.timemanagerapi.integration;
 
-import br.com.emendes.timemanagerapi.dto.request.IntervalRequestBody;
+import br.com.emendes.timemanagerapi.dto.request.IntervalRequest;
 import br.com.emendes.timemanagerapi.dto.response.IntervalResponseBody;
 import br.com.emendes.timemanagerapi.dto.response.detail.ExceptionDetails;
 import br.com.emendes.timemanagerapi.model.entity.Activity;
@@ -117,9 +117,9 @@ class IntervalControllerIT {
   @DisplayName("post for /activities/{activityId}/intervals must returns status 201 when saved successfully")
   void postForIntervals_MustReturnsStatus201_WhenSavedSuccessfully(){
     final String URI = "/activities/1/intervals";
-    IntervalRequestBody intervalRequestBody = new IntervalRequestBody(
-        LocalDateTime.parse("2022-09-25T14:26:00"), LocalTime.parse("00:30:00"));
-    HttpEntity<IntervalRequestBody> requestEntity = new HttpEntity<>(intervalRequestBody);
+    IntervalRequest intervalRequest = new IntervalRequest(
+        "2022-09-25T14:26:00", "00:30:00");
+    HttpEntity<IntervalRequest> requestEntity = new HttpEntity<>(intervalRequest);
 
     Activity activityToBeSaved = ActivityCreator.withoutIdAndWithNameAndDescription(
         "Lorem Ipsum Activity", "A simple project for my portfolio");
@@ -139,9 +139,9 @@ class IntervalControllerIT {
   @DisplayName("post for /activities/{activityId}/intervals must returns IntervalResponseBody when saved successfully")
   void postForIntervals_MustReturnsIntervalResponseBody_WhenSavedSuccessfully(){
     final String URI = "/activities/1/intervals";
-    IntervalRequestBody intervalRequestBody = new IntervalRequestBody(
-        LocalDateTime.parse("2022-09-25T14:26:00"), LocalTime.parse("00:30:00"));
-    HttpEntity<IntervalRequestBody> requestEntity = new HttpEntity<>(intervalRequestBody);
+    IntervalRequest intervalRequest = new IntervalRequest(
+        "2022-09-25T14:26:00", "00:30:00");
+    HttpEntity<IntervalRequest> requestEntity = new HttpEntity<>(intervalRequest);
 
     Activity activityToBeSaved = ActivityCreator.withoutIdAndWithNameAndDescription(
         "Lorem Ipsum Activity", "A simple project for my portfolio");
@@ -165,9 +165,9 @@ class IntervalControllerIT {
   @DisplayName("post for /activities/{activityId}/intervals must returns status 400 when Activity doesn't exist")
   void postForIntervals_MustReturnsStatus400_WhenActivityDoesntExist(){
     final String URI = "/activities/100/intervals";
-    IntervalRequestBody intervalRequestBody = new IntervalRequestBody(
-        LocalDateTime.parse("2022-09-25T14:26:00"), LocalTime.parse("00:30:00"));
-    HttpEntity<IntervalRequestBody> requestEntity = new HttpEntity<>(intervalRequestBody);
+    IntervalRequest intervalRequest = new IntervalRequest(
+        "2022-09-25T14:26:00", "00:30:00");
+    HttpEntity<IntervalRequest> requestEntity = new HttpEntity<>(intervalRequest);
 
     ResponseEntity<ExceptionDetails> responseEntity = testRestTemplate.exchange(
         URI, HttpMethod.POST,
@@ -183,9 +183,9 @@ class IntervalControllerIT {
   @DisplayName("post for /activities/{activityId}/intervals must returns ExceptionDetails when Activity doesn't exist")
   void postForIntervals_MustReturnsExceptionDetails_WhenActivityDoesntExist(){
     final String URI = "/activities/100/intervals";
-    IntervalRequestBody intervalRequestBody = new IntervalRequestBody(
-        LocalDateTime.parse("2022-09-25T14:26:00"), LocalTime.parse("00:30:00"));
-    HttpEntity<IntervalRequestBody> requestEntity = new HttpEntity<>(intervalRequestBody);
+    IntervalRequest intervalRequest = new IntervalRequest(
+        "2022-09-25T14:26:00", "00:30:00");
+    HttpEntity<IntervalRequest> requestEntity = new HttpEntity<>(intervalRequest);
 
     ResponseEntity<ExceptionDetails> responseEntity = testRestTemplate.exchange(
         URI, HttpMethod.POST,
