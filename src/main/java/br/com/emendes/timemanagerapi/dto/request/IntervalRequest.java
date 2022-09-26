@@ -2,6 +2,7 @@ package br.com.emendes.timemanagerapi.dto.request;
 
 import br.com.emendes.timemanagerapi.model.entity.Activity;
 import br.com.emendes.timemanagerapi.model.entity.Interval;
+import br.com.emendes.timemanagerapi.validation.anotation.DateTimeValidation;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -18,6 +19,7 @@ import java.time.LocalTime;
 public class IntervalRequest {
 
   @NotBlank(message = "startedAt must not be null or blank")
+  @DateTimeValidation
   private String startedAt;
   @NotBlank(message = "elapsedTime must not be null or blank")
   private String elapsedTime;

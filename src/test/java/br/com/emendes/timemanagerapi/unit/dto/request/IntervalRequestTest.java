@@ -17,16 +17,16 @@ import java.util.Set;
 class IntervalRequestTest {
 
   private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-  private final String VALID_STARTED_AT = "A simple project for my portfolio";
-  private final String VALID_ELAPSED_TIME = "Finances API";
+  private final String VALID_STARTED_AT = "2022-09-26T10:30:00";
+  private final String VALID_ELAPSED_TIME = "00:30:00";
 
   @Nested
-  @DisplayName("tests for name validation")
-  class NameValidation {
+  @DisplayName("tests for startedAt validation")
+  class StartedAtValidation {
 
     @ParameterizedTest
     @ValueSource(strings = {"2022-09-26T11:32:40", "2022-10-02T00:00:00", "2022-10-01T23:59:59"})
-    @DisplayName("validate startedAt must not returns violations when startedAt is valid")
+    @DisplayName("validate startedAt must not return violations when startedAt is valid")
     void validateStartedAt_MustNotReturnViolations_WhenStartedAtIsValid(String intervalStartedAt){
       IntervalRequest intervalRequest =
           new IntervalRequest(intervalStartedAt, VALID_ELAPSED_TIME);
@@ -37,10 +37,10 @@ class IntervalRequestTest {
     }
 
     @Test
-    @DisplayName("validate startedAt must returns violations when startedAt is null")
+    @DisplayName("validate startedAt must return violations when startedAt is null")
     void validateStartedAt_MustReturnsViolations_WhenStartedAtIsNull(){
       IntervalRequest intervalRequest =
-          new IntervalRequest(null, VALID_STARTED_AT);
+          new IntervalRequest(null, VALID_ELAPSED_TIME);
 
       Set<ConstraintViolation<IntervalRequest>> violations = validator.validate(intervalRequest);
 
@@ -52,16 +52,30 @@ class IntervalRequestTest {
     }
 
     @Test
-    @DisplayName("validate startedAt must returns violations when startedAt is empty")
+    @DisplayName("validate startedAt must return violations when startedAt is empty")
     void validateStartedAt_MustReturnsViolations_WhenStartedAtIsEmpty(){
       IntervalRequest intervalRequest =
-          new IntervalRequest("", VALID_STARTED_AT);
+          new IntervalRequest("", VALID_ELAPSED_TIME);
 
       Set<ConstraintViolation<IntervalRequest>> violations = validator.validate(intervalRequest);
 
       Assertions.assertThat(violations).isNotEmpty().hasSize(1);
       Assertions.assertThat(violations.stream().findFirst().get().getMessage())
           .isEqualTo("startedAt must not be null or blank");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"lorem", "2022-10-35T00:00:00", "2022-10-01T29:00:00", "2022-10-01 00:00:00"})
+    @DisplayName("validate startedAt must return violations when startedAt is not valid date time")
+    void validateStartedAt_MustReturnViolations_WhenStartedAtIsNotValidDateTime(String intervalStartedAt){
+      IntervalRequest intervalRequest =
+          new IntervalRequest(intervalStartedAt, VALID_ELAPSED_TIME);
+
+      Set<ConstraintViolation<IntervalRequest>> violations = validator.validate(intervalRequest);
+
+      Assertions.assertThat(violations).isNotEmpty().hasSize(1);
+      Assertions.assertThat(violations.stream().findFirst().get().getMessage())
+          .isEqualTo("Invalid Date Time");
     }
 
   }
@@ -73,9 +87,9 @@ class IntervalRequestTest {
     @ParameterizedTest
     @ValueSource(strings = {"A simple project for my portfolio", "elapsedTime", "d"})
     @DisplayName("validate elapsedTime must not returns violations when name is valid")
-    void validateElapsedTime_MustNotReturnsViolations_WhenElapsedTimeIsValid(String elapsedTime){
+    void validateElapsedTime_MustNotReturnsViolations_WhenElapsedTimeIsValid(String intervalElapsedTime){
       IntervalRequest intervalRequest =
-          new IntervalRequest(VALID_ELAPSED_TIME, elapsedTime);
+          new IntervalRequest(VALID_STARTED_AT, intervalElapsedTime);
 
       Set<ConstraintViolation<IntervalRequest>> violations = validator.validate(intervalRequest);
 
@@ -86,7 +100,7 @@ class IntervalRequestTest {
     @DisplayName("validate elapsedTime must returns violations when elapsedTime is null")
     void validateElapsedTime_MustReturnsViolations_WhenElapsedTimeIsNull(){
       IntervalRequest intervalRequest =
-          new IntervalRequest(VALID_ELAPSED_TIME, null);
+          new IntervalRequest(VALID_STARTED_AT, null);
 
       Set<ConstraintViolation<IntervalRequest>> violations = validator.validate(intervalRequest);
 
@@ -99,7 +113,7 @@ class IntervalRequestTest {
     @DisplayName("validate elapsedTime must returns violations when elapsedTime is empty")
     void validateElapsedTime_MustReturnsViolations_WhenElapsedTimeIsEmpty(){
       IntervalRequest intervalRequest =
-          new IntervalRequest(VALID_ELAPSED_TIME, "");
+          new IntervalRequest(VALID_STARTED_AT, "");
 
       Set<ConstraintViolation<IntervalRequest>> violations = validator.validate(intervalRequest);
 
