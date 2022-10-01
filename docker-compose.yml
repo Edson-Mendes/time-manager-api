@@ -1,0 +1,31 @@
+version: "3.7"
+x-database-variables: &database-variables
+  SPRING_DATASOURCE_URL: jdbc:postgresql://tm-db:5432/time-manager-db
+  DB_USERNAME_DEV: postgres
+  DB_PASSWORD_DEV: 1234
+services:
+  db:
+    image: postgres
+    container_name: tm-db
+    ports:
+      - 5432:5432
+    volumes:
+      - tm-volume:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: 1234
+      PGDATA: /var/lib/postgresql/data/pgdata
+
+  app:
+    build: .
+    container_name: tm-app
+    ports:
+      - 8080:8080
+    depends_on:
+      - db
+    environment:
+      <<: *database-variables
+
+volumes:
+  tm-volume:
+    external: true
+    name: time-manager-volume
