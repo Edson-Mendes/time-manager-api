@@ -5,7 +5,7 @@ import br.com.emendes.timemanagerapi.model.entity.Interval;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-// TODO: Não está sendo utilizado
+
 public class IntervalCreator {
 
   public static Interval withActivityIdStartedAtAndElapsedTime(long activityId, String startedAt, String elapsedTime) {

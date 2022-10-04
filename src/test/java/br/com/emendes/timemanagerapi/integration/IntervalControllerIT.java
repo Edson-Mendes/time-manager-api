@@ -27,6 +27,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+
 //  TODO: Não esquecer de refatorar esses testes!
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -43,7 +44,7 @@ class IntervalControllerIT {
 
   @Test
   @DisplayName("get for /activities/{activityId}/intervals must returns status 200 when found successfully")
-  void getForIntervals_MustReturnsStatus200_WhenFoundSuccessfully(){
+  void getForIntervals_MustReturnsStatus200_WhenFoundSuccessfully() {
     final String URI = "/activities/1/intervals";
 
     Activity activityToBeSaved = ActivityCreator.withoutIdAndWithNameAndDescription(
@@ -86,7 +87,7 @@ class IntervalControllerIT {
 
   @Test
   @DisplayName("get for /activities/{activityId}/intervals must returns status 400 when Activity doesn't exist")
-  void getForIntervals_MustReturnsStatus400_WhenActivityDoesntExist(){
+  void getForIntervals_MustReturnsStatus400_WhenActivityDoesntExist() {
     final String URI = "/activities/100/intervals";
 
     ResponseEntity<ExceptionDetails> responseEntity = testRestTemplate.exchange(
@@ -99,7 +100,7 @@ class IntervalControllerIT {
 
   @Test
   @DisplayName("get for /activities/{activityId}/intervals must returns status 400 when Activity doesn't exist")
-  void getForIntervals_MustReturnsExceptionDetails_WhenActivityDoesntExist(){
+  void getForIntervals_MustReturnsExceptionDetails_WhenActivityDoesntExist() {
     final String URI = "/activities/100/intervals";
 
     ResponseEntity<ExceptionDetails> responseEntity = testRestTemplate.exchange(
@@ -115,7 +116,7 @@ class IntervalControllerIT {
 
   @Test
   @DisplayName("post for /activities/{activityId}/intervals must returns status 201 when saved successfully")
-  void postForIntervals_MustReturnsStatus201_WhenSavedSuccessfully(){
+  void postForIntervals_MustReturnsStatus201_WhenSavedSuccessfully() {
     final String URI = "/activities/1/intervals";
     IntervalRequest intervalRequest = new IntervalRequest(
         "2022-09-25T14:26:00", "00:30:00");
@@ -137,7 +138,7 @@ class IntervalControllerIT {
 
   @Test
   @DisplayName("post for /activities/{activityId}/intervals must returns IntervalResponseBody when saved successfully")
-  void postForIntervals_MustReturnsIntervalResponseBody_WhenSavedSuccessfully(){
+  void postForIntervals_MustReturnsIntervalResponseBody_WhenSavedSuccessfully() {
     final String URI = "/activities/1/intervals";
     IntervalRequest intervalRequest = new IntervalRequest(
         "2022-09-25T14:26:00", "00:30:00");
@@ -163,7 +164,7 @@ class IntervalControllerIT {
 
   @Test
   @DisplayName("post for /activities/{activityId}/intervals must returns status 400 when Activity doesn't exist")
-  void postForIntervals_MustReturnsStatus400_WhenActivityDoesntExist(){
+  void postForIntervals_MustReturnsStatus400_WhenActivityDoesntExist() {
     final String URI = "/activities/100/intervals";
     IntervalRequest intervalRequest = new IntervalRequest(
         "2022-09-25T14:26:00", "00:30:00");
@@ -181,7 +182,7 @@ class IntervalControllerIT {
 
   @Test
   @DisplayName("post for /activities/{activityId}/intervals must returns ExceptionDetails when Activity doesn't exist")
-  void postForIntervals_MustReturnsExceptionDetails_WhenActivityDoesntExist(){
+  void postForIntervals_MustReturnsExceptionDetails_WhenActivityDoesntExist() {
     final String URI = "/activities/100/intervals";
     IntervalRequest intervalRequest = new IntervalRequest(
         "2022-09-25T14:26:00", "00:30:00");
@@ -201,7 +202,7 @@ class IntervalControllerIT {
 
   @Test
   @DisplayName("delete for /activities/{activityId}/intervals/{id} must returns status 204 when deleted successfully")
-  void deleteForIntervalsId_MustReturnsStatus204_WhenDeletedSuccessfully(){
+  void deleteForIntervalsId_MustReturnsStatus204_WhenDeletedSuccessfully() {
     final String URI = "/activities/1/intervals/1";
 
     Activity activityToBeSaved = ActivityCreator.withoutIdAndWithNameAndDescription(
@@ -222,7 +223,7 @@ class IntervalControllerIT {
 
   @Test
   @DisplayName("delete for /activities/{activityId}/intervals/{id} must returns null request body when deleted successfully")
-  void deleteForIntervalsId_MustReturnsNullRequestBody_WhenDeletedSuccessfully(){
+  void deleteForIntervalsId_MustReturnsNullRequestBody_WhenDeletedSuccessfully() {
     final String URI = "/activities/1/intervals/1";
 
     Activity activityToBeSaved = ActivityCreator.withoutIdAndWithNameAndDescription(
@@ -242,7 +243,7 @@ class IntervalControllerIT {
 
   @Test
   @DisplayName("delete for /activities/{activityId}/intervals/{id} must returns status 400 when Activity doesn't exist")
-  void deleteForIntervalsId_MustReturnsStatus400_WhenActivityDoesntExist(){
+  void deleteForIntervalsId_MustReturnsStatus400_WhenActivityDoesntExist() {
     final String URI = "/activities/100/intervals/1";
 
     ResponseEntity<ExceptionDetails> responseEntity = testRestTemplate.exchange(
@@ -257,7 +258,7 @@ class IntervalControllerIT {
 
   @Test
   @DisplayName("delete for /activities/{activityId}/intervals/{id} must returns ExceptionDetails when Activity doesn't exist")
-  void deleteForIntervalsId_MustReturnsExceptionDetails_WhenActivityDoesntExist(){
+  void deleteForIntervalsId_MustReturnsExceptionDetails_WhenActivityDoesntExist() {
     final String URI = "/activities/100/intervals/1";
 
     ResponseEntity<ExceptionDetails> responseEntity = testRestTemplate.exchange(

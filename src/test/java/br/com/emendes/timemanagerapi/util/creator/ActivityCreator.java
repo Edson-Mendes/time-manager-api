@@ -39,4 +39,12 @@ public class ActivityCreator {
         .build();
   }
 
+  public static Activity withStatus(String status) {
+    return Activity.builder()
+        .name("Lorem Activity")
+        .description("some description")
+        .createdAt(LocalDateTime.parse("2022-10-03T10:15:30"))
+        .status(Status.valueOf(status))
+        .build();
+  }
 }

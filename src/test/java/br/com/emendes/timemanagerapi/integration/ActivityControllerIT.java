@@ -39,7 +39,7 @@ class ActivityControllerIT {
 
   @Test
   @DisplayName("get for /activities must returns status 200 when found successfully")
-  void getForActivities_MustReturnsStatus200_WhenFoundSuccessfully(){
+  void getForActivities_MustReturnsStatus200_WhenFoundSuccessfully() {
     Activity activityToBeSaved1 = ActivityCreator.withoutIdAndWithNameAndDescription(
         "Finances API", "A simple project");
     Activity activityToBeSaved2 = ActivityCreator.withoutIdAndWithNameAndDescription(
@@ -79,7 +79,7 @@ class ActivityControllerIT {
 
   @Test
   @DisplayName("get for /activities must returns only enabled activities when exists activities disabled")
-  void getForActivities_MustReturnsOnlyEnabledActivities_WhenExistsActivitiesDisabled(){
+  void getForActivities_MustReturnsOnlyEnabledActivities_WhenExistsActivitiesDisabled() {
     Activity activityToBeSaved1 = ActivityCreator.withoutIdAndWithNameAndDescription(
         "Finances API", "A simple project");
     Activity activityToBeSaved2 = ActivityCreator.withoutIdAndWithNameAndDescription(

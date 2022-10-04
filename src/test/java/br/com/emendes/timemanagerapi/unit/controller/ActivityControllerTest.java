@@ -7,6 +7,7 @@ import br.com.emendes.timemanagerapi.dto.response.ActivityResponseBody;
 import br.com.emendes.timemanagerapi.model.Status;
 import br.com.emendes.timemanagerapi.service.ActivityService;
 import br.com.emendes.timemanagerapi.util.creator.ActivityResponseBodyCreator;
+import br.com.emendes.timemanagerapi.util.creator.PageableCreator;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -22,7 +23,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 
@@ -37,7 +37,7 @@ class ActivityControllerTest {
   private final UriComponentsBuilder URI_BUILDER = UriComponentsBuilder.fromHttpUrl("http://localhost:8080");
   private final ActivityRequestBody VALID_ACTIVITY_REQUEST_BODY =
       new ActivityRequestBody("Lorem Ipsum Activity", "A simple project for my portfolio");
-  private final Pageable DEFAULT_PAGEABLE = PageRequest.of(0, 10, Sort.Direction.DESC, "createdAt");
+  private final Pageable DEFAULT_PAGEABLE = PageableCreator.activityDefaultPageable();
 
 //  Mocks de métodos/actions de activityServiceMock
   @BeforeEach

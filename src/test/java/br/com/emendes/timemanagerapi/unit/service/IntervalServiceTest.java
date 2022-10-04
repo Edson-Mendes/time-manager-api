@@ -135,7 +135,7 @@ class IntervalServiceTest {
 
     @Test
     @DisplayName("find must throws ActivityNotFoundException when activityId doesn't exist")
-    void create_MustThrowsActivityNotFoundException_WhenActivityIdDoesntExist() {
+    void find_MustThrowsActivityNotFoundException_WhenActivityIdDoesntExist() {
       Assertions.assertThatExceptionOfType(ActivityNotFoundException.class)
           .isThrownBy(() -> intervalService.find(
               NONEXISTENT_ACTIVITY_ID, DEFAULT_PAGEABLE))

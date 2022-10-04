@@ -10,6 +10,7 @@ import br.com.emendes.timemanagerapi.repository.ActivityRepository;
 import br.com.emendes.timemanagerapi.service.ActivityService;
 import br.com.emendes.timemanagerapi.util.creator.ActivityCreator;
 import br.com.emendes.timemanagerapi.util.creator.ActivityResponseBodyCreator;
+import br.com.emendes.timemanagerapi.util.creator.PageableCreator;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -37,9 +38,9 @@ class ActivityServiceTest {
 
   private final ActivityRequestBody VALID_ACTIVITY_REQUEST_BODY =
       new ActivityRequestBody("Lorem Ipsum Activity", "A simple project for my portfolio");
-//  FIXME: DEFAULT_PAGEABLE não está de acordo com o real pageable default.
-  private final Pageable DEFAULT_PAGEABLE = PageRequest.of(0, 10, Sort.Direction.DESC, "createdAt");
+  private final Pageable DEFAULT_PAGEABLE = PageableCreator.activityDefaultPageable();
   private final long NONEXISTENT_ACTIVITY_ID = 9999L;
+  private final long NOT_ACTIVE_ACTIVITY_ID = 9999L;
 
   //  Mocks de métodos/actions de activityServiceMock
   @BeforeEach
@@ -95,7 +96,7 @@ class ActivityServiceTest {
 
     @Test
     @DisplayName("findById must returns Activity when found successful")
-    void findById_MustReturnsActivity_WhenFoundSuccessful(){
+    void findById_MustReturnsActivity_WhenFoundSuccessful() {
       Activity activityToBeFound = ActivityCreator.withIdAndName(1L, "Lorem Ipsum Activity");
       BDDMockito.when(activityRepositoryMock.findById(1L)).thenReturn(Optional.of(activityToBeFound));
 
@@ -107,7 +108,7 @@ class ActivityServiceTest {
 
     @Test
     @DisplayName("findById must throws ActivityNotFoundException when activityId doesn't exist")
-    void findById_MustThrowsActivityNotFoundException_WhenActivityIdDoesntExist(){
+    void findById_MustThrowsActivityNotFoundException_WhenActivityIdDoesntExist() {
       BDDMockito.when(activityRepositoryMock.findById(NONEXISTENT_ACTIVITY_ID)).thenReturn(Optional.empty());
 
       Assertions.assertThatExceptionOfType(ActivityNotFoundException.class)

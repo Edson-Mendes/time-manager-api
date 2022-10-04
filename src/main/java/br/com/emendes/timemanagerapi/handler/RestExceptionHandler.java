@@ -3,6 +3,7 @@ package br.com.emendes.timemanagerapi.handler;
 import br.com.emendes.timemanagerapi.exception.ActivityNotFoundException;
 import br.com.emendes.timemanagerapi.dto.response.detail.ExceptionDetails;
 import br.com.emendes.timemanagerapi.dto.response.detail.ValidationExceptionDetails;
+import br.com.emendes.timemanagerapi.exception.IntervalCreationException;
 import br.com.emendes.timemanagerapi.exception.IntervalNotFoundException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -31,6 +32,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
   @ExceptionHandler(IntervalNotFoundException.class)
   public ResponseEntity<ExceptionDetails> handleIntervalNotFound(IntervalNotFoundException ex) {
+    ExceptionDetails responseBody = generateExceptionDetails(ex.getMessage());
+
+    return ResponseEntity.badRequest().body(responseBody);
+  }
+
+  @ExceptionHandler(IntervalCreationException.class)
+  public ResponseEntity<ExceptionDetails> handleIntervalCreation(IntervalCreationException ex) {
     ExceptionDetails responseBody = generateExceptionDetails(ex.getMessage());
 
     return ResponseEntity.badRequest().body(responseBody);
