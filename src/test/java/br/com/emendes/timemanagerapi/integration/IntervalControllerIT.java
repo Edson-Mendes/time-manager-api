@@ -3,6 +3,7 @@ package br.com.emendes.timemanagerapi.integration;
 import br.com.emendes.timemanagerapi.dto.request.IntervalRequest;
 import br.com.emendes.timemanagerapi.dto.response.IntervalResponseBody;
 import br.com.emendes.timemanagerapi.dto.response.detail.ExceptionDetails;
+import br.com.emendes.timemanagerapi.model.Status;
 import br.com.emendes.timemanagerapi.model.entity.Activity;
 import br.com.emendes.timemanagerapi.model.entity.Interval;
 import br.com.emendes.timemanagerapi.repository.ActivityRepository;
@@ -24,9 +25,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 //  TODO: Não esquecer de refatorar esses testes!
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -117,20 +115,19 @@ class IntervalControllerIT {
   @Test
   @DisplayName("post for /activities/{activityId}/intervals must returns status 201 when saved successfully")
   void postForIntervals_MustReturnsStatus201_WhenSavedSuccessfully() {
+    Activity activityToBeSaved = ActivityCreator.withoutIdAndWithNameAndDescription(
+        "Lorem Ipsum Activity", "A simple project for my portfolio");
+    activityRepository.save(activityToBeSaved);
+
     final String URI = "/activities/1/intervals";
     IntervalRequest intervalRequest = new IntervalRequest(
         "2022-09-25T14:26:00", "00:30:00");
     HttpEntity<IntervalRequest> requestEntity = new HttpEntity<>(intervalRequest);
 
-    Activity activityToBeSaved = ActivityCreator.withoutIdAndWithNameAndDescription(
-        "Lorem Ipsum Activity", "A simple project for my portfolio");
-    activityRepository.save(activityToBeSaved);
-
     ResponseEntity<IntervalResponseBody> responseEntity = testRestTemplate.exchange(
         URI, HttpMethod.POST,
         requestEntity, new ParameterizedTypeReference<>() {
         });
-
     HttpStatus actualStatus = responseEntity.getStatusCode();
 
     Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.CREATED);
@@ -198,6 +195,89 @@ class IntervalControllerIT {
     Assertions.assertThat(actualBody).isNotNull();
     Assertions.assertThat(actualBody.getTitle()).isEqualTo("Bad Request");
     Assertions.assertThat(actualBody.getDetails()).isEqualTo("Activity not found for id: 100");
+  }
+
+  @Test
+  @DisplayName("post for /activities/{activityId}/intervals must returns status 400 when Activity status is concluded")
+  void postForIntervals_MustReturnsStatus400_WhenActivityStatusIsConcluded() {
+    Activity activityConcluded = ActivityCreator.withStatus(Status.CONCLUDED);
+    activityRepository.save(activityConcluded);
+
+    final String URI = "/activities/1/intervals";
+    IntervalRequest intervalRequest = new IntervalRequest(
+        "2022-09-25T14:26:00", "00:30:00");
+    HttpEntity<IntervalRequest> requestEntity = new HttpEntity<>(intervalRequest);
+
+    ResponseEntity<ExceptionDetails> responseEntity = testRestTemplate.exchange(
+        URI, HttpMethod.POST,
+        requestEntity, new ParameterizedTypeReference<>() {
+        });
+    HttpStatus actualStatus = responseEntity.getStatusCode();
+
+    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.BAD_REQUEST);
+  }
+
+  @Test
+  @DisplayName("post for /activities/{activityId}/intervals must returns ExceptionDetails when Activity status is concluded")
+  void postForIntervals_MustReturnsExceptionDetails_WhenActivityStatusIsConcluded() {
+    Activity activityConcluded = ActivityCreator.withStatus(Status.CONCLUDED);
+    activityRepository.save(activityConcluded);
+
+    final String URI = "/activities/1/intervals";
+    IntervalRequest intervalRequest = new IntervalRequest(
+        "2022-09-25T14:26:00", "00:30:00");
+    HttpEntity<IntervalRequest> requestEntity = new HttpEntity<>(intervalRequest);
+
+    ResponseEntity<ExceptionDetails> responseEntity = testRestTemplate.exchange(
+        URI, HttpMethod.POST,
+        requestEntity, new ParameterizedTypeReference<>() {
+        });
+    ExceptionDetails actualBody = responseEntity.getBody();
+
+    Assertions.assertThat(actualBody).isNotNull();
+    Assertions.assertThat(actualBody.getTitle()).isEqualTo("Bad Request");
+    Assertions.assertThat(actualBody.getDetails()).isEqualTo("Cannot create interval on non active activity");
+  }
+  @Test
+  @DisplayName("post for /activities/{activityId}/intervals must returns status 400 when Activity status is deleted")
+  void postForIntervals_MustReturnsStatus400_WhenActivityStatusIsDeleted() {
+    Activity activityDeleted = ActivityCreator.withStatus(Status.DELETED);
+    activityRepository.save(activityDeleted);
+
+    final String URI = "/activities/1/intervals";
+    IntervalRequest intervalRequest = new IntervalRequest(
+        "2022-09-25T14:26:00", "00:30:00");
+    HttpEntity<IntervalRequest> requestEntity = new HttpEntity<>(intervalRequest);
+
+    ResponseEntity<ExceptionDetails> responseEntity = testRestTemplate.exchange(
+        URI, HttpMethod.POST,
+        requestEntity, new ParameterizedTypeReference<>() {
+        });
+    HttpStatus actualStatus = responseEntity.getStatusCode();
+
+    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.BAD_REQUEST);
+  }
+
+  @Test
+  @DisplayName("post for /activities/{activityId}/intervals must returns ExceptionDetails when Activity status is deleted")
+  void postForIntervals_MustReturnsExceptionDetails_WhenActivityStatusIsDeleted() {
+    Activity activityDeleted = ActivityCreator.withStatus(Status.DELETED);
+    activityRepository.save(activityDeleted);
+
+    final String URI = "/activities/1/intervals";
+    IntervalRequest intervalRequest = new IntervalRequest(
+        "2022-09-25T14:26:00", "00:30:00");
+    HttpEntity<IntervalRequest> requestEntity = new HttpEntity<>(intervalRequest);
+
+    ResponseEntity<ExceptionDetails> responseEntity = testRestTemplate.exchange(
+        URI, HttpMethod.POST,
+        requestEntity, new ParameterizedTypeReference<>() {
+        });
+    ExceptionDetails actualBody = responseEntity.getBody();
+
+    Assertions.assertThat(actualBody).isNotNull();
+    Assertions.assertThat(actualBody.getTitle()).isEqualTo("Bad Request");
+    Assertions.assertThat(actualBody.getDetails()).isEqualTo("Cannot create interval on non active activity");
   }
 
   @Test
