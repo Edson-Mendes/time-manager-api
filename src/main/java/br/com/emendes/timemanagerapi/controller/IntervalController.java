@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.validation.Valid;
 import java.net.URI;
 
 // TODO: Pesquisar se há um nome melhor para representar o intervalo que é trabalhado na atividade.
@@ -33,7 +34,7 @@ public class IntervalController {
   //  TODO: Fazer um handler para lidar com tentativa de converter algo que não seja long para long.
   @PostMapping
   public ResponseEntity<IntervalResponseBody> create(
-      @PathVariable long activityId, @RequestBody IntervalRequest requestBody, UriComponentsBuilder uriBuilder) {
+      @PathVariable long activityId, @RequestBody @Valid IntervalRequest requestBody, UriComponentsBuilder uriBuilder) {
     IntervalResponseBody intervalResponseBody = intervalService.create(activityId, requestBody);
 
     URI uri = uriBuilder.path("/activities/{activityId}/intervals/{id}").build(activityId, intervalResponseBody.getId());

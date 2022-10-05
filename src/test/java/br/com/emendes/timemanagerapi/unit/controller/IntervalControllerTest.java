@@ -90,6 +90,20 @@ class IntervalControllerTest {
       Assertions.assertThat(actualResponseBody.getElapsedTime()).isEqualTo("00:30:00");
     }
 
+    @Test
+    @DisplayName("create must returns correct location when created successfully")
+    void create_MustReturnsCorrectLocation_WhenCreatedSuccessful(){
+      IntervalRequest requestBody = new IntervalRequest(
+          "2022-08-16T15:07:00", "00:30:00");
+
+      ResponseEntity<IntervalResponseBody> response = intervalController
+          .create(EXISTENT_ACTIVITY_ID, requestBody, URI_BUILDER);
+
+      Assertions.assertThat(response.getHeaders().getLocation()).isNotNull();
+      Assertions.assertThat(response.getHeaders().getLocation().getPath())
+          .isNotNull().contains("/activities/1/intervals/100");
+    }
+
   }
 
   @Nested

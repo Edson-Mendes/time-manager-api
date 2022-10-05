@@ -3,7 +3,9 @@ package br.com.emendes.timemanagerapi.unit.service;
 import br.com.emendes.timemanagerapi.dto.request.IntervalRequest;
 import br.com.emendes.timemanagerapi.dto.response.IntervalResponseBody;
 import br.com.emendes.timemanagerapi.exception.ActivityNotFoundException;
+import br.com.emendes.timemanagerapi.exception.IntervalCreationException;
 import br.com.emendes.timemanagerapi.exception.IntervalNotFoundException;
+import br.com.emendes.timemanagerapi.model.Status;
 import br.com.emendes.timemanagerapi.model.entity.Activity;
 import br.com.emendes.timemanagerapi.model.entity.Interval;
 import br.com.emendes.timemanagerapi.repository.IntervalRepository;
@@ -102,6 +104,38 @@ class IntervalServiceTest {
           .isThrownBy(() -> intervalService.create(
               NONEXISTENT_ACTIVITY_ID, validIntervalRequest))
           .withMessage("Activity not found for id: "+NONEXISTENT_ACTIVITY_ID);
+    }
+
+    @Test
+    @DisplayName("create must throws IntervalCreationException when activity status is concluded")
+    void create_MustThrowsIntervalCreationException_WhenActivityStatusIsConcluded(){
+      final long ACTIVITY_ID_CONCLUDED = 100L;
+      BDDMockito.when(activityServiceMock.findById(ACTIVITY_ID_CONCLUDED))
+          .thenReturn(ActivityCreator.withStatus(Status.CONCLUDED));
+
+      IntervalRequest validIntervalRequest = new IntervalRequest(
+          "2022-08-16T15:07:00", "00:30:00");
+
+      Assertions.assertThatExceptionOfType(IntervalCreationException.class)
+          .isThrownBy(() -> intervalService.create(
+              ACTIVITY_ID_CONCLUDED, validIntervalRequest))
+          .withMessage("Cannot create interval on non active activity");
+    }
+
+    @Test
+    @DisplayName("create must throws IntervalCreationException when activity status is deleted")
+    void create_MustThrowsIntervalCreationException_WhenActivityStatusIsDeleted(){
+      final long ACTIVITY_ID_DELETED = 100L;
+      BDDMockito.when(activityServiceMock.findById(ACTIVITY_ID_DELETED))
+          .thenReturn(ActivityCreator.withStatus(Status.DELETED));
+
+      IntervalRequest validIntervalRequest = new IntervalRequest(
+          "2022-08-16T15:07:00", "00:30:00");
+
+      Assertions.assertThatExceptionOfType(IntervalCreationException.class)
+          .isThrownBy(() -> intervalService.create(
+              ACTIVITY_ID_DELETED, validIntervalRequest))
+          .withMessage("Cannot create interval on non active activity");
     }
 
   }
