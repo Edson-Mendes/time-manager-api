@@ -40,7 +40,6 @@ class ActivityServiceTest {
       new ActivityRequestBody("Lorem Ipsum Activity", "A simple project for my portfolio");
   private final Pageable DEFAULT_PAGEABLE = PageableCreator.activityDefaultPageable();
   private final long NONEXISTENT_ACTIVITY_ID = 9999L;
-  private final long NOT_ACTIVE_ACTIVITY_ID = 9999L;
 
   //  Mocks de métodos/actions de activityServiceMock
   @BeforeEach
@@ -149,6 +148,20 @@ class ActivityServiceTest {
       Assertions.assertThatExceptionOfType(ActivityNotFoundException.class)
           .isThrownBy(() -> activityService.update(NONEXISTENT_ACTIVITY_ID, activityToBeUpdated))
           .withMessage("Activity not found for id: " + NONEXISTENT_ACTIVITY_ID);
+    }
+
+    @Test
+    @DisplayName("update must throws ActivityNotFoundException when activity status is deleted")
+    void update_MustThrowsActivityNotFoundException_WhenActivityStatusIsDeleted() {
+      long ACTIVITY_ID_DELETED = 99999L;
+      BDDMockito.when(activityRepositoryMock.findById(ACTIVITY_ID_DELETED))
+          .thenReturn(Optional.of(ActivityCreator.withIdAndStatus(99999L, Status.DELETED)));
+      ActivityRequestBody activityToBeUpdated =
+          new ActivityRequestBody("Finances REST API", "A simple Restful API for my portfolio");
+
+      Assertions.assertThatExceptionOfType(ActivityNotFoundException.class)
+          .isThrownBy(() -> activityService.update(ACTIVITY_ID_DELETED, activityToBeUpdated))
+          .withMessage("Activity not found for id: " + ACTIVITY_ID_DELETED);
     }
 
   }

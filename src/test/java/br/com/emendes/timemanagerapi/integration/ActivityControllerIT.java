@@ -4,8 +4,8 @@ import br.com.emendes.timemanagerapi.dto.request.ActivityRequestBody;
 import br.com.emendes.timemanagerapi.dto.response.ActivityResponseBody;
 import br.com.emendes.timemanagerapi.dto.response.detail.ExceptionDetails;
 import br.com.emendes.timemanagerapi.dto.response.detail.ValidationExceptionDetails;
-import br.com.emendes.timemanagerapi.model.entity.Activity;
 import br.com.emendes.timemanagerapi.model.Status;
+import br.com.emendes.timemanagerapi.model.entity.Activity;
 import br.com.emendes.timemanagerapi.repository.ActivityRepository;
 import br.com.emendes.timemanagerapi.util.creator.ActivityCreator;
 import br.com.emendes.timemanagerapi.util.wrapper.PageableResponse;
@@ -225,6 +225,28 @@ class ActivityControllerIT {
   }
 
   @Test
+  @DisplayName("put for /activities/{id} must returns status 400 when activity don't exist")
+  void putForActivitiesId_MustReturnsStatus400_WhenActivityDontExist() {
+    long id = 999L;
+    String uri = ACTIVITIES_URI + "/" + id;
+
+    String activityName = "Finances Rest API";
+    String activityDescription = "A simple project";
+    ActivityRequestBody activityToBeUpdated = new ActivityRequestBody(activityName, activityDescription);
+
+    HttpEntity<ActivityRequestBody> requestEntity = new HttpEntity<>(activityToBeUpdated);
+
+    ResponseEntity<ExceptionDetails> response = testRestTemplate.exchange(
+        uri, HttpMethod.PUT, requestEntity,
+        new ParameterizedTypeReference<>() {
+        });
+
+    HttpStatus actualStatus = response.getStatusCode();
+
+    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.BAD_REQUEST);
+  }
+
+  @Test
   @DisplayName("put for /activities/{id} must returns ExceptionDetails when activity don't exist")
   void putForActivitiesId_MustReturnsExceptionDetails_WhenActivityDontExist() {
     long id = 999L;
@@ -241,14 +263,31 @@ class ActivityControllerIT {
         new ParameterizedTypeReference<>() {
         });
 
-    HttpStatus actualStatus = response.getStatusCode();
     ExceptionDetails actualBody = response.getBody();
 
-    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.BAD_REQUEST);
     Assertions.assertThat(actualBody).isNotNull();
     Assertions.assertThat(actualBody.getTitle()).isEqualTo("Bad Request");
     Assertions.assertThat(actualBody.getStatus()).isEqualTo(400);
     Assertions.assertThat(actualBody.getDetails()).isEqualTo("Activity not found for id: " + id);
+  }
+
+  @Test
+  @DisplayName("put for /activities/{id} must returns status 400 when request body is invalid")
+  void putForActivitiesId_MustReturnsStatus400_WhenRequestBodyIsInvalid() {
+    long id = 999L;
+    String uri = ACTIVITIES_URI + "/" + id;
+    ActivityRequestBody activityToBeUpdated = new ActivityRequestBody("", null);
+
+    HttpEntity<ActivityRequestBody> requestEntity = new HttpEntity<>(activityToBeUpdated);
+
+    ResponseEntity<ValidationExceptionDetails> response = testRestTemplate.exchange(
+        uri, HttpMethod.PUT, requestEntity,
+        new ParameterizedTypeReference<>() {
+        });
+
+    HttpStatus actualStatus = response.getStatusCode();
+
+    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.BAD_REQUEST);
   }
 
   @Test
@@ -265,10 +304,8 @@ class ActivityControllerIT {
         new ParameterizedTypeReference<>() {
         });
 
-    HttpStatus actualStatus = response.getStatusCode();
     ValidationExceptionDetails actualBody = response.getBody();
 
-    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.BAD_REQUEST);
     Assertions.assertThat(actualBody).isNotNull();
     Assertions.assertThat(actualBody.getTitle()).isEqualTo("Bad Request");
     Assertions.assertThat(actualBody.getStatus()).isEqualTo(400);
@@ -279,6 +316,49 @@ class ActivityControllerIT {
     Assertions.assertThat(actualBody.getMessages())
         .contains("name must not be null or blank")
         .contains("description must not be null or blank");
+  }
+
+  @Test
+  @DisplayName("put for /activities/{id} must returns status 400 when activity status is deleted")
+  void putForActivitiesId_MustReturnsStatus400_WhenActivityStatusIsDeleted() {
+    activityRepository.save(ActivityCreator.withStatus(Status.DELETED));
+
+    long id = 1L;
+    String uri = ACTIVITIES_URI + "/" + id;
+    ActivityRequestBody activityToBeUpdated = new ActivityRequestBody("lorem name", "ipsum description");
+    HttpEntity<ActivityRequestBody> requestEntity = new HttpEntity<>(activityToBeUpdated);
+
+    ResponseEntity<ValidationExceptionDetails> response = testRestTemplate.exchange(
+        uri, HttpMethod.PUT, requestEntity,
+        new ParameterizedTypeReference<>() {
+        });
+
+    HttpStatus actualStatus = response.getStatusCode();
+
+    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.BAD_REQUEST);
+  }
+
+  @Test
+  @DisplayName("put for /activities/{id} must returns ValidationExceptionDetails when activity status is deleted")
+  void putForActivitiesId_MustReturnsValidationExceptionDetails_WhenActivityStatusIsDeleted() {
+    activityRepository.save(ActivityCreator.withStatus(Status.DELETED));
+
+    long id = 1L;
+    String uri = ACTIVITIES_URI + "/" + id;
+    ActivityRequestBody activityToBeUpdated = new ActivityRequestBody("lorem name", "ipsum description");
+    HttpEntity<ActivityRequestBody> requestEntity = new HttpEntity<>(activityToBeUpdated);
+
+    ResponseEntity<ValidationExceptionDetails> response = testRestTemplate.exchange(
+        uri, HttpMethod.PUT, requestEntity,
+        new ParameterizedTypeReference<>() {
+        });
+
+    ValidationExceptionDetails actualBody = response.getBody();
+
+    Assertions.assertThat(actualBody).isNotNull();
+    Assertions.assertThat(actualBody.getTitle()).isEqualTo("Bad Request");
+    Assertions.assertThat(actualBody.getStatus()).isEqualTo(400);
+    Assertions.assertThat(actualBody.getDetails()).isEqualTo("Activity not found for id: " + id);
   }
 
   @Test
