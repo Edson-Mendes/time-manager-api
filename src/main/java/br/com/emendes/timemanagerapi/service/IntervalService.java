@@ -2,6 +2,7 @@ package br.com.emendes.timemanagerapi.service;
 
 import br.com.emendes.timemanagerapi.dto.request.IntervalRequest;
 import br.com.emendes.timemanagerapi.dto.response.IntervalResponseBody;
+import br.com.emendes.timemanagerapi.exception.ActivityNotFoundException;
 import br.com.emendes.timemanagerapi.exception.IntervalCreationException;
 import br.com.emendes.timemanagerapi.exception.IntervalNotFoundException;
 import br.com.emendes.timemanagerapi.model.Status;
@@ -32,8 +33,12 @@ public class IntervalService {
   }
 
   public Page<IntervalResponseBody> find(long activityId, Pageable pageable) {
+    Activity activity = activityService.findById(activityId);
+    if(activity.getStatus() == Status.DELETED){
+      throw new ActivityNotFoundException("Activity not found for id: " + activityId);
+    }
     Page<Interval> intervalPage = intervalRepository.findByActivity(
-        activityService.findById(activityId), pageable);
+        activity, pageable);
     return intervalPage.map(IntervalResponseBody::new);
   }
 

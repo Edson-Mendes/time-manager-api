@@ -97,7 +97,7 @@ class IntervalControllerIT {
   }
 
   @Test
-  @DisplayName("get for /activities/{activityId}/intervals must returns status 400 when Activity doesn't exist")
+  @DisplayName("get for /activities/{activityId}/intervals must returns ExceptionDetails when Activity doesn't exist")
   void getForIntervals_MustReturnsExceptionDetails_WhenActivityDoesntExist() {
     final String URI = "/activities/100/intervals";
 
@@ -110,6 +110,46 @@ class IntervalControllerIT {
     Assertions.assertThat(actualBody).isNotNull();
     Assertions.assertThat(actualBody.getTitle()).isEqualTo("Bad Request");
     Assertions.assertThat(actualBody.getDetails()).isEqualTo("Activity not found for id: 100");
+  }
+
+  @Test
+  @DisplayName("get for /activities/{activityId}/intervals must returns status 400 when activity status is deleted")
+  void getForIntervals_MustReturnsStatus200_WhenActivityStatusIsDeleted() {
+    final String URI = "/activities/1/intervals";
+
+    Activity activitySaved = activityRepository.save(ActivityCreator.withStatus(Status.DELETED));
+    Interval interval = IntervalCreator.withActivityStartedAtAndElapsedTime(
+        activitySaved, "2022-09-25T10:32:57", "00:30:00"
+    );
+    intervalRepository.save(interval);
+
+    ResponseEntity<ExceptionDetails> responseEntity = testRestTemplate.exchange(
+        URI, HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+        });
+    HttpStatus actualStatus = responseEntity.getStatusCode();
+
+    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.BAD_REQUEST);
+  }
+
+  @Test
+  @DisplayName("get for /activities/{activityId}/intervals must returns ExceptionDetails when activity status is deleted")
+  void getForIntervals_MustReturnsExceptionDetails_WhenActivityStatusIsDeleted() {
+    final String URI = "/activities/1/intervals";
+
+    Activity activitySaved = activityRepository.save(ActivityCreator.withStatus(Status.DELETED));
+    Interval interval = IntervalCreator.withActivityStartedAtAndElapsedTime(
+        activitySaved, "2022-09-25T10:32:57", "00:30:00"
+    );
+    intervalRepository.save(interval);
+
+    ResponseEntity<ExceptionDetails> responseEntity = testRestTemplate.exchange(
+        URI, HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+        });
+    ExceptionDetails actualBody = responseEntity.getBody();
+
+    Assertions.assertThat(actualBody).isNotNull();
+    Assertions.assertThat(actualBody.getTitle()).isEqualTo("Bad Request");
+    Assertions.assertThat(actualBody.getDetails()).isEqualTo("Activity not found for id: 1");
   }
 
   @Test

@@ -176,6 +176,18 @@ class IntervalServiceTest {
           .withMessage("Activity not found for id: "+NONEXISTENT_ACTIVITY_ID);
     }
 
+    @Test
+    @DisplayName("find must throws ActivityNotFoundException when activity status is deleted")
+    void find_MustThrowsActivityNotFoundException_WhenActivityStatusIsDeleted() {
+      BDDMockito.when(activityServiceMock.findById(EXISTENT_ACTIVITY_ID))
+          .thenReturn(ActivityCreator.withIdAndStatus(EXISTENT_ACTIVITY_ID, Status.DELETED));
+
+      Assertions.assertThatExceptionOfType(ActivityNotFoundException.class)
+          .isThrownBy(() -> intervalService.find(
+              EXISTENT_ACTIVITY_ID, DEFAULT_PAGEABLE))
+          .withMessage("Activity not found for id: "+EXISTENT_ACTIVITY_ID);
+    }
+
   }
 
   @Nested
