@@ -2,7 +2,10 @@ package br.com.emendes.timemanagerapi.dto.request;
 
 import br.com.emendes.timemanagerapi.model.Status;
 import br.com.emendes.timemanagerapi.validation.anotation.StatusValidation;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.validation.constraints.NotBlank;
 
@@ -19,7 +22,6 @@ public class UpdateStatusRequest {
   public Status toStatus() {
     return Status.valueOf(this.status.toUpperCase());
   }
-
 
   @Override
   public boolean equals(Object o) {

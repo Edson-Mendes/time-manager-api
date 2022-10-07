@@ -1,6 +1,7 @@
 package br.com.emendes.timemanagerapi.integration;
 
 import br.com.emendes.timemanagerapi.dto.request.ActivityRequestBody;
+import br.com.emendes.timemanagerapi.dto.request.UpdateStatusRequest;
 import br.com.emendes.timemanagerapi.dto.response.ActivityResponseBody;
 import br.com.emendes.timemanagerapi.dto.response.detail.ExceptionDetails;
 import br.com.emendes.timemanagerapi.dto.response.detail.ValidationExceptionDetails;
@@ -13,6 +14,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
@@ -31,6 +33,7 @@ import org.springframework.test.context.ActiveProfiles;
 class ActivityControllerIT {
 
   @Autowired
+  @Qualifier(value = "withPatch")
   private TestRestTemplate testRestTemplate;
   @Autowired
   private ActivityRepository activityRepository;
@@ -225,8 +228,8 @@ class ActivityControllerIT {
   }
 
   @Test
-  @DisplayName("put for /activities/{id} must returns status 400 when activity don't exist")
-  void putForActivitiesId_MustReturnsStatus400_WhenActivityDontExist() {
+  @DisplayName("put for /activities/{id} must returns status 400 when activity doesn't exist")
+  void putForActivitiesId_MustReturnsStatus400_WhenActivityDoesntExist() {
     long id = 999L;
     String uri = ACTIVITIES_URI + "/" + id;
 
@@ -247,8 +250,8 @@ class ActivityControllerIT {
   }
 
   @Test
-  @DisplayName("put for /activities/{id} must returns ExceptionDetails when activity don't exist")
-  void putForActivitiesId_MustReturnsExceptionDetails_WhenActivityDontExist() {
+  @DisplayName("put for /activities/{id} must returns ExceptionDetails when activity doesn't exist")
+  void putForActivitiesId_MustReturnsExceptionDetails_WhenActivityDoesntExist() {
     long id = 999L;
     String uri = ACTIVITIES_URI + "/" + id;
 
@@ -339,7 +342,7 @@ class ActivityControllerIT {
   }
 
   @Test
-  @DisplayName("put for /activities/{id} must returns ValidationExceptionDetails when activity status is deleted")
+  @DisplayName("put for /activities/{id} must returns ExceptionDetails when activity status is deleted")
   void putForActivitiesId_MustReturnsValidationExceptionDetails_WhenActivityStatusIsDeleted() {
     activityRepository.save(ActivityCreator.withStatus(Status.DELETED));
 
@@ -354,6 +357,116 @@ class ActivityControllerIT {
         });
 
     ValidationExceptionDetails actualBody = response.getBody();
+
+    Assertions.assertThat(actualBody).isNotNull();
+    Assertions.assertThat(actualBody.getTitle()).isEqualTo("Bad Request");
+    Assertions.assertThat(actualBody.getStatus()).isEqualTo(400);
+    Assertions.assertThat(actualBody.getDetails()).isEqualTo("Activity not found for id: " + id);
+  }
+
+  @Test
+  @DisplayName("patch for /activities/{id} must returns status 204 when update status successfully")
+  void patchForActivitiesId_MustReturnsStatus204_WhenUpdateStatusSuccessfully() {
+    long id = 1L;
+    String uri = ACTIVITIES_URI + "/" + id;
+    UpdateStatusRequest updateStatusRequest = new UpdateStatusRequest("Concluded");
+    HttpEntity<UpdateStatusRequest> requestEntity = new HttpEntity<>(updateStatusRequest);
+
+    Activity activityToBeSaved = ActivityCreator.withStatus(Status.ACTIVE);
+    activityRepository.save(activityToBeSaved);
+
+    ResponseEntity<Void> response = testRestTemplate.exchange(
+        uri, HttpMethod.PATCH, requestEntity,
+        new ParameterizedTypeReference<>() {
+        });
+
+    HttpStatus actualStatus = response.getStatusCode();
+
+    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.NO_CONTENT);
+    Assertions.assertThat(response.getBody()).isNull();
+  }
+
+  @Test
+  @DisplayName("patch for /activities/{id} must returns status 400 when status is invalid")
+  void patchForActivitiesId_MustReturnsStatus400_WhenStatusIsInvalid() {
+    long id = 1L;
+    String uri = ACTIVITIES_URI + "/" + id;
+    UpdateStatusRequest updateStatusRequest = new UpdateStatusRequest("cconclude");
+    HttpEntity<UpdateStatusRequest> requestEntity = new HttpEntity<>(updateStatusRequest);
+
+    Activity activityToBeSaved = ActivityCreator.withStatus(Status.ACTIVE);
+    activityRepository.save(activityToBeSaved);
+
+    ResponseEntity<ValidationExceptionDetails> response = testRestTemplate.exchange(
+        uri, HttpMethod.PATCH, requestEntity,
+        new ParameterizedTypeReference<>() {
+        });
+
+    HttpStatus actualStatus = response.getStatusCode();
+
+    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.BAD_REQUEST);
+  }
+
+  @Test
+  @DisplayName("patch for /activities/{id} must returns ValidationExceptionDetails when status is invalid")
+  void patchForActivitiesId_MustReturnsValidationExceptionDetails_WhenStatusIsInvalid() {
+    long id = 1L;
+    String uri = ACTIVITIES_URI + "/" + id;
+    UpdateStatusRequest updateStatusRequest = new UpdateStatusRequest("cconclude");
+    HttpEntity<UpdateStatusRequest> requestEntity = new HttpEntity<>(updateStatusRequest);
+
+    Activity activityToBeSaved = ActivityCreator.withStatus(Status.ACTIVE);
+    activityRepository.save(activityToBeSaved);
+
+    ResponseEntity<ValidationExceptionDetails> response = testRestTemplate.exchange(
+        uri, HttpMethod.PATCH, requestEntity,
+        new ParameterizedTypeReference<>() {
+        });
+
+    ValidationExceptionDetails actualBody = response.getBody();
+
+    Assertions.assertThat(actualBody).isNotNull();
+    Assertions.assertThat(actualBody.getTitle()).isEqualTo("Bad Request");
+    Assertions.assertThat(actualBody.getStatus()).isEqualTo(400);
+    Assertions.assertThat(actualBody.getDetails()).isEqualTo("Invalid field(s)");
+    Assertions.assertThat(actualBody.getFields()).contains("status");
+    Assertions.assertThat(actualBody.getMessages()).contains("invalid status");
+  }
+
+  @Test
+  @DisplayName("patch for /activities/{id} must returns status 400 when activity doesn't exist")
+  void patchForActivitiesId_MustReturnsStatus400_WhenActivityDoesntExist() {
+    long id = 999L;
+    String uri = ACTIVITIES_URI + "/" + id;
+
+    UpdateStatusRequest updateStatusRequest = new UpdateStatusRequest("concluded");
+    HttpEntity<UpdateStatusRequest> requestEntity = new HttpEntity<>(updateStatusRequest);
+
+    ResponseEntity<ExceptionDetails> response = testRestTemplate.exchange(
+        uri, HttpMethod.PATCH, requestEntity,
+        new ParameterizedTypeReference<>() {
+        });
+
+    HttpStatus actualStatus = response.getStatusCode();
+
+    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.BAD_REQUEST);
+  }
+
+  @Test
+  @DisplayName("patch for /activities/{id} must returns ExceptionDetails when activity doesn't exist")
+  void patchForActivitiesId_MustReturnsExceptionDetails_WhenActivityDoesntExist() {
+    long id = 999L;
+    String uri = ACTIVITIES_URI + "/" + id;
+
+    UpdateStatusRequest updateStatusRequest = new UpdateStatusRequest("concluded");
+    HttpEntity<UpdateStatusRequest> requestEntity = new HttpEntity<>(updateStatusRequest);
+
+    ResponseEntity<ExceptionDetails> response = testRestTemplate.exchange(
+        uri, HttpMethod.PATCH, requestEntity,
+        new ParameterizedTypeReference<>() {
+        });
+
+    ExceptionDetails actualBody = response.getBody();
 
     Assertions.assertThat(actualBody).isNotNull();
     Assertions.assertThat(actualBody.getTitle()).isEqualTo("Bad Request");

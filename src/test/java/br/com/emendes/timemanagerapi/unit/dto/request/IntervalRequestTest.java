@@ -1,8 +1,6 @@
 package br.com.emendes.timemanagerapi.unit.dto.request;
 
 import br.com.emendes.timemanagerapi.dto.request.IntervalRequest;
-import br.com.emendes.timemanagerapi.model.entity.Activity;
-import lombok.extern.log4j.Log4j2;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -43,6 +41,21 @@ class IntervalRequestTest {
     void validateStartedAt_MustReturnsViolations_WhenStartedAtIsNull(){
       IntervalRequest intervalRequest =
           new IntervalRequest(null, VALID_ELAPSED_TIME);
+
+      Set<ConstraintViolation<IntervalRequest>> actualViolations = validator.validate(intervalRequest);
+
+      Assertions.assertThat(actualViolations)
+          .isNotEmpty()
+          .hasSize(1);
+      Assertions.assertThat(actualViolations.stream().findFirst().get().getMessage())
+          .isEqualTo("startedAt must not be null or blank");
+    }
+
+    @Test
+    @DisplayName("validate startedAt must return violations when startedAt is blank")
+    void validateStartedAt_MustReturnsViolations_WhenStartedAtIsBlank(){
+      IntervalRequest intervalRequest =
+          new IntervalRequest("   ", VALID_ELAPSED_TIME);
 
       Set<ConstraintViolation<IntervalRequest>> actualViolations = validator.validate(intervalRequest);
 
@@ -113,6 +126,20 @@ class IntervalRequestTest {
     @DisplayName("validate elapsedTime must return violations when elapsedTime is empty")
     void validateElapsedTime_MustReturnsViolations_WhenElapsedTimeIsEmpty(){
       IntervalRequest intervalRequest = new IntervalRequest(VALID_STARTED_AT, "");
+
+      Set<ConstraintViolation<IntervalRequest>> actualViolations = validator.validate(intervalRequest);
+
+      Assertions.assertThat(actualViolations)
+          .isNotEmpty()
+          .hasSize(1);
+      Assertions.assertThat(actualViolations.stream().findFirst().get().getMessage())
+          .isEqualTo("elapsedTime must not be null or blank");
+    }
+
+    @Test
+    @DisplayName("validate elapsedTime must return violations when elapsedTime is blank")
+    void validateElapsedTime_MustReturnsViolations_WhenElapsedTimeIsBlank(){
+      IntervalRequest intervalRequest = new IntervalRequest(VALID_STARTED_AT, "   ");
 
       Set<ConstraintViolation<IntervalRequest>> actualViolations = validator.validate(intervalRequest);
 

@@ -64,6 +64,19 @@ class ActivityRequestBodyTest {
           .isEqualTo("name must not be null or blank");
     }
 
+    @Test
+    @DisplayName("validate name must returns violations when name is blank")
+    void validateName_MustReturnsViolations_WhenNameIsBlank(){
+      ActivityRequestBody activityRequestBody =
+          new ActivityRequestBody("   ", VALID_DESCRIPTION);
+
+      Set<ConstraintViolation<ActivityRequestBody>> violations = validator.validate(activityRequestBody);
+
+      Assertions.assertThat(violations).isNotEmpty().hasSize(1);
+      Assertions.assertThat(violations.stream().findFirst().get().getMessage())
+          .isEqualTo("name must not be null or blank");
+    }
+
   }
 
   @Nested
@@ -100,6 +113,21 @@ class ActivityRequestBodyTest {
     void validateDescription_MustReturnsViolations_WhenDescriptionIsEmpty(){
       ActivityRequestBody activityRequestBody =
           new ActivityRequestBody(VALID_NAME, "");
+
+      Set<ConstraintViolation<ActivityRequestBody>> violations = validator.validate(activityRequestBody);
+
+      Assertions.assertThat(violations)
+          .isNotEmpty()
+          .hasSize(1);
+      Assertions.assertThat(violations.stream().findFirst().get().getMessage())
+          .isEqualTo("description must not be null or blank");
+    }
+
+    @Test
+    @DisplayName("validate description must returns violations when description is blank")
+    void validateDescription_MustReturnsViolations_WhenDescriptionIsBlank(){
+      ActivityRequestBody activityRequestBody =
+          new ActivityRequestBody(VALID_NAME, "   ");
 
       Set<ConstraintViolation<ActivityRequestBody>> violations = validator.validate(activityRequestBody);
 
