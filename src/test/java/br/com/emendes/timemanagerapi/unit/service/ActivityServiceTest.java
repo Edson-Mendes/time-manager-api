@@ -39,6 +39,7 @@ class ActivityServiceTest {
   private final ActivityRequestBody VALID_ACTIVITY_REQUEST_BODY =
       new ActivityRequestBody("Lorem Ipsum Activity", "A simple project for my portfolio");
   private final Pageable DEFAULT_PAGEABLE = PageableCreator.activityDefaultPageable();
+  private final long EXISTENT_ACTIVITY_ID = 1000L;
   private final long NONEXISTENT_ACTIVITY_ID = 9999L;
 
   //  Mocks de métodos/actions de activityServiceMock
@@ -56,6 +57,9 @@ class ActivityServiceTest {
             .withIdNameAndDescription(1L, "Lorem Ipsum Activity", "A simple project for my portfolio"));
 
     BDDMockito.when(activityRepositoryMock.findById(NONEXISTENT_ACTIVITY_ID)).thenReturn(Optional.empty());
+
+    BDDMockito.when(activityRepositoryMock.findById(EXISTENT_ACTIVITY_ID))
+        .thenReturn(Optional.of(ActivityCreator.withIdAndStatus(EXISTENT_ACTIVITY_ID, Status.DELETED)));
   }
 
   @Nested
@@ -192,6 +196,16 @@ class ActivityServiceTest {
       Assertions.assertThatExceptionOfType(ActivityNotFoundException.class)
           .isThrownBy(() -> activityService.updateStatusById(NONEXISTENT_ACTIVITY_ID, updateStatusRequest))
           .withMessage("Activity not found for id: " + NONEXISTENT_ACTIVITY_ID);
+    }
+
+    @Test
+    @DisplayName("updateStatusById must throws ActivityNotFoundException when activity status is deleted")
+    void updateStatusById_MustThrowsActivityNotFoundException_WhenActivityStatusIsDeleted() {
+      UpdateStatusRequest updateStatusRequest = new UpdateStatusRequest("CONCLUDED");
+
+      Assertions.assertThatExceptionOfType(ActivityNotFoundException.class)
+          .isThrownBy(() -> activityService.updateStatusById(EXISTENT_ACTIVITY_ID, updateStatusRequest))
+          .withMessage("Activity not found for id: " + EXISTENT_ACTIVITY_ID);
     }
 
   }

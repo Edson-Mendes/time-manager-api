@@ -475,6 +475,51 @@ class ActivityControllerIT {
   }
 
   @Test
+  @DisplayName("patch for /activities/{id} must returns status 400 when activity status is deleted")
+  void patchForActivitiesId_MustReturnsStatus400_WhenActivityStatusIsDeleted() {
+    long id = 1L;
+    String uri = ACTIVITIES_URI + "/" + id;
+
+    activityRepository.save(ActivityCreator.withStatus(Status.DELETED));
+
+    UpdateStatusRequest updateStatusRequest = new UpdateStatusRequest("concluded");
+    HttpEntity<UpdateStatusRequest> requestEntity = new HttpEntity<>(updateStatusRequest);
+
+    ResponseEntity<ExceptionDetails> response = testRestTemplate.exchange(
+        uri, HttpMethod.PATCH, requestEntity,
+        new ParameterizedTypeReference<>() {
+        });
+
+    HttpStatus actualStatus = response.getStatusCode();
+
+    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.BAD_REQUEST);
+  }
+
+  @Test
+  @DisplayName("patch for /activities/{id} must returns ExceptionDetails when activity status is deleted")
+  void patchForActivitiesId_MustReturnsExceptionDetails_WhenActivityStatusIsDeleted() {
+    long id = 1L;
+    String uri = ACTIVITIES_URI + "/" + id;
+
+    activityRepository.save(ActivityCreator.withStatus(Status.DELETED));
+
+    UpdateStatusRequest updateStatusRequest = new UpdateStatusRequest("concluded");
+    HttpEntity<UpdateStatusRequest> requestEntity = new HttpEntity<>(updateStatusRequest);
+
+    ResponseEntity<ExceptionDetails> response = testRestTemplate.exchange(
+        uri, HttpMethod.PATCH, requestEntity,
+        new ParameterizedTypeReference<>() {
+        });
+
+    ExceptionDetails actualBody = response.getBody();
+
+    Assertions.assertThat(actualBody).isNotNull();
+    Assertions.assertThat(actualBody.getTitle()).isEqualTo("Bad Request");
+    Assertions.assertThat(actualBody.getStatus()).isEqualTo(400);
+    Assertions.assertThat(actualBody.getDetails()).isEqualTo("Activity not found for id: " + id);
+  }
+
+  @Test
   @DisplayName("delete for /activities/{id} must returns status 204 when deleted successfully")
   void deleteForActivitiesId_MustReturnsStatus204_WhenDeletedSuccessfully() {
     long id = 1L;

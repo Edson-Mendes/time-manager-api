@@ -56,6 +56,9 @@ public class ActivityService {
 
   private void updateStatusById(long id, Status status){
     Activity activityToChangeStatus = findById(id);
+    if (activityToChangeStatus.getStatus() == Status.DELETED) {
+      throw new ActivityNotFoundException("Activity not found for id: " + id);
+    }
     activityToChangeStatus.setStatus(status);
     activityRepository.save(activityToChangeStatus);
   }
