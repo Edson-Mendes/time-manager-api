@@ -84,6 +84,46 @@ class IntervalControllerIT {
   }
 
   @Test
+  @DisplayName("get for /activities/{activityId}/intervals must returns status 200 when Activity status is concluded")
+  void getForIntervals_MustReturnsStatus200_WhenActivityStatusIsConcluded() {
+    final String URI = "/activities/1/intervals";
+    Activity activityToBeSaved = ActivityCreator.withStatus(Status.CONCLUDED);
+    Activity activitySaved = activityRepository.save(activityToBeSaved);
+    Interval interval = IntervalCreator.withActivityStartedAtAndElapsedTime(
+        activitySaved, "2022-09-25T10:32:57", "00:30:00"
+    );
+    intervalRepository.save(interval);
+
+    ResponseEntity<PageableResponse<IntervalResponseBody>> responseEntity = testRestTemplate.exchange(
+        URI, HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+        });
+    HttpStatus actualStatus = responseEntity.getStatusCode();
+
+    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.OK);
+  }
+
+  @Test
+  @DisplayName("get for /activities/{activityId}/intervals must returns Page<IntervalResponseBody> when Activity status is concluded")
+  void getForIntervals_MustReturnsPageIntervalResponseBody_WhenActivityStatusIsConcluded() {
+    final String URI = "/activities/1/intervals";
+    Activity activityToBeSaved = ActivityCreator.withStatus(Status.CONCLUDED);
+    Activity activitySaved = activityRepository.save(activityToBeSaved);
+    Interval interval = IntervalCreator.withActivityStartedAtAndElapsedTime(
+        activitySaved, "2022-09-25T10:32:57", "00:30:00"
+    );
+    intervalRepository.save(interval);
+
+    ResponseEntity<PageableResponse<IntervalResponseBody>> responseEntity = testRestTemplate.exchange(
+        URI, HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+        });
+    Page<IntervalResponseBody> actualBody = responseEntity.getBody();
+
+    Assertions.assertThat(actualBody).isNotNull().hasSize(1);
+    Assertions.assertThat(actualBody.getContent().get(0).getStartedAt()).isEqualTo("2022-09-25T10:32:57");
+    Assertions.assertThat(actualBody.getContent().get(0).getElapsedTime()).isEqualTo("00:30:00");
+  }
+
+  @Test
   @DisplayName("get for /activities/{activityId}/intervals must returns status 400 when Activity doesn't exist")
   void getForIntervals_MustReturnsStatus400_WhenActivityDoesntExist() {
     final String URI = "/activities/100/intervals";

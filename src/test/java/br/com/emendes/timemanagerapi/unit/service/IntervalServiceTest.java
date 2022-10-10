@@ -12,6 +12,7 @@ import br.com.emendes.timemanagerapi.repository.IntervalRepository;
 import br.com.emendes.timemanagerapi.service.ActivityService;
 import br.com.emendes.timemanagerapi.service.IntervalService;
 import br.com.emendes.timemanagerapi.util.creator.ActivityCreator;
+import br.com.emendes.timemanagerapi.util.creator.IntervalCreator;
 import br.com.emendes.timemanagerapi.util.creator.IntervalResponseBodyCreator;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -154,6 +155,26 @@ class IntervalServiceTest {
 
       Assertions.assertThat(intervalsPage).hasSize(1);
       Assertions.assertThat(intervalsPage.getContent()).contains(expectedIntervalRespBody);
+    }
+
+    @Test
+    @DisplayName("find must returns Page<IntervalResponseBody> when Activity Status is concluded")
+    void find_MustReturnsPageIntervalResponseBody_WhenActivityStatusIsConcluded(){
+      Activity activityFound = ActivityCreator.withIdAndStatus(EXISTENT_ACTIVITY_ID, Status.CONCLUDED);
+      Interval intervalFound = IntervalCreator.withIdActivityIdStartedAtAndElapsedTime(
+          100L, EXISTENT_ACTIVITY_ID, "2022-08-16T15:07:00", "00:30:00");
+      BDDMockito.when(activityServiceMock.findById(EXISTENT_ACTIVITY_ID))
+          .thenReturn(activityFound);
+      BDDMockito.when(intervalRepositoryMock.findByActivity(activityFound, DEFAULT_PAGEABLE))
+          .thenReturn(new PageImpl<>(List.of(intervalFound), DEFAULT_PAGEABLE, 1));
+
+      Page<IntervalResponseBody> intervalsPage = intervalService.find(EXISTENT_ACTIVITY_ID, DEFAULT_PAGEABLE);
+
+      IntervalResponseBody expectedIntervalResponse = IntervalResponseBodyCreator
+          .withIdAndStartedAtAndElapsedTime(100L, "2022-08-16T15:07:00", "00:30:00");
+
+      Assertions.assertThat(intervalsPage).hasSize(1);
+      Assertions.assertThat(intervalsPage.getContent()).contains(expectedIntervalResponse);
     }
 
     @Test
