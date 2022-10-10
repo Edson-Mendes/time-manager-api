@@ -4,8 +4,8 @@ import br.com.emendes.timemanagerapi.dto.request.ActivityRequestBody;
 import br.com.emendes.timemanagerapi.dto.request.UpdateStatusRequest;
 import br.com.emendes.timemanagerapi.dto.response.ActivityResponseBody;
 import br.com.emendes.timemanagerapi.exception.ActivityNotFoundException;
-import br.com.emendes.timemanagerapi.model.entity.Activity;
 import br.com.emendes.timemanagerapi.model.Status;
+import br.com.emendes.timemanagerapi.model.entity.Activity;
 import br.com.emendes.timemanagerapi.repository.ActivityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -38,29 +38,31 @@ public class ActivityService {
   }
 
   public void update(long id, ActivityRequestBody activityRequestBody) {
-    Activity activityToBeUpdated = findById(id);
-    if (activityToBeUpdated.getStatus() == Status.DELETED) {
-      throw new ActivityNotFoundException("Activity not found for id: " + id);
-    }
+    Activity activityToBeUpdated = findByIdAndNotDeleted(id);
     activityToBeUpdated.update(activityRequestBody);
     activityRepository.save(activityToBeUpdated);
   }
 
-  public void deleteActivityById(long id){
+  public void deleteActivityById(long id) {
     updateStatusById(id, Status.DELETED);
   }
 
-  public void updateStatusById(long id, UpdateStatusRequest updateStatusRequest){
+  public void updateStatusById(long id, UpdateStatusRequest updateStatusRequest) {
     updateStatusById(id, updateStatusRequest.toStatus());
   }
 
-  private void updateStatusById(long id, Status status){
-    Activity activityToChangeStatus = findById(id);
-    if (activityToChangeStatus.getStatus() == Status.DELETED) {
-      throw new ActivityNotFoundException("Activity not found for id: " + id);
-    }
+  private void updateStatusById(long id, Status status) {
+    Activity activityToChangeStatus = findByIdAndNotDeleted(id);
     activityToChangeStatus.setStatus(status);
     activityRepository.save(activityToChangeStatus);
+  }
+
+  private Activity findByIdAndNotDeleted(long id) {
+    Activity activityFound = findById(id);
+    if (activityFound.getStatus() == Status.DELETED) {
+      throw new ActivityNotFoundException("Activity not found for id: " + id);
+    }
+    return activityFound;
   }
 
 }

@@ -21,7 +21,7 @@ public class IntervalService {
   private final ActivityService activityService;
   private final IntervalRepository intervalRepository;
 
-  public IntervalResponseBody create(long activityId, IntervalRequest requestBody){
+  public IntervalResponseBody create(long activityId, IntervalRequest requestBody) {
     Activity activity = activityService.findById(activityId);
     if(activity.getStatus() != Status.ACTIVE){
       throw new IntervalCreationException("Cannot create interval on non active activity");
@@ -48,7 +48,7 @@ public class IntervalService {
     intervalRepository.delete(findById(intervalId));
   }
 
-  private Interval findById(long id){
+  private Interval findById(long id) {
     return intervalRepository.findById(id).orElseThrow(
         () -> new IntervalNotFoundException("Interval not found for id: " + id));
   }
