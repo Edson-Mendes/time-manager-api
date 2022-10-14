@@ -26,6 +26,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
   public JWTAuthenticationFilter(AuthenticationManager authenticationManager) {
     this.authenticationManager = authenticationManager;
+    setPostOnly(true);
     setFilterProcessesUrl("/login");
   }
 
@@ -43,8 +44,6 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
       );
     } catch (IOException e) {
       throw new RuntimeException("Deu ruim na LEITURA do body");
-    } catch (AuthenticationException ae) {
-      throw new RuntimeException("Deu ruim na AUTENTICAÇÂO do usuário");
     }
   }
 
@@ -68,6 +67,14 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     String body = logged.getUsername() + " " + token;
 
     response.getWriter().write(body);
+    response.getWriter().flush();
+  }
+
+  @Override
+  protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
+//    super.unsuccessfulAuthentication(request, response, failed);
+    response.setStatus(400);
+    response.getWriter().write("Credenciais inválidas!!!");
     response.getWriter().flush();
   }
 }

@@ -139,7 +139,8 @@ Time Manager API é uma aplicação para auxiliar no gerenciamento de tempo gast
 - `Intellij`
 - `Java 17`
 - `Maven`
-- `Spring Boot, Spring MVC, Spring Data JPA`
+- `Spring Boot, Spring MVC, Spring Data JPA, Spring Security`
+- `JWT`
 - `Docker`
 - `PostgreSQL`
 - `Flyway`
