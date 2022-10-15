@@ -4,9 +4,11 @@ import br.com.emendes.timemanagerapi.config.security.filter.JWTAuthenticationFil
 import br.com.emendes.timemanagerapi.model.entity.Role;
 import br.com.emendes.timemanagerapi.model.entity.User;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -22,6 +24,12 @@ import java.util.Set;
 @Log4j2
 @Profile({"dev"})
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+
+  @Bean
+  @Override
+  public AuthenticationManager authenticationManagerBean() throws Exception {
+    return super.authenticationManagerBean();
+  }
 
   @Override
   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -46,11 +54,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   protected void configure(HttpSecurity http) throws Exception {
     http.authorizeRequests()
         .antMatchers(HttpMethod.GET, "/activities", "/activities/**").permitAll()
+        .antMatchers(HttpMethod.POST, "/signin").permitAll()
         .antMatchers(HttpMethod.POST, "/activities", "/activities/*/intervals").permitAll()
         .antMatchers(HttpMethod.PUT, "/activities/*", "/activities/*/intervals/*").permitAll()
         .antMatchers(HttpMethod.DELETE, "/activities/*", "/activities/*/intervals/*").permitAll()
         .anyRequest().authenticated()
-        .and()
+        .and().csrf().disable()
         .addFilter(new JWTAuthenticationFilter(authenticationManager()));
   }
 }
