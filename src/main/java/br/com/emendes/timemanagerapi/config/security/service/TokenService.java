@@ -1,11 +1,11 @@
 package br.com.emendes.timemanagerapi.config.security.service;
 
 import br.com.emendes.timemanagerapi.model.entity.User;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -32,4 +32,19 @@ public class TokenService {
         .signWith(SignatureAlgorithm.HS256, secret)
         .compact();
   }
+
+  public boolean isTokenValid(String token) {
+    try {
+      Jwts.parser().setSigningKey(this.secret).parseClaimsJws(token);
+      return true;
+    } catch (Exception e) {
+      return false;
+    }
+  }
+
+  public Long getUserId(String token) {
+    Claims claims = Jwts.parser().setSigningKey(this.secret).parseClaimsJws(token).getBody();
+    return Long.parseLong(claims.getSubject());
+  }
+
 }

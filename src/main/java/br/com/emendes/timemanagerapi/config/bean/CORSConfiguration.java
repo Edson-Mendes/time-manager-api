@@ -1,4 +1,4 @@
-package br.com.emendes.timemanagerapi.config;
+package br.com.emendes.timemanagerapi.config.bean;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

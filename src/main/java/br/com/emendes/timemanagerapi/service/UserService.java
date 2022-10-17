@@ -20,4 +20,9 @@ public class UserService {
     });
   }
 
+  public UserDetails findUserDetailsById(long id) {
+    return userRepository.findById(id).orElseThrow(() -> {
+      throw new UsernameNotFoundException("Usuário não encontrado!");
+    });
+  }
 }

@@ -17,4 +17,8 @@ public class AuthenticationService implements UserDetailsService {
     return userService.findByUsername(username);
   }
 
+  public UserDetails findUserDetailsById(long id){
+    return userService.findUserDetailsById(id);
+  }
+
 }

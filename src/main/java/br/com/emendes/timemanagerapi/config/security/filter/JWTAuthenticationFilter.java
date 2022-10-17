@@ -1,81 +1,54 @@
 package br.com.emendes.timemanagerapi.config.security.filter;
 
-import br.com.emendes.timemanagerapi.dto.request.LoginRequest;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import lombok.extern.log4j.Log4j2;
+import br.com.emendes.timemanagerapi.config.security.service.AuthenticationService;
+import br.com.emendes.timemanagerapi.config.security.service.TokenService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Date;
 
-// TODO: Deletar filtro
-@Log4j2
-public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+public class JWTAuthenticationFilter extends BasicAuthenticationFilter {
 
-  private final AuthenticationManager authenticationManager;
+  private final TokenService tokenService;
+  private final AuthenticationService authenticationService;
 
-  public JWTAuthenticationFilter(AuthenticationManager authenticationManager) {
-    this.authenticationManager = authenticationManager;
-    setPostOnly(true);
-    setFilterProcessesUrl("/login");
+  public JWTAuthenticationFilter(
+      AuthenticationManager authenticationManager, TokenService tokenService, AuthenticationService authenticationService) {
+    super(authenticationManager);
+    this.authenticationService = authenticationService;
+    this.tokenService = tokenService;
   }
 
   @Override
-  public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-
-    try {
-      LoginRequest creds = new ObjectMapper()
-          .readValue(request.getInputStream(), LoginRequest.class);
-
-      log.debug(creds);
-
-      return authenticationManager.authenticate(
-          new UsernamePasswordAuthenticationToken(creds.getEmail(), creds.getPassword())
-      );
-    } catch (IOException e) {
-      throw new RuntimeException("Deu ruim na LEITURA do body");
+  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
+    String token = recoverToken(request);
+    if (tokenService.isTokenValid(token)) {
+      SecurityContextHolder.getContext().setAuthentication(getAuthentication(token));
     }
+
+    chain.doFilter(request, response);
   }
 
-  @Override
-  protected void successfulAuthentication(
-      HttpServletRequest request,
-      HttpServletResponse response,
-      FilterChain chain, Authentication auth) throws IOException, ServletException {
-    UserDetails logged = (UserDetails) auth.getPrincipal();
-    Date now = new Date();
-    Date expirationDate = new Date(now.getTime() + 3600000L);
-
-    String token = Jwts.builder()
-        .setIssuer("Time Manager API")
-        .setSubject(logged.getUsername())
-        .setIssuedAt(now)
-        .setExpiration(expirationDate)
-        .signWith(SignatureAlgorithm.HS256, "1234")
-        .compact();
-
-    String body = logged.getUsername() + " " + token;
-
-    response.getWriter().write(body);
-    response.getWriter().flush();
+  private String recoverToken(HttpServletRequest request) {
+    String token = request.getHeader("Authorization");
+    if (token == null || !token.startsWith("Bearer ")) {
+      return null;
+    }
+    return token.substring(7);
   }
 
-  @Override
-  protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
-//    super.unsuccessfulAuthentication(request, response, failed);
-    response.setStatus(400);
-    response.getWriter().write("Credenciais inválidas!!!");
-    response.getWriter().flush();
+  private Authentication getAuthentication(String token) {
+    Long userId = tokenService.getUserId(token);
+    UserDetails userDetails = authenticationService.findUserDetailsById(userId);
+    return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
   }
+
 }
