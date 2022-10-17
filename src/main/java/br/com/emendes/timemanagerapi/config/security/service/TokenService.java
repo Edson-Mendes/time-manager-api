@@ -20,13 +20,13 @@ public class TokenService {
   private String secret;
 
   public String generateToken(Authentication authentication) {
-    UserDetails logged = (UserDetails) authentication.getPrincipal();
+    User logged = (User) authentication.getPrincipal();
     Date now = new Date();
     Date expirationDate = new Date(now.getTime() + Long.parseLong(expiration));
 
     return Jwts.builder()
         .setIssuer("Time Manager API")
-        .setSubject(logged.getUsername())
+        .setSubject(logged.getId().toString())
         .setIssuedAt(now)
         .setExpiration(expirationDate)
         .signWith(SignatureAlgorithm.HS256, secret)

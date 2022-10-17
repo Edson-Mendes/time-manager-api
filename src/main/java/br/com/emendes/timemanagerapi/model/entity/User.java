@@ -17,6 +17,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@ToString
 @Entity(name = "tb_user")
 public class User implements UserDetails {
 
@@ -29,7 +30,7 @@ public class User implements UserDetails {
   private String email;
   @Column(nullable = false)
   private String password;
-  @ManyToMany(fetch = FetchType.LAZY)
+  @ManyToMany(fetch = FetchType.EAGER)
   @OnDelete(action = OnDeleteAction.CASCADE)
   @JoinTable(
       name = "tb_user_roles",
@@ -37,31 +38,6 @@ public class User implements UserDetails {
       inverseJoinColumns = @JoinColumn(name = "roles_id", nullable = false)
   )
   private Set<Role> roles = new HashSet<>();
-
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-
-    User user = (User) o;
-
-    if (!Objects.equals(id, user.id)) return false;
-    if (!Objects.equals(name, user.name)) return false;
-    if (!Objects.equals(email, user.email)) return false;
-    if (!Objects.equals(password, user.password)) return false;
-    return Objects.equals(roles, user.roles);
-  }
-
-  @Override
-  public int hashCode() {
-    int result = id != null ? id.hashCode() : 0;
-    result = 31 * result + (name != null ? name.hashCode() : 0);
-    result = 31 * result + (email != null ? email.hashCode() : 0);
-    result = 31 * result + (password != null ? password.hashCode() : 0);
-    result = 31 * result + (roles != null ? roles.hashCode() : 0);
-    return result;
-  }
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -96,5 +72,27 @@ public class User implements UserDetails {
   @Override
   public boolean isEnabled() {
     return true;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    User user = (User) o;
+
+    if (!Objects.equals(id, user.id)) return false;
+    if (!Objects.equals(name, user.name)) return false;
+    if (!Objects.equals(email, user.email)) return false;
+    return Objects.equals(password, user.password);
+  }
+
+  @Override
+  public int hashCode() {
+    int result = id != null ? id.hashCode() : 0;
+    result = 31 * result + (name != null ? name.hashCode() : 0);
+    result = 31 * result + (email != null ? email.hashCode() : 0);
+    result = 31 * result + (password != null ? password.hashCode() : 0);
+    return result;
   }
 }
