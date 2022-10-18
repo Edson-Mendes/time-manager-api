@@ -1,16 +1,11 @@
 package br.com.emendes.timemanagerapi.model.entity;
 
-import br.com.emendes.timemanagerapi.model.entity.Activity;
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Column;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Objects;
 
 /**
  * Classe que representa um <em>intervalo</em> de tempo de execução/trabalho em uma atividade.
@@ -18,9 +13,9 @@ import java.time.LocalTime;
  */
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
 @Builder
-@Data
+@Getter
+@Setter
 @Entity(name = "tb_interval")
 public class Interval {
 
@@ -34,4 +29,25 @@ public class Interval {
   @ManyToOne()
   private Activity activity;
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    Interval interval = (Interval) o;
+
+    if (!Objects.equals(id, interval.id)) return false;
+    if (!Objects.equals(startedAt, interval.startedAt)) return false;
+    if (!Objects.equals(elapsedTime, interval.elapsedTime)) return false;
+    return Objects.equals(activity, interval.activity);
+  }
+
+  @Override
+  public int hashCode() {
+    int result = id != null ? id.hashCode() : 0;
+    result = 31 * result + (startedAt != null ? startedAt.hashCode() : 0);
+    result = 31 * result + (elapsedTime != null ? elapsedTime.hashCode() : 0);
+    result = 31 * result + (activity != null ? activity.hashCode() : 0);
+    return result;
+  }
 }

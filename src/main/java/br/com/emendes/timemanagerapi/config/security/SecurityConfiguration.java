@@ -21,7 +21,7 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 @RequiredArgsConstructor
 @EnableWebSecurity
 @Configuration
-@Profile({"dev"})
+@Profile({"dev", "test"})
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
   private final AuthenticationService authenticationService;
@@ -39,6 +39,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     auth.userDetailsService(authenticationService).passwordEncoder(passwordEncoder);
   }
 
+//  TODO: Pesquisar como adicionar cabeçalho WWW-Authenticate
   @Override
   protected void configure(HttpSecurity http) throws Exception {
     http.authorizeRequests()
