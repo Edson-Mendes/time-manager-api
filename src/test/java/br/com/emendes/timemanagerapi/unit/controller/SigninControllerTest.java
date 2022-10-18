@@ -26,11 +26,11 @@ class SigninControllerTest {
   private SigninController signinController;
 
   @Mock
-  private SigninService signinService;
+  private SigninService signinServiceMock;
 
   @BeforeEach
   void setUp(){
-    BDDMockito.when(signinService.signin(LoginRequestCreator.validLoginRequest()))
+    BDDMockito.when(signinServiceMock.signin(LoginRequestCreator.validLoginRequest()))
         .thenReturn(TokenResponseCreator.validTokenResponse());
   }
 
