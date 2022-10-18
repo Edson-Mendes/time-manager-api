@@ -2,6 +2,7 @@ package br.com.emendes.timemanagerapi.dto.request;
 
 import lombok.*;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import java.util.Objects;
 
@@ -12,9 +13,10 @@ import java.util.Objects;
 @ToString
 public class LoginRequest {
 
-  @NotBlank
+  @NotBlank(message = "email must not be null or blank")
+  @Email(message = "must be a well-formed email address")
   private String email;
-  @NotBlank
+  @NotBlank(message = "password must not be null or blank")
   private String password;
 
   @Override
