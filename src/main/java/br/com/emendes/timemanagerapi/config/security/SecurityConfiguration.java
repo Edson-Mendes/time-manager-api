@@ -43,6 +43,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   @Override
   protected void configure(HttpSecurity http) throws Exception {
     http.authorizeRequests()
+//        .antMatchers(HttpMethod.GET, "/activities" ,"/activities/**").permitAll()
+//        .antMatchers(HttpMethod.POST, "/activities" ,"/activities/**").permitAll()
+//        .antMatchers(HttpMethod.DELETE, "/activities" ,"/activities/**").permitAll()
+//        .antMatchers(HttpMethod.PUT, "/activities" ,"/activities/**").permitAll()
+//        .antMatchers(HttpMethod.PATCH, "/activities" ,"/activities/**").permitAll()
         .antMatchers(HttpMethod.POST, "/signin").permitAll()
         .anyRequest().authenticated()
         .and().csrf().disable()

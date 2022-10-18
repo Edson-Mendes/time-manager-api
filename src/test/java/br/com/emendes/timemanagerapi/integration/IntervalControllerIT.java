@@ -1,7 +1,9 @@
 package br.com.emendes.timemanagerapi.integration;
 
 import br.com.emendes.timemanagerapi.dto.request.IntervalRequest;
+import br.com.emendes.timemanagerapi.dto.request.LoginRequest;
 import br.com.emendes.timemanagerapi.dto.response.IntervalResponseBody;
+import br.com.emendes.timemanagerapi.dto.response.TokenResponse;
 import br.com.emendes.timemanagerapi.dto.response.detail.ExceptionDetails;
 import br.com.emendes.timemanagerapi.model.Status;
 import br.com.emendes.timemanagerapi.model.entity.Activity;
@@ -12,6 +14,7 @@ import br.com.emendes.timemanagerapi.util.creator.ActivityCreator;
 import br.com.emendes.timemanagerapi.util.creator.IntervalCreator;
 import br.com.emendes.timemanagerapi.util.wrapper.PageableResponse;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +22,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -40,6 +40,19 @@ class IntervalControllerIT {
   @Autowired
   private IntervalRepository intervalRepository;
 
+  private HttpHeaders headers;
+
+  @BeforeEach
+  public void addHeader(){
+    HttpEntity<LoginRequest> requestBody = new HttpEntity<>(new LoginRequest("user@email.com", "1234"));
+
+    ResponseEntity<TokenResponse> response = testRestTemplate.exchange(
+        "/signin", HttpMethod.POST, requestBody, new ParameterizedTypeReference<>() {});
+
+    headers = new HttpHeaders();
+    headers.add("Authorization", "Bearer "+response.getBody().getToken());
+  }
+
   @Test
   @DisplayName("get for /activities/{activityId}/intervals must returns status 200 when found successfully")
   void getForIntervals_MustReturnsStatus200_WhenFoundSuccessfully() {
@@ -53,8 +66,9 @@ class IntervalControllerIT {
     );
     intervalRepository.save(interval);
 
+    HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
     ResponseEntity<PageableResponse<IntervalResponseBody>> responseEntity = testRestTemplate.exchange(
-        URI, HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+        URI, HttpMethod.GET, requestEntity, new ParameterizedTypeReference<>() {
         });
     HttpStatus actualStatus = responseEntity.getStatusCode();
 
@@ -73,8 +87,9 @@ class IntervalControllerIT {
     );
     intervalRepository.save(interval);
 
+    HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
     ResponseEntity<PageableResponse<IntervalResponseBody>> responseEntity = testRestTemplate.exchange(
-        URI, HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+        URI, HttpMethod.GET, requestEntity, new ParameterizedTypeReference<>() {
         });
     Page<IntervalResponseBody> actualBody = responseEntity.getBody();
 
@@ -94,8 +109,9 @@ class IntervalControllerIT {
     );
     intervalRepository.save(interval);
 
+    HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
     ResponseEntity<PageableResponse<IntervalResponseBody>> responseEntity = testRestTemplate.exchange(
-        URI, HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+        URI, HttpMethod.GET, requestEntity, new ParameterizedTypeReference<>() {
         });
     HttpStatus actualStatus = responseEntity.getStatusCode();
 
@@ -113,8 +129,9 @@ class IntervalControllerIT {
     );
     intervalRepository.save(interval);
 
+    HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
     ResponseEntity<PageableResponse<IntervalResponseBody>> responseEntity = testRestTemplate.exchange(
-        URI, HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+        URI, HttpMethod.GET, requestEntity, new ParameterizedTypeReference<>() {
         });
     Page<IntervalResponseBody> actualBody = responseEntity.getBody();
 
@@ -128,8 +145,9 @@ class IntervalControllerIT {
   void getForIntervals_MustReturnsStatus400_WhenActivityDoesntExist() {
     final String URI = "/activities/100/intervals";
 
+    HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
     ResponseEntity<ExceptionDetails> responseEntity = testRestTemplate.exchange(
-        URI, HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+        URI, HttpMethod.GET, requestEntity, new ParameterizedTypeReference<>() {
         });
     HttpStatus actualStatus = responseEntity.getStatusCode();
 
@@ -141,8 +159,9 @@ class IntervalControllerIT {
   void getForIntervals_MustReturnsExceptionDetails_WhenActivityDoesntExist() {
     final String URI = "/activities/100/intervals";
 
+    HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
     ResponseEntity<ExceptionDetails> responseEntity = testRestTemplate.exchange(
-        URI, HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+        URI, HttpMethod.GET, requestEntity, new ParameterizedTypeReference<>() {
         });
 
     ExceptionDetails actualBody = responseEntity.getBody();
@@ -163,8 +182,9 @@ class IntervalControllerIT {
     );
     intervalRepository.save(interval);
 
+    HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
     ResponseEntity<ExceptionDetails> responseEntity = testRestTemplate.exchange(
-        URI, HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+        URI, HttpMethod.GET, requestEntity, new ParameterizedTypeReference<>() {
         });
     HttpStatus actualStatus = responseEntity.getStatusCode();
 
@@ -182,8 +202,9 @@ class IntervalControllerIT {
     );
     intervalRepository.save(interval);
 
+    HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
     ResponseEntity<ExceptionDetails> responseEntity = testRestTemplate.exchange(
-        URI, HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+        URI, HttpMethod.GET, requestEntity, new ParameterizedTypeReference<>() {
         });
     ExceptionDetails actualBody = responseEntity.getBody();
 
@@ -202,7 +223,7 @@ class IntervalControllerIT {
     final String URI = "/activities/1/intervals";
     IntervalRequest intervalRequest = new IntervalRequest(
         "2022-09-25T14:26:00", "00:30:00");
-    HttpEntity<IntervalRequest> requestEntity = new HttpEntity<>(intervalRequest);
+    HttpEntity<IntervalRequest> requestEntity = new HttpEntity<>(intervalRequest, headers);
 
     ResponseEntity<IntervalResponseBody> responseEntity = testRestTemplate.exchange(
         URI, HttpMethod.POST,
@@ -219,7 +240,7 @@ class IntervalControllerIT {
     final String URI = "/activities/1/intervals";
     IntervalRequest intervalRequest = new IntervalRequest(
         "2022-09-25T14:26:00", "00:30:00");
-    HttpEntity<IntervalRequest> requestEntity = new HttpEntity<>(intervalRequest);
+    HttpEntity<IntervalRequest> requestEntity = new HttpEntity<>(intervalRequest, headers);
 
     Activity activityToBeSaved = ActivityCreator.withoutIdAndWithNameAndDescription(
         "Lorem Ipsum Activity", "A simple project for my portfolio");
@@ -245,7 +266,7 @@ class IntervalControllerIT {
     final String URI = "/activities/100/intervals";
     IntervalRequest intervalRequest = new IntervalRequest(
         "2022-09-25T14:26:00", "00:30:00");
-    HttpEntity<IntervalRequest> requestEntity = new HttpEntity<>(intervalRequest);
+    HttpEntity<IntervalRequest> requestEntity = new HttpEntity<>(intervalRequest, headers);
 
     ResponseEntity<ExceptionDetails> responseEntity = testRestTemplate.exchange(
         URI, HttpMethod.POST,
@@ -263,7 +284,7 @@ class IntervalControllerIT {
     final String URI = "/activities/100/intervals";
     IntervalRequest intervalRequest = new IntervalRequest(
         "2022-09-25T14:26:00", "00:30:00");
-    HttpEntity<IntervalRequest> requestEntity = new HttpEntity<>(intervalRequest);
+    HttpEntity<IntervalRequest> requestEntity = new HttpEntity<>(intervalRequest, headers);
 
     ResponseEntity<ExceptionDetails> responseEntity = testRestTemplate.exchange(
         URI, HttpMethod.POST,
@@ -286,7 +307,7 @@ class IntervalControllerIT {
     final String URI = "/activities/1/intervals";
     IntervalRequest intervalRequest = new IntervalRequest(
         "2022-09-25T14:26:00", "00:30:00");
-    HttpEntity<IntervalRequest> requestEntity = new HttpEntity<>(intervalRequest);
+    HttpEntity<IntervalRequest> requestEntity = new HttpEntity<>(intervalRequest, headers);
 
     ResponseEntity<ExceptionDetails> responseEntity = testRestTemplate.exchange(
         URI, HttpMethod.POST,
@@ -306,7 +327,7 @@ class IntervalControllerIT {
     final String URI = "/activities/1/intervals";
     IntervalRequest intervalRequest = new IntervalRequest(
         "2022-09-25T14:26:00", "00:30:00");
-    HttpEntity<IntervalRequest> requestEntity = new HttpEntity<>(intervalRequest);
+    HttpEntity<IntervalRequest> requestEntity = new HttpEntity<>(intervalRequest, headers);
 
     ResponseEntity<ExceptionDetails> responseEntity = testRestTemplate.exchange(
         URI, HttpMethod.POST,
@@ -327,7 +348,7 @@ class IntervalControllerIT {
     final String URI = "/activities/1/intervals";
     IntervalRequest intervalRequest = new IntervalRequest(
         "2022-09-25T14:26:00", "00:30:00");
-    HttpEntity<IntervalRequest> requestEntity = new HttpEntity<>(intervalRequest);
+    HttpEntity<IntervalRequest> requestEntity = new HttpEntity<>(intervalRequest, headers);
 
     ResponseEntity<ExceptionDetails> responseEntity = testRestTemplate.exchange(
         URI, HttpMethod.POST,
@@ -347,7 +368,7 @@ class IntervalControllerIT {
     final String URI = "/activities/1/intervals";
     IntervalRequest intervalRequest = new IntervalRequest(
         "2022-09-25T14:26:00", "00:30:00");
-    HttpEntity<IntervalRequest> requestEntity = new HttpEntity<>(intervalRequest);
+    HttpEntity<IntervalRequest> requestEntity = new HttpEntity<>(intervalRequest, headers);
 
     ResponseEntity<ExceptionDetails> responseEntity = testRestTemplate.exchange(
         URI, HttpMethod.POST,
@@ -373,8 +394,9 @@ class IntervalControllerIT {
     );
     intervalRepository.save(interval);
 
+    HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
     ResponseEntity<Void> responseEntity = testRestTemplate.exchange(
-        URI, HttpMethod.DELETE, null, new ParameterizedTypeReference<>() {
+        URI, HttpMethod.DELETE, requestEntity, new ParameterizedTypeReference<>() {
         });
     HttpStatus actualStatus = responseEntity.getStatusCode();
 
@@ -394,8 +416,9 @@ class IntervalControllerIT {
     );
     intervalRepository.save(interval);
 
+    HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
     ResponseEntity<Void> responseEntity = testRestTemplate.exchange(
-        URI, HttpMethod.DELETE, null, new ParameterizedTypeReference<>() {
+        URI, HttpMethod.DELETE, requestEntity, new ParameterizedTypeReference<>() {
         });
 
     Assertions.assertThat(responseEntity.getBody()).isNull();
@@ -406,9 +429,10 @@ class IntervalControllerIT {
   void deleteForIntervalsId_MustReturnsStatus400_WhenActivityDoesntExist() {
     final String URI = "/activities/100/intervals/1";
 
+    HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
     ResponseEntity<ExceptionDetails> responseEntity = testRestTemplate.exchange(
         URI, HttpMethod.DELETE,
-        null, new ParameterizedTypeReference<>() {
+        requestEntity, new ParameterizedTypeReference<>() {
         });
 
     HttpStatus actualStatus = responseEntity.getStatusCode();
@@ -421,9 +445,10 @@ class IntervalControllerIT {
   void deleteForIntervalsId_MustReturnsExceptionDetails_WhenActivityDoesntExist() {
     final String URI = "/activities/100/intervals/1";
 
+    HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
     ResponseEntity<ExceptionDetails> responseEntity = testRestTemplate.exchange(
         URI, HttpMethod.DELETE,
-        null, new ParameterizedTypeReference<>() {
+        requestEntity, new ParameterizedTypeReference<>() {
         });
 
     ExceptionDetails actualBody = responseEntity.getBody();
