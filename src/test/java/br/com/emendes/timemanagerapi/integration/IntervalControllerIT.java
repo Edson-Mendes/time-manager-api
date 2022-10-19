@@ -43,14 +43,15 @@ class IntervalControllerIT {
   private HttpHeaders headers;
 
   @BeforeEach
-  public void addHeader(){
+  public void addHeader() {
     HttpEntity<LoginRequest> requestBody = new HttpEntity<>(new LoginRequest("user@email.com", "1234"));
 
     ResponseEntity<TokenResponse> response = testRestTemplate.exchange(
-        "/signin", HttpMethod.POST, requestBody, new ParameterizedTypeReference<>() {});
+        "/signin", HttpMethod.POST, requestBody, new ParameterizedTypeReference<>() {
+        });
 
     headers = new HttpHeaders();
-    headers.add("Authorization", "Bearer "+response.getBody().getToken());
+    headers.add("Authorization", "Bearer " + response.getBody().getToken());
   }
 
   @Test
@@ -214,6 +215,25 @@ class IntervalControllerIT {
   }
 
   @Test
+  @DisplayName("get for /activities/{activityId}/intervals must returns status 401 when authorization header is invalid")
+  void getForIntervals_MustReturnsStatus401_WhenAuthorizationHeaderIsInvalid() {
+    final String URI = "/activities/1/intervals";
+
+    Activity activitySaved = activityRepository.save(ActivityCreator.withStatus(Status.DELETED));
+    Interval interval = IntervalCreator.withActivityStartedAtAndElapsedTime(
+        activitySaved, "2022-09-25T10:32:57", "00:30:00"
+    );
+    intervalRepository.save(interval);
+
+    ResponseEntity<ExceptionDetails> responseEntity = testRestTemplate.exchange(
+        URI, HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+        });
+    HttpStatus actualStatus = responseEntity.getStatusCode();
+
+    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.UNAUTHORIZED);
+  }
+
+  @Test
   @DisplayName("post for /activities/{activityId}/intervals must returns status 201 when saved successfully")
   void postForIntervals_MustReturnsStatus201_WhenSavedSuccessfully() {
     Activity activityToBeSaved = ActivityCreator.withoutIdAndWithNameAndDescription(
@@ -339,6 +359,7 @@ class IntervalControllerIT {
     Assertions.assertThat(actualBody.getTitle()).isEqualTo("Bad Request");
     Assertions.assertThat(actualBody.getDetails()).isEqualTo("Cannot create interval on non active activity");
   }
+
   @Test
   @DisplayName("post for /activities/{activityId}/intervals must returns status 400 when Activity status is deleted")
   void postForIntervals_MustReturnsStatus400_WhenActivityStatusIsDeleted() {
@@ -379,6 +400,26 @@ class IntervalControllerIT {
     Assertions.assertThat(actualBody).isNotNull();
     Assertions.assertThat(actualBody.getTitle()).isEqualTo("Bad Request");
     Assertions.assertThat(actualBody.getDetails()).isEqualTo("Cannot create interval on non active activity");
+  }
+
+  @Test
+  @DisplayName("post for /activities/{activityId}/intervals must returns status 401 when authorization header is invalid")
+  void postForIntervals_MustReturnsStatus401_WhenAuthorizationHeaderIsInvalid() {
+    Activity activityDeleted = ActivityCreator.withStatus(Status.DELETED);
+    activityRepository.save(activityDeleted);
+
+    final String URI = "/activities/1/intervals";
+    IntervalRequest intervalRequest = new IntervalRequest(
+        "2022-09-25T14:26:00", "00:30:00");
+    HttpEntity<IntervalRequest> requestEntity = new HttpEntity<>(intervalRequest);
+
+    ResponseEntity<ExceptionDetails> responseEntity = testRestTemplate.exchange(
+        URI, HttpMethod.POST,
+        requestEntity, new ParameterizedTypeReference<>() {
+        });
+    HttpStatus actualStatus = responseEntity.getStatusCode();
+
+    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.UNAUTHORIZED);
   }
 
   @Test
@@ -456,6 +497,21 @@ class IntervalControllerIT {
     Assertions.assertThat(actualBody).isNotNull();
     Assertions.assertThat(actualBody.getTitle()).isEqualTo("Bad Request");
     Assertions.assertThat(actualBody.getDetails()).isEqualTo("Activity not found for id: 100");
+  }
+
+  @Test
+  @DisplayName("delete for /activities/{activityId}/intervals/{id} must returns status 401 when authorization header is invalid")
+  void deleteForIntervalsId_MustReturnsStatus401_WhenAuthorizationHeaderIsInvalid() {
+    final String URI = "/activities/100/intervals/1";
+
+
+    ResponseEntity<ExceptionDetails> responseEntity =
+        testRestTemplate.exchange(URI, HttpMethod.DELETE, null, new ParameterizedTypeReference<>() {
+        });
+
+    HttpStatus actualStatus = responseEntity.getStatusCode();
+
+    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.UNAUTHORIZED);
   }
 
 }

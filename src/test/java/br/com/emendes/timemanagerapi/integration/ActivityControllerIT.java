@@ -43,14 +43,15 @@ class ActivityControllerIT {
   private final String ACTIVITIES_URI = "/activities";
 
   @BeforeEach
-  public void addHeader(){
+  public void addHeader() {
     HttpEntity<LoginRequest> requestBody = new HttpEntity<>(new LoginRequest("user@email.com", "1234"));
 
     ResponseEntity<TokenResponse> response = testRestTemplate.exchange(
-        "/signin", HttpMethod.POST, requestBody, new ParameterizedTypeReference<>() {});
+        "/signin", HttpMethod.POST, requestBody, new ParameterizedTypeReference<>() {
+        });
 
     headers = new HttpHeaders();
-    headers.add("Authorization", "Bearer "+response.getBody().getToken());
+    headers.add("Authorization", "Bearer " + response.getBody().getToken());
   }
 
   @Test
@@ -150,6 +151,18 @@ class ActivityControllerIT {
   }
 
   @Test
+  @DisplayName("get for /activities must returns status 401 when authorization header is invalid")
+  void getForActivities_MustReturnsStatus401_WhenAuthorizationHeaderIsInvalid() {
+    ResponseEntity<ExceptionDetails> responseEntity = testRestTemplate.exchange(
+        ACTIVITIES_URI, HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+        });
+
+    HttpStatus actualStatus = responseEntity.getStatusCode();
+
+    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.UNAUTHORIZED);
+  }
+
+  @Test
   @DisplayName("post for /activities must returns status 201 when saved successfully")
   void postForActivities_MustReturnsStatus201_WhenSavedSuccessfully() {
     ActivityRequestBody body = new ActivityRequestBody("Finances API", "A simple project");
@@ -218,6 +231,21 @@ class ActivityControllerIT {
     Assertions.assertThat(actualBody.getFields()).contains("description");
     Assertions.assertThat(actualBody.getMessages()).contains("name must not be null or blank");
     Assertions.assertThat(actualBody.getMessages()).contains("description must not be null or blank");
+  }
+
+  @Test
+  @DisplayName("post for /activities must returns status 401 when authorization header is invalid")
+  void postForActivities_MustReturnsStatus401_WhenAuthorizationHeaderIsInvalid() {
+    ActivityRequestBody body = new ActivityRequestBody("", null);
+    HttpEntity<ActivityRequestBody> requestEntity = new HttpEntity<>(body);
+    ResponseEntity<ValidationExceptionDetails> responseEntity = testRestTemplate.exchange(
+        ACTIVITIES_URI, HttpMethod.POST,
+        requestEntity, new ParameterizedTypeReference<>() {
+        });
+
+    HttpStatus actualStatus = responseEntity.getStatusCode();
+
+    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.UNAUTHORIZED);
   }
 
   @Test
@@ -384,6 +412,26 @@ class ActivityControllerIT {
   }
 
   @Test
+  @DisplayName("put for /activities/{id} must returns status 401 when authorization header is invalid")
+  void putForActivitiesId_MustReturnsStatus401_WhenAuthorizationHeaderIsInvalid() {
+    activityRepository.save(ActivityCreator.withStatus(Status.DELETED));
+
+    long id = 1L;
+    String uri = ACTIVITIES_URI + "/" + id;
+    ActivityRequestBody activityToBeUpdated = new ActivityRequestBody("lorem name", "ipsum description");
+    HttpEntity<ActivityRequestBody> requestEntity = new HttpEntity<>(activityToBeUpdated);
+
+    ResponseEntity<ValidationExceptionDetails> response = testRestTemplate.exchange(
+        uri, HttpMethod.PUT, requestEntity,
+        new ParameterizedTypeReference<>() {
+        });
+
+    HttpStatus actualStatus = response.getStatusCode();
+
+    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.UNAUTHORIZED);
+  }
+
+  @Test
   @DisplayName("patch for /activities/{id} must returns status 204 when update status successfully")
   void patchForActivitiesId_MustReturnsStatus204_WhenUpdateStatusSuccessfully() {
     long id = 1L;
@@ -539,6 +587,27 @@ class ActivityControllerIT {
   }
 
   @Test
+  @DisplayName("patch for /activities/{id} must returns status 401 when authorization header is invalid")
+  void patchForActivitiesId_MustReturnsStatus401_WhenAuthorizationHeaderIsInvalid() {
+    long id = 1L;
+    String uri = ACTIVITIES_URI + "/" + id;
+
+    activityRepository.save(ActivityCreator.withStatus(Status.DELETED));
+
+    UpdateStatusRequest updateStatusRequest = new UpdateStatusRequest("concluded");
+    HttpEntity<UpdateStatusRequest> requestEntity = new HttpEntity<>(updateStatusRequest);
+
+    ResponseEntity<ExceptionDetails> response = testRestTemplate.exchange(
+        uri, HttpMethod.PATCH, requestEntity,
+        new ParameterizedTypeReference<>() {
+        });
+
+    HttpStatus actualStatus = response.getStatusCode();
+
+    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.UNAUTHORIZED);
+  }
+
+  @Test
   @DisplayName("delete for /activities/{id} must returns status 204 when deleted successfully")
   void deleteForActivitiesId_MustReturnsStatus204_WhenDeletedSuccessfully() {
     long id = 1L;
@@ -581,6 +650,23 @@ class ActivityControllerIT {
   }
 
   @Test
+  @DisplayName("delete for /activities/{id} must returns status 400 when activity don't exist")
+  void deleteForActivitiesId_MustReturnsStatus400_WhenActivityDontExists() {
+    long id = 999L;
+    String uri = ACTIVITIES_URI + "/" + id;
+
+    HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
+    ResponseEntity<ExceptionDetails> response = testRestTemplate.exchange(
+        uri, HttpMethod.DELETE, requestEntity,
+        new ParameterizedTypeReference<>() {
+        });
+
+    HttpStatus actualStatus = response.getStatusCode();
+
+    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.BAD_REQUEST);
+  }
+
+  @Test
   @DisplayName("delete for /activities/{id} must returns ExceptionDetails when activity don't exist")
   void deleteForActivitiesId_MustReturnsExceptionDetails_WhenActivityDontExists() {
     long id = 999L;
@@ -592,14 +678,28 @@ class ActivityControllerIT {
         new ParameterizedTypeReference<>() {
         });
 
-    HttpStatus actualStatus = response.getStatusCode();
     ExceptionDetails actualBody = response.getBody();
 
-    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.BAD_REQUEST);
     Assertions.assertThat(actualBody).isNotNull();
     Assertions.assertThat(actualBody.getTitle()).isEqualTo("Bad Request");
     Assertions.assertThat(actualBody.getStatus()).isEqualTo(400);
     Assertions.assertThat(actualBody.getDetails()).isEqualTo("Activity not found for id: " + id);
+  }
+
+  @Test
+  @DisplayName("delete for /activities/{id} must returns status 401 when authorization header is invalid")
+  void deleteForActivitiesId_MustReturnsStatus401_WhenAuthorizationHeaderIsInvalid() {
+    long id = 999L;
+    String uri = ACTIVITIES_URI + "/" + id;
+
+    ResponseEntity<ExceptionDetails> response = testRestTemplate.exchange(
+        uri, HttpMethod.DELETE, null,
+        new ParameterizedTypeReference<>() {
+        });
+
+    HttpStatus actualStatus = response.getStatusCode();
+
+    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.UNAUTHORIZED);
   }
 
 }

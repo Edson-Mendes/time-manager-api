@@ -12,12 +12,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
-    show-sql: true
     properties:
       hibernate:
         show_sql: true
         format-sql: true
-        use_sql_comments: true
 
 # log
 logging:
@@ -28,3 +26,7 @@ logging:
         type:
           descriptor:
             sql: trace
+
+# port
+#server:
+#  port: 8888
