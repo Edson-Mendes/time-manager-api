@@ -1,5 +1,6 @@
 package br.com.emendes.timemanagerapi.dto.request;
 
+import br.com.emendes.timemanagerapi.validation.anotation.PasswordMatch;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,17 +14,18 @@ import java.util.Objects;
 @Setter
 @AllArgsConstructor
 @ToString
+@PasswordMatch // TODO: Pesquisar como adicionar FieldErrors
 // TODO: Pensar nas valições de name, password e confirm
 public class SignupRequest {
 
-  @NotBlank
+  @NotBlank(message = "name must not be null or blank")
   private String name;
-  @NotBlank
-  @Email
+  @NotBlank(message = "email must not be null or blank")
+  @Email(message = "must be a well-formed email address")
   private String email;
-  @NotBlank
+  @NotBlank(message = "password must not be null or blank")
   private String password;
-  @NotBlank
+  @NotBlank(message = "confirm must not be null or blank")
   private String confirm;
 
   @Override
