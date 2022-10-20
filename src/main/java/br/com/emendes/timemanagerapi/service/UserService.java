@@ -24,13 +24,13 @@ public class UserService {
 //    TODO: Essa busca faz dois selects, um para buscar o usuário pelo email e outro para buscar as roles do usuário
 //    pensar em como realizar com apenas um select.
     return userRepository.findByEmail(username).orElseThrow(() -> {
-      throw new UsernameNotFoundException("Usuário não encontrado!");
+      throw new UsernameNotFoundException("User not found");
     });
   }
 
   public UserDetails findUserDetailsById(long id) {
     return userRepository.findById(id).orElseThrow(() -> {
-      throw new UsernameNotFoundException("Usuário não encontrado!");
+      throw new UsernameNotFoundException("User not found");
     });
   }
 
@@ -39,7 +39,7 @@ public class UserService {
     User user = mapper.map(signupRequest, User.class);
     user.addRole(getRole());
     user.setPassword(passwordEncoder.encode(signupRequest.getPassword()));
-    userRepository.save(user);
+    user = userRepository.save(user);
     return mapper.map(user, UserResponse.class);
   }
 
