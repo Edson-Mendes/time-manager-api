@@ -13,6 +13,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import java.util.Set;
 
+@DisplayName("Unit tests for LoginRequest")
 class LoginRequestTest {
 
   private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
