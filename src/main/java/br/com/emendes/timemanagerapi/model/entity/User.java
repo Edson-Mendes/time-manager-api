@@ -37,7 +37,7 @@ public class User implements UserDetails {
       joinColumns = @JoinColumn(name = "user_id", nullable = false),
       inverseJoinColumns = @JoinColumn(name = "roles_id", nullable = false)
   )
-  private Set<Role> roles = new HashSet<>();
+  private Set<Role> roles;
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -94,5 +94,10 @@ public class User implements UserDetails {
     result = 31 * result + (email != null ? email.hashCode() : 0);
     result = 31 * result + (password != null ? password.hashCode() : 0);
     return result;
+  }
+
+  public void addRole(Role newRole) {
+    if(this.roles == null) this.roles = new HashSet<>();
+    roles.add(newRole);
   }
 }
