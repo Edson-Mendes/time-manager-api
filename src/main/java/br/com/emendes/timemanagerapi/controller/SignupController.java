@@ -9,8 +9,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
+import java.net.URI;
 
 @RequiredArgsConstructor
 @RestController
@@ -20,8 +22,10 @@ public class SignupController {
   private final UserService userService;
 
   @PostMapping
-  public ResponseEntity<UserResponse> signup(@RequestBody @Valid SignupRequest signupRequest){
-    return ResponseEntity.ok(userService.save(signupRequest));
+  public ResponseEntity<UserResponse> signup(@RequestBody @Valid SignupRequest signupRequest, UriComponentsBuilder uriBuilder){
+    UserResponse userResponse = userService.save(signupRequest);
+    URI uri = uriBuilder.path("/users/{id}").build(userResponse.getId());
+    return ResponseEntity.created(uri).body(userResponse);
   }
 
 }
