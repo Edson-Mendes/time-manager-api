@@ -7,6 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
@@ -30,6 +31,10 @@ public class User implements UserDetails {
   private String email;
   @Column(nullable = false)
   private String password;
+  @Column(nullable = false)
+  private LocalDateTime createdAt;
+  @Column(nullable = false)
+  private boolean enabled;
   @ManyToMany(fetch = FetchType.EAGER)
   @OnDelete(action = OnDeleteAction.CASCADE)
   @JoinTable(
@@ -71,7 +76,7 @@ public class User implements UserDetails {
 
   @Override
   public boolean isEnabled() {
-    return true;
+    return enabled;
   }
 
   @Override

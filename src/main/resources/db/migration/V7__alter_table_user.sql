@@ -1,0 +1,1 @@
+ALTER TABLE tb_user ADD created_at TIMESTAMP NOT NULL DEFAULT DATE_TRUNC('second', CURRENT_TIMESTAMP::timestamp);
