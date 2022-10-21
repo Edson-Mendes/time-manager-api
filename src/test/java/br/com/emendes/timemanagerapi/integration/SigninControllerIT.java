@@ -25,7 +25,6 @@ import org.springframework.test.context.ActiveProfiles;
 @DisplayName("Integration tests for /signin")
 class SigninControllerIT {
 
-
   @Autowired
   @Qualifier(value = "withPatch")
   private TestRestTemplate testRestTemplate;

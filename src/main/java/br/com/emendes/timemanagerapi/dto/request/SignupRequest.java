@@ -15,7 +15,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @ToString
 @PasswordMatch // TODO: Pesquisar como adicionar FieldErrors
-// TODO: Pensar nas valições de name, password e confirm
+// TODO: Realizar verificação de tamanho das Strings, fazer isso em todos os requests!
 public class SignupRequest {
 
   @NotBlank(message = "name must not be null or blank")
