@@ -2,14 +2,16 @@ package br.com.emendes.timemanagerapi.service;
 
 import br.com.emendes.timemanagerapi.dto.request.ActivityRequestBody;
 import br.com.emendes.timemanagerapi.dto.request.UpdateStatusRequest;
-import br.com.emendes.timemanagerapi.dto.response.ActivityResponseBody;
+import br.com.emendes.timemanagerapi.dto.response.ActivityResponse;
 import br.com.emendes.timemanagerapi.exception.ActivityNotFoundException;
 import br.com.emendes.timemanagerapi.model.Status;
 import br.com.emendes.timemanagerapi.model.entity.Activity;
+import br.com.emendes.timemanagerapi.model.entity.User;
 import br.com.emendes.timemanagerapi.repository.ActivityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,12 +20,12 @@ public class ActivityService {
 
   private final ActivityRepository activityRepository;
 
-  public Page<ActivityResponseBody> find(Pageable pageable) {
+  public Page<ActivityResponse> find(Pageable pageable) {
     Page<Activity> activitiesPage = activityRepository.findByStatusIsNot(pageable, Status.DELETED);
     if (activitiesPage.getTotalElements() == 0) {
       throw new ActivityNotFoundException("Não possui atividades");
     }
-    return activitiesPage.map(ActivityResponseBody::new);
+    return activitiesPage.map(ActivityResponse::new);
   }
 
   public Activity findById(long id) {
@@ -31,11 +33,13 @@ public class ActivityService {
         () -> new ActivityNotFoundException("Activity not found for id: " + id));
   }
 
-  public ActivityResponseBody create(ActivityRequestBody activityRequestBody) {
-    Activity activitySaved = activityRepository.save(activityRequestBody.toActivity());
+  public ActivityResponse create(ActivityRequestBody activityRequestBody) {
+    User user = getCurrentUser();
+    Activity activitySaved = activityRepository.save(activityRequestBody.toActivity(user));
 
-    return new ActivityResponseBody(activitySaved);
+    return new ActivityResponse(activitySaved);
   }
+
 
   public void update(long id, ActivityRequestBody activityRequestBody) {
     Activity activityToBeUpdated = findByIdAndNotDeleted(id);
@@ -63,6 +67,9 @@ public class ActivityService {
       throw new ActivityNotFoundException("Activity not found for id: " + id);
     }
     return activityFound;
+  }
+  private User getCurrentUser() {
+    return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
   }
 
 }

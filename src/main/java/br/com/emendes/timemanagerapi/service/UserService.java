@@ -12,6 +12,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+
 @RequiredArgsConstructor
 @Service
 public class UserService {
@@ -39,6 +42,7 @@ public class UserService {
     User user = mapper.map(signupRequest, User.class);
     user.addRole(getRole());
     user.setPassword(passwordEncoder.encode(signupRequest.getPassword()));
+    user.setCreatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
     user = userRepository.save(user);
     return mapper.map(user, UserResponse.class);
   }

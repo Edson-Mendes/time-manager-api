@@ -3,7 +3,7 @@ package br.com.emendes.timemanagerapi.integration;
 import br.com.emendes.timemanagerapi.dto.request.ActivityRequestBody;
 import br.com.emendes.timemanagerapi.dto.request.LoginRequest;
 import br.com.emendes.timemanagerapi.dto.request.UpdateStatusRequest;
-import br.com.emendes.timemanagerapi.dto.response.ActivityResponseBody;
+import br.com.emendes.timemanagerapi.dto.response.ActivityResponse;
 import br.com.emendes.timemanagerapi.dto.response.TokenResponse;
 import br.com.emendes.timemanagerapi.dto.response.detail.ExceptionDetails;
 import br.com.emendes.timemanagerapi.dto.response.detail.ValidationExceptionDetails;
@@ -66,7 +66,7 @@ class ActivityControllerIT {
 
     HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
 
-    ResponseEntity<PageableResponse<ActivityResponseBody>> responseEntity = testRestTemplate.exchange(
+    ResponseEntity<PageableResponse<ActivityResponse>> responseEntity = testRestTemplate.exchange(
         ACTIVITIES_URI, HttpMethod.GET, requestEntity, new ParameterizedTypeReference<>() {
         });
     HttpStatus actualStatus = responseEntity.getStatusCode();
@@ -85,10 +85,10 @@ class ActivityControllerIT {
     activityRepository.save(activityToBeSaved2);
 
     HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
-    ResponseEntity<PageableResponse<ActivityResponseBody>> responseEntity = testRestTemplate.exchange(
+    ResponseEntity<PageableResponse<ActivityResponse>> responseEntity = testRestTemplate.exchange(
         ACTIVITIES_URI, HttpMethod.GET, requestEntity, new ParameterizedTypeReference<>() {
         });
-    Page<ActivityResponseBody> actualBody = responseEntity.getBody();
+    Page<ActivityResponse> actualBody = responseEntity.getBody();
 
     Assertions.assertThat(actualBody).isNotNull().hasSize(2);
     Assertions.assertThat(actualBody.getContent().get(0).getName()).isEqualTo("Finances API");
@@ -109,11 +109,11 @@ class ActivityControllerIT {
     activityRepository.save(activityToBeSaved2);
     HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
 
-    ResponseEntity<PageableResponse<ActivityResponseBody>> responseEntity = testRestTemplate.exchange(
+    ResponseEntity<PageableResponse<ActivityResponse>> responseEntity = testRestTemplate.exchange(
         ACTIVITIES_URI, HttpMethod.GET, requestEntity, new ParameterizedTypeReference<>() {
         });
-    Page<ActivityResponseBody> actualBody = responseEntity.getBody();
-    ActivityResponseBody actualActivityRespBody = actualBody.getContent().get(0);
+    Page<ActivityResponse> actualBody = responseEntity.getBody();
+    ActivityResponse actualActivityRespBody = actualBody.getContent().get(0);
 
     Assertions.assertThat(actualBody).isNotNull().hasSize(1);
     Assertions.assertThat(actualActivityRespBody.getName()).isEqualTo("Finances API");
@@ -167,7 +167,7 @@ class ActivityControllerIT {
   void postForActivities_MustReturnsStatus201_WhenSavedSuccessfully() {
     ActivityRequestBody body = new ActivityRequestBody("Finances API", "A simple project");
     HttpEntity<ActivityRequestBody> requestEntity = new HttpEntity<>(body, headers);
-    ResponseEntity<ActivityResponseBody> responseEntity = testRestTemplate.exchange(
+    ResponseEntity<ActivityResponse> responseEntity = testRestTemplate.exchange(
         ACTIVITIES_URI, HttpMethod.POST,
         requestEntity, new ParameterizedTypeReference<>() {
         });
@@ -182,12 +182,12 @@ class ActivityControllerIT {
   void postForActivities_MustReturnsActivityResponseBody_WhenSavedSuccessfully() {
     ActivityRequestBody body = new ActivityRequestBody("Finances API", "A simple project");
     HttpEntity<ActivityRequestBody> requestEntity = new HttpEntity<>(body, headers);
-    ResponseEntity<ActivityResponseBody> responseEntity = testRestTemplate.exchange(
+    ResponseEntity<ActivityResponse> responseEntity = testRestTemplate.exchange(
         ACTIVITIES_URI, HttpMethod.POST,
         requestEntity, new ParameterizedTypeReference<>() {
         });
 
-    ActivityResponseBody actualBody = responseEntity.getBody();
+    ActivityResponse actualBody = responseEntity.getBody();
 
     Assertions.assertThat(actualBody).isNotNull();
     Assertions.assertThat(actualBody.getId()).isEqualTo(1L);

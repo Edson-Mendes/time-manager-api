@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @EqualsAndHashCode
 @Builder
-public class ActivityResponseBody {
+public class ActivityResponse {
 
   private long id;
   private String name;
@@ -21,7 +21,7 @@ public class ActivityResponseBody {
   private LocalDateTime createdAt;
   private Status status;
 
-  public ActivityResponseBody(Activity activity){
+  public ActivityResponse(Activity activity){
     this.id = activity.getId();
     this.name = activity.getName();
     this.description = activity.getDescription();

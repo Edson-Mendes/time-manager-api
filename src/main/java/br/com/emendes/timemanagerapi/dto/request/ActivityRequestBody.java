@@ -2,6 +2,7 @@ package br.com.emendes.timemanagerapi.dto.request;
 
 import br.com.emendes.timemanagerapi.model.entity.Activity;
 import br.com.emendes.timemanagerapi.model.Status;
+import br.com.emendes.timemanagerapi.model.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -22,12 +23,13 @@ public class ActivityRequestBody {
   @NotBlank(message = "description must not be null or blank")
   private String description;
 
-  public Activity toActivity() {
+  public Activity toActivity(User user) {
     return Activity.builder()
         .name(this.name)
         .description(this.description)
         .createdAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
         .status(Status.ACTIVE)
+        .user(user)
         .build();
   }
 }

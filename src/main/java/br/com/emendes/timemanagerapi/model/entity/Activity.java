@@ -3,6 +3,8 @@ package br.com.emendes.timemanagerapi.model.entity;
 import br.com.emendes.timemanagerapi.dto.request.ActivityRequestBody;
 import br.com.emendes.timemanagerapi.model.Status;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -44,6 +46,8 @@ public class Activity {
 //  TODO: Ver se vale a pena mudar para SET
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "activity")
   private List<Interval> intervals;
+  @ManyToOne(fetch = FetchType.LAZY)
+  private User user;
 
   public void update(ActivityRequestBody activityRequestBody) {
     this.name = activityRequestBody.getName();

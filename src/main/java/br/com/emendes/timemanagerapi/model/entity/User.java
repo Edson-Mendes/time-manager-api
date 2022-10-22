@@ -33,8 +33,8 @@ public class User implements UserDetails {
   private String password;
   @Column(nullable = false)
   private LocalDateTime createdAt;
-  @Column(nullable = false)
-  private boolean enabled;
+  @Column(nullable = false, columnDefinition = "boolean DEFAULT true")
+  private boolean enabled = true;
   @ManyToMany(fetch = FetchType.EAGER)
   @OnDelete(action = OnDeleteAction.CASCADE)
   @JoinTable(

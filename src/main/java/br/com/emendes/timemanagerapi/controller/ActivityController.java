@@ -2,7 +2,7 @@ package br.com.emendes.timemanagerapi.controller;
 
 import br.com.emendes.timemanagerapi.dto.request.ActivityRequestBody;
 import br.com.emendes.timemanagerapi.dto.request.UpdateStatusRequest;
-import br.com.emendes.timemanagerapi.dto.response.ActivityResponseBody;
+import br.com.emendes.timemanagerapi.dto.response.ActivityResponse;
 import br.com.emendes.timemanagerapi.service.ActivityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -24,7 +24,7 @@ public class ActivityController {
   private final ActivityService activityService;
 
   @GetMapping
-  public ResponseEntity<Page<ActivityResponseBody>> find(
+  public ResponseEntity<Page<ActivityResponse>> find(
       @SortDefault.SortDefaults({
           @SortDefault(sort = "status", direction = Sort.Direction.ASC),
           @SortDefault(sort = "createdAt", direction = Sort.Direction.DESC)
@@ -33,12 +33,12 @@ public class ActivityController {
   }
 
   @PostMapping
-  public ResponseEntity<ActivityResponseBody> create(
+  public ResponseEntity<ActivityResponse> create(
       @RequestBody @Valid ActivityRequestBody activityRequestBody, UriComponentsBuilder uriBuilder) {
-    ActivityResponseBody activityResponseBody = activityService.create(activityRequestBody);
+    ActivityResponse activityResponse = activityService.create(activityRequestBody);
 
-    URI uri = uriBuilder.path("/activities/{id}").build(activityResponseBody.getId());
-    return ResponseEntity.created(uri).body(activityResponseBody);
+    URI uri = uriBuilder.path("/activities/{id}").build(activityResponse.getId());
+    return ResponseEntity.created(uri).body(activityResponse);
   }
 
   @PutMapping("/{id}")

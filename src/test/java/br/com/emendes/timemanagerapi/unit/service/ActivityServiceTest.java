@@ -2,7 +2,7 @@ package br.com.emendes.timemanagerapi.unit.service;
 
 import br.com.emendes.timemanagerapi.dto.request.ActivityRequestBody;
 import br.com.emendes.timemanagerapi.dto.request.UpdateStatusRequest;
-import br.com.emendes.timemanagerapi.dto.response.ActivityResponseBody;
+import br.com.emendes.timemanagerapi.dto.response.ActivityResponse;
 import br.com.emendes.timemanagerapi.exception.ActivityNotFoundException;
 import br.com.emendes.timemanagerapi.model.entity.Activity;
 import br.com.emendes.timemanagerapi.model.Status;
@@ -69,8 +69,8 @@ class ActivityServiceTest {
     @Test
     @DisplayName("find must returns Page<ActivityResponseBody> when DB has Activities")
     void find_MustReturnsPageActivityResponseBody_WhenDBHasActivities() {
-      Page<ActivityResponseBody> actualActivitiesResponse = activityService.find(DEFAULT_PAGEABLE);
-      List<ActivityResponseBody> actualListActivityResponse = actualActivitiesResponse.getContent();
+      Page<ActivityResponse> actualActivitiesResponse = activityService.find(DEFAULT_PAGEABLE);
+      List<ActivityResponse> actualListActivityResponse = actualActivitiesResponse.getContent();
 
       Assertions.assertThat(actualActivitiesResponse)
           .isNotEmpty()
@@ -128,11 +128,11 @@ class ActivityServiceTest {
     @Test
     @DisplayName("create must returns ActivityResponseBody when created successful")
     void create_MustReturnsActivityResponseBody_WhenCreatedSuccessful() {
-      ActivityResponseBody actualActivityResponseBody = activityService.create(VALID_ACTIVITY_REQUEST_BODY);
+      ActivityResponse actualActivityResponse = activityService.create(VALID_ACTIVITY_REQUEST_BODY);
 
-      Assertions.assertThat(actualActivityResponseBody.getId())
+      Assertions.assertThat(actualActivityResponse.getId())
           .isEqualTo(1L);
-      Assertions.assertThat(actualActivityResponseBody.getName())
+      Assertions.assertThat(actualActivityResponse.getName())
           .isNotNull()
           .isEqualTo("Lorem Ipsum Activity");
     }

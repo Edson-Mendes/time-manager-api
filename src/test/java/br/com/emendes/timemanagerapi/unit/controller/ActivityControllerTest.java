@@ -3,7 +3,7 @@ package br.com.emendes.timemanagerapi.unit.controller;
 import br.com.emendes.timemanagerapi.controller.ActivityController;
 import br.com.emendes.timemanagerapi.dto.request.ActivityRequestBody;
 import br.com.emendes.timemanagerapi.dto.request.UpdateStatusRequest;
-import br.com.emendes.timemanagerapi.dto.response.ActivityResponseBody;
+import br.com.emendes.timemanagerapi.dto.response.ActivityResponse;
 import br.com.emendes.timemanagerapi.model.Status;
 import br.com.emendes.timemanagerapi.service.ActivityService;
 import br.com.emendes.timemanagerapi.util.creator.ActivityResponseBodyCreator;
@@ -42,7 +42,7 @@ class ActivityControllerTest {
 //  Mocks de métodos/actions de activityServiceMock
   @BeforeEach
   public void setUp() {
-    List<ActivityResponseBody> listActivityRespBody =
+    List<ActivityResponse> listActivityRespBody =
         List.of(ActivityResponseBodyCreator.withIdAndName(1L, "Lorem Ipsum Activity"),
             ActivityResponseBodyCreator.withIdAndName(2L, "XPTO Activity"));
 
@@ -78,11 +78,11 @@ class ActivityControllerTest {
     @Test
     @DisplayName("find must returns Page<ActivityResponseBody> when found successfully")
     void find_MustReturnsPageActivityResponseBody_WhenFoundSuccessfully() {
-      Page<ActivityResponseBody> actualBody = activityController.find(DEFAULT_PAGEABLE).getBody();
+      Page<ActivityResponse> actualBody = activityController.find(DEFAULT_PAGEABLE).getBody();
 
-      ActivityResponseBody expectedActivityRespBody1 = ActivityResponseBodyCreator
+      ActivityResponse expectedActivityRespBody1 = ActivityResponseBodyCreator
           .withIdAndName(1L, "Lorem Ipsum Activity");
-      ActivityResponseBody expectedActivityRespBody2 = ActivityResponseBodyCreator
+      ActivityResponse expectedActivityRespBody2 = ActivityResponseBodyCreator
           .withIdAndName(2L, "XPTO Activity");
 
       Assertions.assertThat(actualBody).isNotNull().isNotEmpty().hasSize(2);
@@ -108,7 +108,7 @@ class ActivityControllerTest {
     @Test
     @DisplayName("create must returns ActivityResponseBody when created successfully")
     void create_MustReturnsActivityResponseBody_WhenCreatedSuccessfully() {
-      ActivityResponseBody actualBody = activityController.create(VALID_ACTIVITY_REQUEST_BODY, URI_BUILDER).getBody();
+      ActivityResponse actualBody = activityController.create(VALID_ACTIVITY_REQUEST_BODY, URI_BUILDER).getBody();
 
       Assertions.assertThat(actualBody).isNotNull();
       Assertions.assertThat(actualBody.getId()).isEqualTo(1L);
