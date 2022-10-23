@@ -6,11 +6,13 @@ import br.com.emendes.timemanagerapi.dto.response.ActivityResponse;
 import br.com.emendes.timemanagerapi.exception.ActivityNotFoundException;
 import br.com.emendes.timemanagerapi.model.entity.Activity;
 import br.com.emendes.timemanagerapi.model.Status;
+import br.com.emendes.timemanagerapi.model.entity.User;
 import br.com.emendes.timemanagerapi.repository.ActivityRepository;
 import br.com.emendes.timemanagerapi.service.ActivityService;
 import br.com.emendes.timemanagerapi.util.creator.ActivityCreator;
 import br.com.emendes.timemanagerapi.util.creator.ActivityResponseBodyCreator;
 import br.com.emendes.timemanagerapi.util.creator.PageableCreator;
+import br.com.emendes.timemanagerapi.util.creator.UserCreator;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -22,10 +24,15 @@ import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.data.domain.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
 import java.util.Optional;
+
+import static org.mockito.Mockito.mock;
 
 @ExtendWith(SpringExtension.class)
 @DisplayName("Unit tests for ActivityService")
@@ -41,6 +48,7 @@ class ActivityServiceTest {
   private final Pageable DEFAULT_PAGEABLE = PageableCreator.activityDefaultPageable();
   private final long EXISTENT_ACTIVITY_ID = 1000L;
   private final long NONEXISTENT_ACTIVITY_ID = 9999L;
+  private final User USER = UserCreator.withAllParameters();
 
   //  Mocks de métodos/actions de activityServiceMock
   @BeforeEach
@@ -48,18 +56,31 @@ class ActivityServiceTest {
     List<Activity> activities = List.of(
         ActivityCreator.withIdAndName(1L, "Lorem Ipsum Activity"),
         ActivityCreator.withIdAndName(2L, "XPTO Activity"));
+
     Page<Activity> activitiesPage = new PageImpl<>(activities, DEFAULT_PAGEABLE, 2);
 
-    BDDMockito.when(activityRepositoryMock.findByStatusIsNot(DEFAULT_PAGEABLE, Status.DELETED)).thenReturn(activitiesPage);
+    BDDMockito.when(activityRepositoryMock.findByUserAndStatusIsNot(DEFAULT_PAGEABLE, USER, Status.DELETED)).thenReturn(activitiesPage);
 
     BDDMockito.when(activityRepositoryMock.save(ArgumentMatchers.any(Activity.class)))
         .thenReturn(ActivityCreator
             .withIdNameAndDescription(1L, "Lorem Ipsum Activity", "A simple project for my portfolio"));
 
-    BDDMockito.when(activityRepositoryMock.findById(NONEXISTENT_ACTIVITY_ID)).thenReturn(Optional.empty());
+    BDDMockito.when(activityRepositoryMock.findByIdAndUser(NONEXISTENT_ACTIVITY_ID, USER)).thenReturn(Optional.empty());
 
-    BDDMockito.when(activityRepositoryMock.findById(EXISTENT_ACTIVITY_ID))
+    BDDMockito.when(activityRepositoryMock.findByIdAndUser(EXISTENT_ACTIVITY_ID, USER))
         .thenReturn(Optional.of(ActivityCreator.withIdAndStatus(EXISTENT_ACTIVITY_ID, Status.DELETED)));
+
+    mockSecurityContextHolder();
+  }
+
+  private void mockSecurityContextHolder() {
+    final Authentication authentication = mock(Authentication.class);
+    final SecurityContext securityContext = mock(SecurityContext.class);
+
+    SecurityContextHolder.setContext(securityContext);
+    BDDMockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+    BDDMockito.when(SecurityContextHolder.getContext().getAuthentication().getPrincipal())
+        .thenReturn(USER);
   }
 
   @Nested
@@ -81,14 +102,14 @@ class ActivityServiceTest {
     }
 
     @Test
-    @DisplayName("find must throws ActivitiesNotFoundException when DB hasn't activities")
-    void find_MustThrowsActivitiesNotFoundException_WhenDBHasntActivities() {
-      BDDMockito.when(activityRepositoryMock.findByStatusIsNot(DEFAULT_PAGEABLE, Status.DELETED))
+    @DisplayName("find must returns empty Page when User hasn't activities")
+    void find_MustReturnsEmptyPage_WhenUserHasntActivities() {
+      BDDMockito.when(activityRepositoryMock.findByUserAndStatusIsNot(DEFAULT_PAGEABLE, USER, Status.DELETED))
           .thenReturn(Page.empty());
 
-      Assertions.assertThatExceptionOfType(ActivityNotFoundException.class)
-          .isThrownBy(() -> activityService.find(DEFAULT_PAGEABLE))
-          .withMessage("Não possui atividades");
+      Page<ActivityResponse> actualPage = activityService.find(DEFAULT_PAGEABLE);
+
+      Assertions.assertThat(actualPage).isEmpty();
     }
 
   }
@@ -101,7 +122,7 @@ class ActivityServiceTest {
     @DisplayName("findById must returns Activity when found successful")
     void findById_MustReturnsActivity_WhenFoundSuccessful() {
       Activity activityToBeFound = ActivityCreator.withIdAndName(1L, "Lorem Ipsum Activity");
-      BDDMockito.when(activityRepositoryMock.findById(1L)).thenReturn(Optional.of(activityToBeFound));
+      BDDMockito.when(activityRepositoryMock.findByIdAndUser(1L, USER)).thenReturn(Optional.of(activityToBeFound));
 
       Activity actualActivityFound = activityService.findById(1L);
       Activity expectedActivityFound = ActivityCreator.withIdAndName(1L, "Lorem Ipsum Activity");
@@ -112,7 +133,7 @@ class ActivityServiceTest {
     @Test
     @DisplayName("findById must throws ActivityNotFoundException when activityId doesn't exist")
     void findById_MustThrowsActivityNotFoundException_WhenActivityIdDoesntExist() {
-      BDDMockito.when(activityRepositoryMock.findById(NONEXISTENT_ACTIVITY_ID)).thenReturn(Optional.empty());
+      BDDMockito.when(activityRepositoryMock.findByIdAndUser(NONEXISTENT_ACTIVITY_ID, USER)).thenReturn(Optional.empty());
 
       Assertions.assertThatExceptionOfType(ActivityNotFoundException.class)
           .isThrownBy(() -> activityService.findById(NONEXISTENT_ACTIVITY_ID))

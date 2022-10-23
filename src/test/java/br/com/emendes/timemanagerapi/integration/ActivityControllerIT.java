@@ -9,7 +9,10 @@ import br.com.emendes.timemanagerapi.dto.response.detail.ExceptionDetails;
 import br.com.emendes.timemanagerapi.dto.response.detail.ValidationExceptionDetails;
 import br.com.emendes.timemanagerapi.model.Status;
 import br.com.emendes.timemanagerapi.model.entity.Activity;
+import br.com.emendes.timemanagerapi.model.entity.Role;
+import br.com.emendes.timemanagerapi.model.entity.User;
 import br.com.emendes.timemanagerapi.repository.ActivityRepository;
+import br.com.emendes.timemanagerapi.repository.UserRepository;
 import br.com.emendes.timemanagerapi.util.creator.ActivityCreator;
 import br.com.emendes.timemanagerapi.util.wrapper.PageableResponse;
 import org.assertj.core.api.Assertions;
@@ -26,6 +29,10 @@ import org.springframework.http.*;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
+
 //  TODO: Não esquecer de refatorar esses testes!
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -38,6 +45,8 @@ class ActivityControllerIT {
   private TestRestTemplate testRestTemplate;
   @Autowired
   private ActivityRepository activityRepository;
+  @Autowired
+  private UserRepository userRepository;
 
   private HttpHeaders headers;
   private final String ACTIVITIES_URI = "/activities";
@@ -55,8 +64,8 @@ class ActivityControllerIT {
   }
 
   @Test
-  @DisplayName("get for /activities must returns status 200 when found successfully")
-  void getForActivities_MustReturnsStatus200_WhenFoundSuccessfully() {
+  @DisplayName("get /activities must returns status 200 when found successfully")
+  void getActivities_MustReturnsStatus200_WhenFoundSuccessfully() {
     Activity activityToBeSaved1 = ActivityCreator.withoutIdAndWithNameAndDescription(
         "Finances API", "A simple project");
     Activity activityToBeSaved2 = ActivityCreator.withoutIdAndWithNameAndDescription(
@@ -75,8 +84,8 @@ class ActivityControllerIT {
   }
 
   @Test
-  @DisplayName("get for /activities must returns Page<ActivitiesResponseBody> when found successfully")
-  void getForActivities_MustReturnsPageActivitiesResponseBody_WhenFoundSuccessfully() {
+  @DisplayName("get /activities must returns Page<ActivitiesResponseBody> when found successfully")
+  void getActivities_MustReturnsPageActivitiesResponseBody_WhenFoundSuccessfully() {
     Activity activityToBeSaved1 = ActivityCreator.withoutIdAndWithNameAndDescription(
         "Finances API", "A simple project");
     Activity activityToBeSaved2 = ActivityCreator.withoutIdAndWithNameAndDescription(
@@ -98,8 +107,8 @@ class ActivityControllerIT {
   }
 
   @Test
-  @DisplayName("get for /activities must returns only enabled activities when exists activities disabled")
-  void getForActivities_MustReturnsOnlyEnabledActivities_WhenExistsActivitiesDisabled() {
+  @DisplayName("get /activities must returns only enabled activities when exists activities disabled")
+  void getActivities_MustReturnsOnlyEnabledActivities_WhenExistsActivitiesDisabled() {
     Activity activityToBeSaved1 = ActivityCreator.withoutIdAndWithNameAndDescription(
         "Finances API", "A simple project");
     Activity activityToBeSaved2 = ActivityCreator.withoutIdAndWithNameAndDescription(
@@ -122,8 +131,8 @@ class ActivityControllerIT {
   }
 
   @Test
-  @DisplayName("get for /activities must returns status 400 when doesn't have activities")
-  void getForActivities_MustReturnsStatus400_WhenDoesntHaveActivities() {
+  @DisplayName("get /activities must returns status 200 when user doesn't have activities")
+  void getActivities_MustReturnsStatus200_WhenUserDoesntHaveActivities() {
     HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
     ResponseEntity<ExceptionDetails> responseEntity = testRestTemplate.exchange(
         ACTIVITIES_URI, HttpMethod.GET, requestEntity, new ParameterizedTypeReference<>() {
@@ -131,28 +140,25 @@ class ActivityControllerIT {
 
     HttpStatus actualStatus = responseEntity.getStatusCode();
 
-    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.BAD_REQUEST);
+    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.OK);
   }
 
   @Test
-  @DisplayName("get for /activities must returns ExceptionDetails when  doesn't have activities>")
-  void getForActivities_MustReturnsExceptionDetails_WhenDoesntHaveActivities() {
+  @DisplayName("get /activities must returns empty Page when user doesn't have activities")
+  void getActivities_MustReturnsEmptyPage_WhenUserDoesntHaveActivities() {
     HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
-    ResponseEntity<ExceptionDetails> responseEntity = testRestTemplate.exchange(
+    ResponseEntity<PageableResponse<ActivityResponse>> responseEntity = testRestTemplate.exchange(
         ACTIVITIES_URI, HttpMethod.GET, requestEntity, new ParameterizedTypeReference<>() {
         });
 
-    ExceptionDetails actualBody = responseEntity.getBody();
+    PageableResponse<ActivityResponse> actualBody = responseEntity.getBody();
 
-    Assertions.assertThat(actualBody).isNotNull();
-    Assertions.assertThat(actualBody.getStatus()).isEqualTo(400);
-    Assertions.assertThat(actualBody.getTitle()).isEqualTo("Bad Request");
-    Assertions.assertThat(actualBody.getDetails()).isEqualTo("Não possui atividades");
+    Assertions.assertThat(actualBody).isNotNull().isEmpty();
   }
 
   @Test
-  @DisplayName("get for /activities must returns status 401 when authorization header is invalid")
-  void getForActivities_MustReturnsStatus401_WhenAuthorizationHeaderIsInvalid() {
+  @DisplayName("get /activities must returns status 401 when authorization header is invalid")
+  void getActivities_MustReturnsStatus401_WhenAuthorizationHeaderIsInvalid() {
     ResponseEntity<ExceptionDetails> responseEntity = testRestTemplate.exchange(
         ACTIVITIES_URI, HttpMethod.GET, null, new ParameterizedTypeReference<>() {
         });
@@ -163,8 +169,8 @@ class ActivityControllerIT {
   }
 
   @Test
-  @DisplayName("post for /activities must returns status 201 when saved successfully")
-  void postForActivities_MustReturnsStatus201_WhenSavedSuccessfully() {
+  @DisplayName("post /activities must returns status 201 when saved successfully")
+  void postActivities_MustReturnsStatus201_WhenSavedSuccessfully() {
     ActivityRequest body = new ActivityRequest("Finances API", "A simple project");
     HttpEntity<ActivityRequest> requestEntity = new HttpEntity<>(body, headers);
     ResponseEntity<ActivityResponse> responseEntity = testRestTemplate.exchange(
@@ -178,8 +184,8 @@ class ActivityControllerIT {
   }
 
   @Test
-  @DisplayName("post for /activities must returns ActivityResponseBody when saved successfully")
-  void postForActivities_MustReturnsActivityResponseBody_WhenSavedSuccessfully() {
+  @DisplayName("post /activities must returns ActivityResponse when saved successfully")
+  void postActivities_MustReturnsActivityResponse_WhenSavedSuccessfully() {
     ActivityRequest body = new ActivityRequest("Finances API", "A simple project");
     HttpEntity<ActivityRequest> requestEntity = new HttpEntity<>(body, headers);
     ResponseEntity<ActivityResponse> responseEntity = testRestTemplate.exchange(
@@ -197,8 +203,8 @@ class ActivityControllerIT {
   }
 
   @Test
-  @DisplayName("post for /activities must returns status 400 when saved fails")
-  void postForActivities_MustReturnsStatus400_WhenSavedFails() {
+  @DisplayName("post /activities must returns status 400 when save fails")
+  void postActivities_MustReturnsStatus400_WhenSaveFails() {
     ActivityRequest body = new ActivityRequest("", null);
     HttpEntity<ActivityRequest> requestEntity = new HttpEntity<>(body, headers);
     ResponseEntity<ValidationExceptionDetails> responseEntity = testRestTemplate.exchange(
@@ -212,8 +218,8 @@ class ActivityControllerIT {
   }
 
   @Test
-  @DisplayName("post for /activities must returns ValidationExceptionDetails when saved fails")
-  void postForActivities_MustReturnsValidationExceptionDetails_WhenSavedFails() {
+  @DisplayName("post /activities must returns ValidationExceptionDetails when save fails")
+  void postActivities_MustReturnsValidationExceptionDetails_WhenSaveFails() {
     ActivityRequest body = new ActivityRequest("", null);
     HttpEntity<ActivityRequest> requestEntity = new HttpEntity<>(body, headers);
     ResponseEntity<ValidationExceptionDetails> responseEntity = testRestTemplate.exchange(
@@ -234,8 +240,8 @@ class ActivityControllerIT {
   }
 
   @Test
-  @DisplayName("post for /activities must returns status 401 when authorization header is invalid")
-  void postForActivities_MustReturnsStatus401_WhenAuthorizationHeaderIsInvalid() {
+  @DisplayName("post /activities must returns status 401 when authorization header is invalid")
+  void postActivities_MustReturnsStatus401_WhenAuthorizationHeaderIsInvalid() {
     ActivityRequest body = new ActivityRequest("", null);
     HttpEntity<ActivityRequest> requestEntity = new HttpEntity<>(body);
     ResponseEntity<ValidationExceptionDetails> responseEntity = testRestTemplate.exchange(
@@ -249,8 +255,8 @@ class ActivityControllerIT {
   }
 
   @Test
-  @DisplayName("put for /activities/{id} must returns status 204 when updated successfully")
-  void putForActivitiesId_MustReturnsStatus204_WhenUpdatedSuccessfully() {
+  @DisplayName("put /activities/{id} must returns status 204 when updated successfully")
+  void putActivitiesId_MustReturnsStatus204_WhenUpdatedSuccessfully() {
     long id = 1L;
     String uri = ACTIVITIES_URI + "/" + id;
     Activity activityToBeSaved = ActivityCreator.withoutIdAndWithNameAndDescription(
@@ -275,8 +281,8 @@ class ActivityControllerIT {
   }
 
   @Test
-  @DisplayName("put for /activities/{id} must returns status 400 when activity doesn't exist")
-  void putForActivitiesId_MustReturnsStatus400_WhenActivityDoesntExist() {
+  @DisplayName("put /activities/{id} must returns status 400 when activity doesn't exist")
+  void putActivitiesId_MustReturnsStatus400_WhenActivityDoesntExist() {
     long id = 999L;
     String uri = ACTIVITIES_URI + "/" + id;
 
@@ -297,8 +303,8 @@ class ActivityControllerIT {
   }
 
   @Test
-  @DisplayName("put for /activities/{id} must returns ExceptionDetails when activity doesn't exist")
-  void putForActivitiesId_MustReturnsExceptionDetails_WhenActivityDoesntExist() {
+  @DisplayName("put /activities/{id} must returns ExceptionDetails when activity doesn't exist")
+  void putActivitiesId_MustReturnsExceptionDetails_WhenActivityDoesntExist() {
     long id = 999L;
     String uri = ACTIVITIES_URI + "/" + id;
 
@@ -322,8 +328,8 @@ class ActivityControllerIT {
   }
 
   @Test
-  @DisplayName("put for /activities/{id} must returns status 400 when request body is invalid")
-  void putForActivitiesId_MustReturnsStatus400_WhenRequestBodyIsInvalid() {
+  @DisplayName("put /activities/{id} must returns status 400 when request body is invalid")
+  void putActivitiesId_MustReturnsStatus400_WhenRequestBodyIsInvalid() {
     long id = 999L;
     String uri = ACTIVITIES_URI + "/" + id;
     ActivityRequest activityToBeUpdated = new ActivityRequest("", null);
@@ -341,8 +347,8 @@ class ActivityControllerIT {
   }
 
   @Test
-  @DisplayName("put for /activities/{id} must returns ValidationExceptionDetails when request body is invalid")
-  void putForActivitiesId_MustReturnsValidationExceptionDetails_WhenRequestBodyIsInvalid() {
+  @DisplayName("put /activities/{id} must returns ValidationExceptionDetails when request body is invalid")
+  void putActivitiesId_MustReturnsValidationExceptionDetails_WhenRequestBodyIsInvalid() {
     long id = 999L;
     String uri = ACTIVITIES_URI + "/" + id;
     ActivityRequest activityToBeUpdated = new ActivityRequest("", null);
@@ -369,8 +375,8 @@ class ActivityControllerIT {
   }
 
   @Test
-  @DisplayName("put for /activities/{id} must returns status 400 when activity status is deleted")
-  void putForActivitiesId_MustReturnsStatus400_WhenActivityStatusIsDeleted() {
+  @DisplayName("put /activities/{id} must returns status 400 when activity status is deleted")
+  void putActivitiesId_MustReturnsStatus400_WhenActivityStatusIsDeleted() {
     activityRepository.save(ActivityCreator.withStatus(Status.DELETED));
 
     long id = 1L;
@@ -389,8 +395,8 @@ class ActivityControllerIT {
   }
 
   @Test
-  @DisplayName("put for /activities/{id} must returns ExceptionDetails when activity status is deleted")
-  void putForActivitiesId_MustReturnsValidationExceptionDetails_WhenActivityStatusIsDeleted() {
+  @DisplayName("put /activities/{id} must returns ExceptionDetails when activity status is deleted")
+  void putActivitiesId_MustReturnsExceptionDetails_WhenActivityStatusIsDeleted() {
     activityRepository.save(ActivityCreator.withStatus(Status.DELETED));
 
     long id = 1L;
@@ -412,8 +418,8 @@ class ActivityControllerIT {
   }
 
   @Test
-  @DisplayName("put for /activities/{id} must returns status 401 when authorization header is invalid")
-  void putForActivitiesId_MustReturnsStatus401_WhenAuthorizationHeaderIsInvalid() {
+  @DisplayName("put /activities/{id} must returns status 401 when authorization header is invalid")
+  void putActivitiesId_MustReturnsStatus401_WhenAuthorizationHeaderIsInvalid() {
     activityRepository.save(ActivityCreator.withStatus(Status.DELETED));
 
     long id = 1L;
@@ -432,8 +438,51 @@ class ActivityControllerIT {
   }
 
   @Test
-  @DisplayName("patch for /activities/{id} must returns status 204 when update status successfully")
-  void patchForActivitiesId_MustReturnsStatus204_WhenUpdateStatusSuccessfully() {
+  @DisplayName("put /activities/{id} must returns status 400 when activity belongs to another user")
+  void putActivitiesId_MustReturnsStatus400_WhenActivityBelongsToAnotherUser(){
+    User newUser = saveNewUser();
+    Long id = saveActivityWithUser(newUser).getId();
+
+    String uri = ACTIVITIES_URI + "/" + id;
+    ActivityRequest activityToBeUpdated = new ActivityRequest("lorem name", "ipsum description");
+    HttpEntity<ActivityRequest> requestEntity = new HttpEntity<>(activityToBeUpdated, headers);
+
+    ResponseEntity<ValidationExceptionDetails> response = testRestTemplate.exchange(
+        uri, HttpMethod.PUT, requestEntity,
+        new ParameterizedTypeReference<>() {
+        });
+
+    HttpStatus actualStatus = response.getStatusCode();
+
+    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.BAD_REQUEST);
+  }
+
+  @Test
+  @DisplayName("put /activities/{id} must returns ExceptionDetails when activity belongs to another user")
+  void putActivitiesId_MustReturnsExceptionDetails_WhenActivityBelongsToAnotherUser(){
+    User newUser = saveNewUser();
+    Long id = saveActivityWithUser(newUser).getId();
+
+    String uri = ACTIVITIES_URI + "/" + id;
+    ActivityRequest activityToBeUpdated = new ActivityRequest("lorem name", "ipsum description");
+    HttpEntity<ActivityRequest> requestEntity = new HttpEntity<>(activityToBeUpdated, headers);
+
+    ResponseEntity<ExceptionDetails> response = testRestTemplate.exchange(
+        uri, HttpMethod.PUT, requestEntity,
+        new ParameterizedTypeReference<>() {
+        });
+
+    ExceptionDetails actualBody = response.getBody();
+
+    Assertions.assertThat(actualBody).isNotNull();
+    Assertions.assertThat(actualBody.getTitle()).isEqualTo("Bad Request");
+    Assertions.assertThat(actualBody.getStatus()).isEqualTo(400);
+    Assertions.assertThat(actualBody.getDetails()).isEqualTo("Activity not found for id: " + id);
+  }
+
+  @Test
+  @DisplayName("patch /activities/{id} must returns status 204 when update status successfully")
+  void patchActivitiesId_MustReturnsStatus204_WhenUpdateStatusSuccessfully() {
     long id = 1L;
     String uri = ACTIVITIES_URI + "/" + id;
     UpdateStatusRequest updateStatusRequest = new UpdateStatusRequest("Concluded");
@@ -454,8 +503,8 @@ class ActivityControllerIT {
   }
 
   @Test
-  @DisplayName("patch for /activities/{id} must returns status 400 when status is invalid")
-  void patchForActivitiesId_MustReturnsStatus400_WhenStatusIsInvalid() {
+  @DisplayName("patch /activities/{id} must returns status 400 when status is invalid")
+  void patchActivitiesId_MustReturnsStatus400_WhenStatusIsInvalid() {
     long id = 1L;
     String uri = ACTIVITIES_URI + "/" + id;
     UpdateStatusRequest updateStatusRequest = new UpdateStatusRequest("cconclude");
@@ -475,8 +524,8 @@ class ActivityControllerIT {
   }
 
   @Test
-  @DisplayName("patch for /activities/{id} must returns ValidationExceptionDetails when status is invalid")
-  void patchForActivitiesId_MustReturnsValidationExceptionDetails_WhenStatusIsInvalid() {
+  @DisplayName("patch /activities/{id} must returns ValidationExceptionDetails when status is invalid")
+  void patchActivitiesId_MustReturnsValidationExceptionDetails_WhenStatusIsInvalid() {
     long id = 1L;
     String uri = ACTIVITIES_URI + "/" + id;
     UpdateStatusRequest updateStatusRequest = new UpdateStatusRequest("cconclude");
@@ -501,8 +550,8 @@ class ActivityControllerIT {
   }
 
   @Test
-  @DisplayName("patch for /activities/{id} must returns status 400 when activity doesn't exist")
-  void patchForActivitiesId_MustReturnsStatus400_WhenActivityDoesntExist() {
+  @DisplayName("patch /activities/{id} must returns status 400 when activity doesn't exist")
+  void patchActivitiesId_MustReturnsStatus400_WhenActivityDoesntExist() {
     long id = 999L;
     String uri = ACTIVITIES_URI + "/" + id;
 
@@ -520,8 +569,8 @@ class ActivityControllerIT {
   }
 
   @Test
-  @DisplayName("patch for /activities/{id} must returns ExceptionDetails when activity doesn't exist")
-  void patchForActivitiesId_MustReturnsExceptionDetails_WhenActivityDoesntExist() {
+  @DisplayName("patch /activities/{id} must returns ExceptionDetails when activity doesn't exist")
+  void patchActivitiesId_MustReturnsExceptionDetails_WhenActivityDoesntExist() {
     long id = 999L;
     String uri = ACTIVITIES_URI + "/" + id;
 
@@ -542,8 +591,8 @@ class ActivityControllerIT {
   }
 
   @Test
-  @DisplayName("patch for /activities/{id} must returns status 400 when activity status is deleted")
-  void patchForActivitiesId_MustReturnsStatus400_WhenActivityStatusIsDeleted() {
+  @DisplayName("patch /activities/{id} must returns status 400 when activity status is deleted")
+  void patchActivitiesId_MustReturnsStatus400_WhenActivityStatusIsDeleted() {
     long id = 1L;
     String uri = ACTIVITIES_URI + "/" + id;
 
@@ -563,8 +612,8 @@ class ActivityControllerIT {
   }
 
   @Test
-  @DisplayName("patch for /activities/{id} must returns ExceptionDetails when activity status is deleted")
-  void patchForActivitiesId_MustReturnsExceptionDetails_WhenActivityStatusIsDeleted() {
+  @DisplayName("patch /activities/{id} must returns ExceptionDetails when activity status is deleted")
+  void patchActivitiesId_MustReturnsExceptionDetails_WhenActivityStatusIsDeleted() {
     long id = 1L;
     String uri = ACTIVITIES_URI + "/" + id;
 
@@ -587,8 +636,8 @@ class ActivityControllerIT {
   }
 
   @Test
-  @DisplayName("patch for /activities/{id} must returns status 401 when authorization header is invalid")
-  void patchForActivitiesId_MustReturnsStatus401_WhenAuthorizationHeaderIsInvalid() {
+  @DisplayName("patch /activities/{id} must returns status 401 when authorization header is invalid")
+  void patchActivitiesId_MustReturnsStatus401_WhenAuthorizationHeaderIsInvalid() {
     long id = 1L;
     String uri = ACTIVITIES_URI + "/" + id;
 
@@ -608,8 +657,51 @@ class ActivityControllerIT {
   }
 
   @Test
-  @DisplayName("delete for /activities/{id} must returns status 204 when deleted successfully")
-  void deleteForActivitiesId_MustReturnsStatus204_WhenDeletedSuccessfully() {
+  @DisplayName("patch /activities/{id} must returns status 400 when activity belongs to another user")
+  void patchActivitiesId_MustReturnsStatus400_WhenActivityBelongsToAnotherUser(){
+    User newUser = saveNewUser();
+    Long id = saveActivityWithUser(newUser).getId();
+
+    String uri = ACTIVITIES_URI + "/" + id;
+    UpdateStatusRequest updateStatusRequest = new UpdateStatusRequest("Concluded");
+    HttpEntity<UpdateStatusRequest> requestEntity = new HttpEntity<>(updateStatusRequest, headers);
+
+    ResponseEntity<ValidationExceptionDetails> response = testRestTemplate.exchange(
+        uri, HttpMethod.PATCH, requestEntity,
+        new ParameterizedTypeReference<>() {
+        });
+
+    HttpStatus actualStatus = response.getStatusCode();
+
+    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.BAD_REQUEST);
+  }
+
+  @Test
+  @DisplayName("patch /activities/{id} must returns ExceptionDetails when activity belongs to another user")
+  void patchActivitiesId_MustReturnsExceptionDetails_WhenActivityBelongsToAnotherUser(){
+    User newUser = saveNewUser();
+    Long id = saveActivityWithUser(newUser).getId();
+
+    String uri = ACTIVITIES_URI + "/" + id;
+    UpdateStatusRequest updateStatusRequest = new UpdateStatusRequest("Concluded");
+    HttpEntity<UpdateStatusRequest> requestEntity = new HttpEntity<>(updateStatusRequest, headers);
+
+    ResponseEntity<ValidationExceptionDetails> response = testRestTemplate.exchange(
+        uri, HttpMethod.PATCH, requestEntity,
+        new ParameterizedTypeReference<>() {
+        });
+
+    ExceptionDetails actualBody = response.getBody();
+
+    Assertions.assertThat(actualBody).isNotNull();
+    Assertions.assertThat(actualBody.getTitle()).isEqualTo("Bad Request");
+    Assertions.assertThat(actualBody.getStatus()).isEqualTo(400);
+    Assertions.assertThat(actualBody.getDetails()).isEqualTo("Activity not found for id: " + id);
+  }
+
+  @Test
+  @DisplayName("delete /activities/{id} must returns status 204 when deleted successfully")
+  void deleteActivitiesId_MustReturnsStatus204_WhenDeletedSuccessfully() {
     long id = 1L;
     String uri = ACTIVITIES_URI + "/" + id;
     Activity activityToBeSaved = ActivityCreator.withoutIdAndWithNameAndDescription(
@@ -629,8 +721,8 @@ class ActivityControllerIT {
   }
 
   @Test
-  @DisplayName("delete for /activities/{id} must disable activity when deleted successfully")
-  void deleteForActivitiesId_MustDisableActivity_WhenDeletedSuccessfully() {
+  @DisplayName("delete /activities/{id} must disable activity when deleted successfully")
+  void deleteActivitiesId_MustDisableActivity_WhenDeletedSuccessfully() {
     String uri = ACTIVITIES_URI + "/" + 1L;
     Activity activityToBeSaved = ActivityCreator.withoutIdAndWithNameAndDescription(
         "Finances API", "A simple project");
@@ -650,8 +742,8 @@ class ActivityControllerIT {
   }
 
   @Test
-  @DisplayName("delete for /activities/{id} must returns status 400 when activity don't exist")
-  void deleteForActivitiesId_MustReturnsStatus400_WhenActivityDontExists() {
+  @DisplayName("delete /activities/{id} must returns status 400 when activity don't exist")
+  void deleteActivitiesId_MustReturnsStatus400_WhenActivityDontExists() {
     long id = 999L;
     String uri = ACTIVITIES_URI + "/" + id;
 
@@ -667,8 +759,8 @@ class ActivityControllerIT {
   }
 
   @Test
-  @DisplayName("delete for /activities/{id} must returns ExceptionDetails when activity don't exist")
-  void deleteForActivitiesId_MustReturnsExceptionDetails_WhenActivityDontExists() {
+  @DisplayName("delete /activities/{id} must returns ExceptionDetails when activity don't exist")
+  void deleteActivitiesId_MustReturnsExceptionDetails_WhenActivityDontExists() {
     long id = 999L;
     String uri = ACTIVITIES_URI + "/" + id;
 
@@ -687,8 +779,8 @@ class ActivityControllerIT {
   }
 
   @Test
-  @DisplayName("delete for /activities/{id} must returns status 401 when authorization header is invalid")
-  void deleteForActivitiesId_MustReturnsStatus401_WhenAuthorizationHeaderIsInvalid() {
+  @DisplayName("delete /activities/{id} must returns status 401 when authorization header is invalid")
+  void deleteActivitiesId_MustReturnsStatus401_WhenAuthorizationHeaderIsInvalid() {
     long id = 999L;
     String uri = ACTIVITIES_URI + "/" + id;
 
@@ -700,6 +792,78 @@ class ActivityControllerIT {
     HttpStatus actualStatus = response.getStatusCode();
 
     Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.UNAUTHORIZED);
+  }
+
+  @Test
+  @DisplayName("delete /activities/{id} must returns status 400 when activity belongs to another user")
+  void deleteActivitiesId_MustReturnsStatus400_WhenActivityBelongsToAnotherUser(){
+    User newUser = saveNewUser();
+    Long id = saveActivityWithUser(newUser).getId();
+
+    String uri = ACTIVITIES_URI + "/" + id;
+    Activity activityToBeSaved = ActivityCreator.withoutIdAndWithNameAndDescription(
+        "Finances API", "A simple project");
+    activityRepository.save(activityToBeSaved);
+
+    HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
+    ResponseEntity<Void> response = testRestTemplate.exchange(
+        uri, HttpMethod.DELETE, requestEntity,
+        new ParameterizedTypeReference<>() {
+        });
+
+    HttpStatus actualStatus = response.getStatusCode();
+
+    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.BAD_REQUEST);
+  }
+
+  @Test
+  @DisplayName("delete /activities/{id} must returns ExceptionDetails when activity belongs to another user")
+  void deleteActivitiesId_MustReturnsExceptionDetails_WhenActivityBelongsToAnotherUser(){
+    User newUser = saveNewUser();
+    Long id = saveActivityWithUser(newUser).getId();
+
+    String uri = ACTIVITIES_URI + "/" + id;
+    Activity activityToBeSaved = ActivityCreator.withoutIdAndWithNameAndDescription(
+        "Finances API", "A simple project");
+    activityRepository.save(activityToBeSaved);
+
+    HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
+    ResponseEntity<ExceptionDetails> response = testRestTemplate.exchange(
+        uri, HttpMethod.DELETE, requestEntity,
+        new ParameterizedTypeReference<>() {
+        });
+
+    ExceptionDetails actualBody = response.getBody();
+
+    Assertions.assertThat(actualBody).isNotNull();
+    Assertions.assertThat(actualBody.getTitle()).isEqualTo("Bad Request");
+    Assertions.assertThat(actualBody.getStatus()).isEqualTo(400);
+    Assertions.assertThat(actualBody.getDetails()).isEqualTo("Activity not found for id: " + id);
+  }
+
+  private User saveNewUser() {
+    Set<Role> roles = new HashSet<>();
+    roles.add(new Role(1, "ROLE_USER"));
+    User newUser = User.builder()
+        .name("New User")
+        .email("new.user@email.com")
+        .createdAt(LocalDateTime.parse("2022-10-27T10:00:00"))
+        .password("123456")
+        .roles(roles)
+        .enabled(true)
+        .build();
+    return userRepository.save(newUser);
+  }
+
+  private Activity saveActivityWithUser(User newUser) {
+    Activity activity = Activity.builder()
+        .user(newUser)
+        .status(Status.ACTIVE)
+        .name("new activity")
+        .description("description of new activity")
+        .createdAt(LocalDateTime.parse("2022-10-27T10:00:00"))
+        .build();
+    return activityRepository.save(activity);
   }
 
 }

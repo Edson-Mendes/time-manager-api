@@ -2,6 +2,7 @@ package br.com.emendes.timemanagerapi.util.creator;
 
 import br.com.emendes.timemanagerapi.model.entity.Activity;
 import br.com.emendes.timemanagerapi.model.Status;
+import br.com.emendes.timemanagerapi.model.entity.User;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -32,20 +33,26 @@ public class ActivityCreator {
   }
 
   public static Activity withoutIdAndWithNameAndDescription(String name, String description){
+    User user = new User();
+    user.setId(1L);
     return Activity.builder()
         .name(name)
         .description(description)
         .createdAt(LocalDateTime.now())
         .status(Status.ACTIVE)
+        .user(user)
         .build();
   }
 
   public static Activity withStatus(Status status) {
+    User user = new User();
+    user.setId(1L);
     return Activity.builder()
         .name("Lorem Activity")
         .description("some description")
         .createdAt(LocalDateTime.parse("2022-10-03T10:15:30"))
         .status(status)
+        .user(user)
         .build();
   }
 
