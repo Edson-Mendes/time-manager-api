@@ -1,6 +1,6 @@
 package br.com.emendes.timemanagerapi.unit.service;
 
-import br.com.emendes.timemanagerapi.dto.request.ActivityRequestBody;
+import br.com.emendes.timemanagerapi.dto.request.ActivityRequest;
 import br.com.emendes.timemanagerapi.dto.request.UpdateStatusRequest;
 import br.com.emendes.timemanagerapi.dto.response.ActivityResponse;
 import br.com.emendes.timemanagerapi.exception.ActivityNotFoundException;
@@ -36,8 +36,8 @@ class ActivityServiceTest {
   @Mock
   private ActivityRepository activityRepositoryMock;
 
-  private final ActivityRequestBody VALID_ACTIVITY_REQUEST_BODY =
-      new ActivityRequestBody("Lorem Ipsum Activity", "A simple project for my portfolio");
+  private final ActivityRequest VALID_ACTIVITY_REQUEST_BODY =
+      new ActivityRequest("Lorem Ipsum Activity", "A simple project for my portfolio");
   private final Pageable DEFAULT_PAGEABLE = PageableCreator.activityDefaultPageable();
   private final long EXISTENT_ACTIVITY_ID = 1000L;
   private final long NONEXISTENT_ACTIVITY_ID = 9999L;
@@ -146,8 +146,8 @@ class ActivityServiceTest {
     @Test
     @DisplayName("update must throws ActivityNotFoundException when id doesn't exist")
     void update_MustThrowsActivityNotFoundException_WhenIdDoesntExist() {
-      ActivityRequestBody activityToBeUpdated =
-          new ActivityRequestBody("Finances REST API", "A simple Restful API for my portfolio");
+      ActivityRequest activityToBeUpdated =
+          new ActivityRequest("Finances REST API", "A simple Restful API for my portfolio");
 
       Assertions.assertThatExceptionOfType(ActivityNotFoundException.class)
           .isThrownBy(() -> activityService.update(NONEXISTENT_ACTIVITY_ID, activityToBeUpdated))
@@ -160,8 +160,8 @@ class ActivityServiceTest {
       long ACTIVITY_ID_DELETED = 99999L;
       BDDMockito.when(activityRepositoryMock.findById(ACTIVITY_ID_DELETED))
           .thenReturn(Optional.of(ActivityCreator.withIdAndStatus(99999L, Status.DELETED)));
-      ActivityRequestBody activityToBeUpdated =
-          new ActivityRequestBody("Finances REST API", "A simple Restful API for my portfolio");
+      ActivityRequest activityToBeUpdated =
+          new ActivityRequest("Finances REST API", "A simple Restful API for my portfolio");
 
       Assertions.assertThatExceptionOfType(ActivityNotFoundException.class)
           .isThrownBy(() -> activityService.update(ACTIVITY_ID_DELETED, activityToBeUpdated))

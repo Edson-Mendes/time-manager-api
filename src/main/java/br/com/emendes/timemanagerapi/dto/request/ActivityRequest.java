@@ -16,7 +16,7 @@ import java.time.temporal.ChronoUnit;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-public class ActivityRequestBody {
+public class ActivityRequest {
 
   @NotBlank(message = "name must not be null or blank")
   private String name;

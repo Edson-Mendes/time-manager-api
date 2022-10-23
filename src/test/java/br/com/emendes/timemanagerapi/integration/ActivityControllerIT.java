@@ -1,6 +1,6 @@
 package br.com.emendes.timemanagerapi.integration;
 
-import br.com.emendes.timemanagerapi.dto.request.ActivityRequestBody;
+import br.com.emendes.timemanagerapi.dto.request.ActivityRequest;
 import br.com.emendes.timemanagerapi.dto.request.LoginRequest;
 import br.com.emendes.timemanagerapi.dto.request.UpdateStatusRequest;
 import br.com.emendes.timemanagerapi.dto.response.ActivityResponse;
@@ -165,8 +165,8 @@ class ActivityControllerIT {
   @Test
   @DisplayName("post for /activities must returns status 201 when saved successfully")
   void postForActivities_MustReturnsStatus201_WhenSavedSuccessfully() {
-    ActivityRequestBody body = new ActivityRequestBody("Finances API", "A simple project");
-    HttpEntity<ActivityRequestBody> requestEntity = new HttpEntity<>(body, headers);
+    ActivityRequest body = new ActivityRequest("Finances API", "A simple project");
+    HttpEntity<ActivityRequest> requestEntity = new HttpEntity<>(body, headers);
     ResponseEntity<ActivityResponse> responseEntity = testRestTemplate.exchange(
         ACTIVITIES_URI, HttpMethod.POST,
         requestEntity, new ParameterizedTypeReference<>() {
@@ -180,8 +180,8 @@ class ActivityControllerIT {
   @Test
   @DisplayName("post for /activities must returns ActivityResponseBody when saved successfully")
   void postForActivities_MustReturnsActivityResponseBody_WhenSavedSuccessfully() {
-    ActivityRequestBody body = new ActivityRequestBody("Finances API", "A simple project");
-    HttpEntity<ActivityRequestBody> requestEntity = new HttpEntity<>(body, headers);
+    ActivityRequest body = new ActivityRequest("Finances API", "A simple project");
+    HttpEntity<ActivityRequest> requestEntity = new HttpEntity<>(body, headers);
     ResponseEntity<ActivityResponse> responseEntity = testRestTemplate.exchange(
         ACTIVITIES_URI, HttpMethod.POST,
         requestEntity, new ParameterizedTypeReference<>() {
@@ -199,8 +199,8 @@ class ActivityControllerIT {
   @Test
   @DisplayName("post for /activities must returns status 400 when saved fails")
   void postForActivities_MustReturnsStatus400_WhenSavedFails() {
-    ActivityRequestBody body = new ActivityRequestBody("", null);
-    HttpEntity<ActivityRequestBody> requestEntity = new HttpEntity<>(body, headers);
+    ActivityRequest body = new ActivityRequest("", null);
+    HttpEntity<ActivityRequest> requestEntity = new HttpEntity<>(body, headers);
     ResponseEntity<ValidationExceptionDetails> responseEntity = testRestTemplate.exchange(
         ACTIVITIES_URI, HttpMethod.POST,
         requestEntity, new ParameterizedTypeReference<>() {
@@ -214,8 +214,8 @@ class ActivityControllerIT {
   @Test
   @DisplayName("post for /activities must returns ValidationExceptionDetails when saved fails")
   void postForActivities_MustReturnsValidationExceptionDetails_WhenSavedFails() {
-    ActivityRequestBody body = new ActivityRequestBody("", null);
-    HttpEntity<ActivityRequestBody> requestEntity = new HttpEntity<>(body, headers);
+    ActivityRequest body = new ActivityRequest("", null);
+    HttpEntity<ActivityRequest> requestEntity = new HttpEntity<>(body, headers);
     ResponseEntity<ValidationExceptionDetails> responseEntity = testRestTemplate.exchange(
         ACTIVITIES_URI, HttpMethod.POST,
         requestEntity, new ParameterizedTypeReference<>() {
@@ -236,8 +236,8 @@ class ActivityControllerIT {
   @Test
   @DisplayName("post for /activities must returns status 401 when authorization header is invalid")
   void postForActivities_MustReturnsStatus401_WhenAuthorizationHeaderIsInvalid() {
-    ActivityRequestBody body = new ActivityRequestBody("", null);
-    HttpEntity<ActivityRequestBody> requestEntity = new HttpEntity<>(body);
+    ActivityRequest body = new ActivityRequest("", null);
+    HttpEntity<ActivityRequest> requestEntity = new HttpEntity<>(body);
     ResponseEntity<ValidationExceptionDetails> responseEntity = testRestTemplate.exchange(
         ACTIVITIES_URI, HttpMethod.POST,
         requestEntity, new ParameterizedTypeReference<>() {
@@ -259,9 +259,9 @@ class ActivityControllerIT {
 
     String activityName = "Finances Rest API";
     String activityDescription = "A simple project";
-    ActivityRequestBody activityToBeUpdated = new ActivityRequestBody(activityName, activityDescription);
+    ActivityRequest activityToBeUpdated = new ActivityRequest(activityName, activityDescription);
 
-    HttpEntity<ActivityRequestBody> requestEntity = new HttpEntity<>(activityToBeUpdated, headers);
+    HttpEntity<ActivityRequest> requestEntity = new HttpEntity<>(activityToBeUpdated, headers);
 
     ResponseEntity<Void> response = testRestTemplate.exchange(
         uri, HttpMethod.PUT, requestEntity,
@@ -282,9 +282,9 @@ class ActivityControllerIT {
 
     String activityName = "Finances Rest API";
     String activityDescription = "A simple project";
-    ActivityRequestBody activityToBeUpdated = new ActivityRequestBody(activityName, activityDescription);
+    ActivityRequest activityToBeUpdated = new ActivityRequest(activityName, activityDescription);
 
-    HttpEntity<ActivityRequestBody> requestEntity = new HttpEntity<>(activityToBeUpdated, headers);
+    HttpEntity<ActivityRequest> requestEntity = new HttpEntity<>(activityToBeUpdated, headers);
 
     ResponseEntity<ExceptionDetails> response = testRestTemplate.exchange(
         uri, HttpMethod.PUT, requestEntity,
@@ -304,9 +304,9 @@ class ActivityControllerIT {
 
     String activityName = "Finances Rest API";
     String activityDescription = "A simple project";
-    ActivityRequestBody activityToBeUpdated = new ActivityRequestBody(activityName, activityDescription);
+    ActivityRequest activityToBeUpdated = new ActivityRequest(activityName, activityDescription);
 
-    HttpEntity<ActivityRequestBody> requestEntity = new HttpEntity<>(activityToBeUpdated, headers);
+    HttpEntity<ActivityRequest> requestEntity = new HttpEntity<>(activityToBeUpdated, headers);
 
     ResponseEntity<ExceptionDetails> response = testRestTemplate.exchange(
         uri, HttpMethod.PUT, requestEntity,
@@ -326,9 +326,9 @@ class ActivityControllerIT {
   void putForActivitiesId_MustReturnsStatus400_WhenRequestBodyIsInvalid() {
     long id = 999L;
     String uri = ACTIVITIES_URI + "/" + id;
-    ActivityRequestBody activityToBeUpdated = new ActivityRequestBody("", null);
+    ActivityRequest activityToBeUpdated = new ActivityRequest("", null);
 
-    HttpEntity<ActivityRequestBody> requestEntity = new HttpEntity<>(activityToBeUpdated, headers);
+    HttpEntity<ActivityRequest> requestEntity = new HttpEntity<>(activityToBeUpdated, headers);
 
     ResponseEntity<ValidationExceptionDetails> response = testRestTemplate.exchange(
         uri, HttpMethod.PUT, requestEntity,
@@ -345,9 +345,9 @@ class ActivityControllerIT {
   void putForActivitiesId_MustReturnsValidationExceptionDetails_WhenRequestBodyIsInvalid() {
     long id = 999L;
     String uri = ACTIVITIES_URI + "/" + id;
-    ActivityRequestBody activityToBeUpdated = new ActivityRequestBody("", null);
+    ActivityRequest activityToBeUpdated = new ActivityRequest("", null);
 
-    HttpEntity<ActivityRequestBody> requestEntity = new HttpEntity<>(activityToBeUpdated, headers);
+    HttpEntity<ActivityRequest> requestEntity = new HttpEntity<>(activityToBeUpdated, headers);
 
     ResponseEntity<ValidationExceptionDetails> response = testRestTemplate.exchange(
         uri, HttpMethod.PUT, requestEntity,
@@ -375,8 +375,8 @@ class ActivityControllerIT {
 
     long id = 1L;
     String uri = ACTIVITIES_URI + "/" + id;
-    ActivityRequestBody activityToBeUpdated = new ActivityRequestBody("lorem name", "ipsum description");
-    HttpEntity<ActivityRequestBody> requestEntity = new HttpEntity<>(activityToBeUpdated, headers);
+    ActivityRequest activityToBeUpdated = new ActivityRequest("lorem name", "ipsum description");
+    HttpEntity<ActivityRequest> requestEntity = new HttpEntity<>(activityToBeUpdated, headers);
 
     ResponseEntity<ValidationExceptionDetails> response = testRestTemplate.exchange(
         uri, HttpMethod.PUT, requestEntity,
@@ -395,8 +395,8 @@ class ActivityControllerIT {
 
     long id = 1L;
     String uri = ACTIVITIES_URI + "/" + id;
-    ActivityRequestBody activityToBeUpdated = new ActivityRequestBody("lorem name", "ipsum description");
-    HttpEntity<ActivityRequestBody> requestEntity = new HttpEntity<>(activityToBeUpdated, headers);
+    ActivityRequest activityToBeUpdated = new ActivityRequest("lorem name", "ipsum description");
+    HttpEntity<ActivityRequest> requestEntity = new HttpEntity<>(activityToBeUpdated, headers);
 
     ResponseEntity<ValidationExceptionDetails> response = testRestTemplate.exchange(
         uri, HttpMethod.PUT, requestEntity,
@@ -418,8 +418,8 @@ class ActivityControllerIT {
 
     long id = 1L;
     String uri = ACTIVITIES_URI + "/" + id;
-    ActivityRequestBody activityToBeUpdated = new ActivityRequestBody("lorem name", "ipsum description");
-    HttpEntity<ActivityRequestBody> requestEntity = new HttpEntity<>(activityToBeUpdated);
+    ActivityRequest activityToBeUpdated = new ActivityRequest("lorem name", "ipsum description");
+    HttpEntity<ActivityRequest> requestEntity = new HttpEntity<>(activityToBeUpdated);
 
     ResponseEntity<ValidationExceptionDetails> response = testRestTemplate.exchange(
         uri, HttpMethod.PUT, requestEntity,

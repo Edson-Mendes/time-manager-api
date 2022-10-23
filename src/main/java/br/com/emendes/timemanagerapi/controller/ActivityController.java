@@ -1,6 +1,6 @@
 package br.com.emendes.timemanagerapi.controller;
 
-import br.com.emendes.timemanagerapi.dto.request.ActivityRequestBody;
+import br.com.emendes.timemanagerapi.dto.request.ActivityRequest;
 import br.com.emendes.timemanagerapi.dto.request.UpdateStatusRequest;
 import br.com.emendes.timemanagerapi.dto.response.ActivityResponse;
 import br.com.emendes.timemanagerapi.service.ActivityService;
@@ -34,8 +34,8 @@ public class ActivityController {
 
   @PostMapping
   public ResponseEntity<ActivityResponse> create(
-      @RequestBody @Valid ActivityRequestBody activityRequestBody, UriComponentsBuilder uriBuilder) {
-    ActivityResponse activityResponse = activityService.create(activityRequestBody);
+      @RequestBody @Valid ActivityRequest activityRequest, UriComponentsBuilder uriBuilder) {
+    ActivityResponse activityResponse = activityService.create(activityRequest);
 
     URI uri = uriBuilder.path("/activities/{id}").build(activityResponse.getId());
     return ResponseEntity.created(uri).body(activityResponse);
@@ -43,8 +43,8 @@ public class ActivityController {
 
   @PutMapping("/{id}")
   public ResponseEntity<Void> update(
-      @PathVariable long id, @RequestBody @Valid ActivityRequestBody activityRequestBody) {
-    activityService.update(id, activityRequestBody);
+      @PathVariable long id, @RequestBody @Valid ActivityRequest activityRequest) {
+    activityService.update(id, activityRequest);
     return ResponseEntity.noContent().build();
   }
 

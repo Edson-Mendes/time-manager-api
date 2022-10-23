@@ -1,10 +1,8 @@
 package br.com.emendes.timemanagerapi.model.entity;
 
-import br.com.emendes.timemanagerapi.dto.request.ActivityRequestBody;
+import br.com.emendes.timemanagerapi.dto.request.ActivityRequest;
 import br.com.emendes.timemanagerapi.model.Status;
 import lombok.*;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -49,9 +47,9 @@ public class Activity {
   @ManyToOne(fetch = FetchType.LAZY)
   private User user;
 
-  public void update(ActivityRequestBody activityRequestBody) {
-    this.name = activityRequestBody.getName();
-    this.description = activityRequestBody.getDescription();
+  public void update(ActivityRequest activityRequest) {
+    this.name = activityRequest.getName();
+    this.description = activityRequest.getDescription();
   }
 
   @Override

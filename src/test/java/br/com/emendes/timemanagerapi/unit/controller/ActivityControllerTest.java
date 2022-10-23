@@ -1,7 +1,7 @@
 package br.com.emendes.timemanagerapi.unit.controller;
 
 import br.com.emendes.timemanagerapi.controller.ActivityController;
-import br.com.emendes.timemanagerapi.dto.request.ActivityRequestBody;
+import br.com.emendes.timemanagerapi.dto.request.ActivityRequest;
 import br.com.emendes.timemanagerapi.dto.request.UpdateStatusRequest;
 import br.com.emendes.timemanagerapi.dto.response.ActivityResponse;
 import br.com.emendes.timemanagerapi.model.Status;
@@ -35,8 +35,8 @@ class ActivityControllerTest {
   @Mock
   private ActivityService activityServiceMock;
   private final UriComponentsBuilder URI_BUILDER = UriComponentsBuilder.fromHttpUrl("http://localhost:8080");
-  private final ActivityRequestBody VALID_ACTIVITY_REQUEST_BODY =
-      new ActivityRequestBody("Lorem Ipsum Activity", "A simple project for my portfolio");
+  private final ActivityRequest VALID_ACTIVITY_REQUEST_BODY =
+      new ActivityRequest("Lorem Ipsum Activity", "A simple project for my portfolio");
   private final Pageable DEFAULT_PAGEABLE = PageableCreator.activityDefaultPageable();
 
 //  Mocks de métodos/actions de activityServiceMock
@@ -54,7 +54,7 @@ class ActivityControllerTest {
             .withIdNameAndDescription(1L, "Lorem Ipsum Activity", "A simple project for my portfolio"));
 
     BDDMockito.doNothing().when(activityServiceMock)
-        .update(ArgumentMatchers.anyLong(), ArgumentMatchers.any(ActivityRequestBody.class));
+        .update(ArgumentMatchers.anyLong(), ArgumentMatchers.any(ActivityRequest.class));
 
     BDDMockito.doNothing().when(activityServiceMock)
         .updateStatusById(1L, new UpdateStatusRequest("CONCLUDED"));
@@ -138,7 +138,7 @@ class ActivityControllerTest {
     @Test
     @DisplayName("update must returns status 204 when updated successfully")
     void update_MustReturnsStatus204_WhenUpdatedSuccessfully() {
-      ActivityRequestBody activityToBeUpdated = new ActivityRequestBody(
+      ActivityRequest activityToBeUpdated = new ActivityRequest(
           "Finances REST API", "A simple Restful API for my portfolio");
 
       HttpStatus actualStatusCode = activityController.update(1L, activityToBeUpdated).getStatusCode();
