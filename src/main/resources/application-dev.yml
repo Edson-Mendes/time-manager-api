@@ -4,8 +4,8 @@ spring:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/time-manager-db
 #    url: ${DB_DEV_URL}
-    username: ${DB_USERNAME_DEV}
-    password: ${DB_PASSWORD_DEV}
+    username: user
+    password: 1234
 
 # sql
   sql:

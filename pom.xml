@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>br.com.emendes</groupId>
 	<artifactId>time-manager-api</artifactId>
-	<version>1.0</version>
+	<version>0.1</version>
 	<name>time-manager-api</name>
 	<description>Aplicação para gerenciar o tempo gasto em projetos.</description>
 	<properties>
@@ -63,7 +63,13 @@
 			<artifactId>modelmapper</artifactId>
 			<version>3.1.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-ui</artifactId>
+			<version>1.6.11</version>
+		</dependency>
 
+<!--		Dependências usadas em testes-->
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>

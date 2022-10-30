@@ -1,5 +1,6 @@
 package br.com.emendes.timemanagerapi.controller;
 
+import br.com.emendes.timemanagerapi.controller.openapi.ActivityControllerOpenApi;
 import br.com.emendes.timemanagerapi.dto.request.ActivityRequest;
 import br.com.emendes.timemanagerapi.dto.request.UpdateStatusRequest;
 import br.com.emendes.timemanagerapi.dto.response.ActivityResponse;
@@ -19,7 +20,7 @@ import java.net.URI;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/activities")
-public class ActivityController {
+public class ActivityController implements ActivityControllerOpenApi {
 
   private final ActivityService activityService;
 
@@ -28,7 +29,7 @@ public class ActivityController {
       @SortDefault.SortDefaults({
           @SortDefault(sort = "status", direction = Sort.Direction.ASC),
           @SortDefault(sort = "createdAt", direction = Sort.Direction.DESC)
-      }) Pageable pageable){
+      }) Pageable pageable) {
     return ResponseEntity.ok(activityService.find(pageable));
   }
 
