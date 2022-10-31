@@ -24,6 +24,7 @@ public class ActivityController implements ActivityControllerOpenApi {
 
   private final ActivityService activityService;
 
+  @Override
   @GetMapping
   public ResponseEntity<Page<ActivityResponse>> find(
       @SortDefault.SortDefaults({
@@ -33,6 +34,7 @@ public class ActivityController implements ActivityControllerOpenApi {
     return ResponseEntity.ok(activityService.find(pageable));
   }
 
+  @Override
   @PostMapping
   public ResponseEntity<ActivityResponse> create(
       @RequestBody @Valid ActivityRequest activityRequest, UriComponentsBuilder uriBuilder) {
@@ -42,6 +44,7 @@ public class ActivityController implements ActivityControllerOpenApi {
     return ResponseEntity.created(uri).body(activityResponse);
   }
 
+  @Override
   @PutMapping("/{id}")
   public ResponseEntity<Void> update(
       @PathVariable long id, @RequestBody @Valid ActivityRequest activityRequest) {
@@ -49,6 +52,7 @@ public class ActivityController implements ActivityControllerOpenApi {
     return ResponseEntity.noContent().build();
   }
 
+  @Override
   @PatchMapping("/{id}")
   public ResponseEntity<Void> updateStatus(
       @PathVariable long id, @RequestBody @Valid UpdateStatusRequest updateStatusRequest) {
@@ -56,9 +60,11 @@ public class ActivityController implements ActivityControllerOpenApi {
     return ResponseEntity.noContent().build();
   }
 
+  @Override
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> delete(@PathVariable long id) {
     activityService.deleteActivityById(id);
     return ResponseEntity.noContent().build();
   }
+
 }

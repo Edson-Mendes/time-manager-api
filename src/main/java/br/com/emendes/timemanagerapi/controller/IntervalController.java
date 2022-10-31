@@ -1,5 +1,6 @@
 package br.com.emendes.timemanagerapi.controller;
 
+import br.com.emendes.timemanagerapi.controller.openapi.IntervalControllerOpenApi;
 import br.com.emendes.timemanagerapi.dto.request.IntervalRequest;
 import br.com.emendes.timemanagerapi.dto.response.IntervalResponseBody;
 import br.com.emendes.timemanagerapi.service.IntervalService;
@@ -20,18 +21,20 @@ import java.net.URI;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/activities/{activityId}/intervals")
-public class IntervalController {
+public class IntervalController implements IntervalControllerOpenApi {
 
   private final IntervalService intervalService;
 
+  @Override
   @GetMapping
   public ResponseEntity<Page<IntervalResponseBody>> find(
       @PathVariable long activityId,
-      @PageableDefault(direction = Sort.Direction.DESC, sort = "startedAt") Pageable pageable){
+      @PageableDefault(direction = Sort.Direction.DESC, sort = "startedAt") Pageable pageable) {
     return ResponseEntity.ok(intervalService.find(activityId, pageable));
   }
 
   //  TODO: Fazer um handler para lidar com tentativa de converter algo que não seja long para long.
+  @Override
   @PostMapping
   public ResponseEntity<IntervalResponseBody> create(
       @PathVariable long activityId, @RequestBody @Valid IntervalRequest requestBody, UriComponentsBuilder uriBuilder) {
@@ -41,8 +44,9 @@ public class IntervalController {
     return ResponseEntity.created(uri).body(intervalResponseBody);
   }
 
+  @Override
   @DeleteMapping("{id}")
-  public ResponseEntity<Void> delete(@PathVariable long activityId, @PathVariable long id){
+  public ResponseEntity<Void> delete(@PathVariable long activityId, @PathVariable long id) {
     intervalService.delete(activityId, id);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
