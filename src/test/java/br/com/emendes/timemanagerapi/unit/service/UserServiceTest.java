@@ -43,10 +43,10 @@ class UserServiceTest {
     BDDMockito.when(userRepositoryMock.save(UserCreator.withoutId())).thenReturn(user);
     BDDMockito.when(encoderMock.encode("123456")).thenReturn("123456");
     BDDMockito.when(mapperMock
-            .map(new SignupRequest("user", "user@email.com", "123456", "123456"), User.class))
-        .thenReturn(UserCreator.withNameAndEmail("user", "user@email.com"));
+            .map(new SignupRequest("sql/user", "user@email.com", "123456", "123456"), User.class))
+        .thenReturn(UserCreator.withNameAndEmail("sql/user", "user@email.com"));
     BDDMockito.when(mapperMock.map(user, UserResponse.class))
-        .thenReturn(UserResponseCreator.withNameAndEmail("user", "user@email.com"));
+        .thenReturn(UserResponseCreator.withNameAndEmail("sql/user", "user@email.com"));
     BDDMockito.when(userRepositoryMock.findByEmail("user@email.com")).thenReturn(Optional.of(user));
     BDDMockito.willThrow(new UsernameNotFoundException("User not found"))
         .given(userRepositoryMock).findByEmail("nonexistent@email.com");
@@ -58,12 +58,12 @@ class UserServiceTest {
   @Test
   @DisplayName("save must returns UserResponse when save successfully")
   void save_MustReturnsUserResponse_WhenSaveSuccessfully() {
-    SignupRequest signupRequest = new SignupRequest("user", "user@email.com", "123456", "123456");
+    SignupRequest signupRequest = new SignupRequest("sql/user", "user@email.com", "123456", "123456");
 
     UserResponse actualUserResponse = userService.save(signupRequest);
 
     Assertions.assertThat(actualUserResponse).isNotNull();
-    Assertions.assertThat(actualUserResponse.getName()).isEqualTo("user");
+    Assertions.assertThat(actualUserResponse.getName()).isEqualTo("sql/user");
     Assertions.assertThat(actualUserResponse.getEmail()).isEqualTo("user@email.com");
   }
 

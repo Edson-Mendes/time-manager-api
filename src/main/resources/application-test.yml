@@ -6,7 +6,7 @@ spring:
 # sql
   sql:
     init:
-      mode: always
+      mode: never
 
 # jpa
   jpa:

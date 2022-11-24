@@ -28,12 +28,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.*;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
-//  TODO: Não esquecer de refatorar esses testes!
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -51,122 +53,17 @@ class ActivityControllerIT {
   private HttpHeaders headers;
   private final String ACTIVITIES_URI = "/activities";
 
-  @BeforeEach
-  public void addHeader() {
-    HttpEntity<LoginRequest> requestBody = new HttpEntity<>(new LoginRequest("user@email.com", "1234"));
-
-    ResponseEntity<TokenResponse> response = testRestTemplate.exchange(
-        "/signin", HttpMethod.POST, requestBody, new ParameterizedTypeReference<>() {
-        });
-
-    headers = new HttpHeaders();
-    headers.add("Authorization", "Bearer " + response.getBody().getToken());
-  }
-
-  @Test
-  @DisplayName("get /activities must returns status 200 when found successfully")
-  void getActivities_MustReturnsStatus200_WhenFoundSuccessfully() {
-    Activity activityToBeSaved1 = ActivityCreator.withoutIdAndWithNameAndDescription(
-        "Finances API", "A simple project");
-    Activity activityToBeSaved2 = ActivityCreator.withoutIdAndWithNameAndDescription(
-        "Transaction Analyzer", "A simple project");
-    activityRepository.save(activityToBeSaved1);
-    activityRepository.save(activityToBeSaved2);
-
-    HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
-
-    ResponseEntity<PageableResponse<ActivityResponse>> responseEntity = testRestTemplate.exchange(
-        ACTIVITIES_URI, HttpMethod.GET, requestEntity, new ParameterizedTypeReference<>() {
-        });
-    HttpStatus actualStatus = responseEntity.getStatusCode();
-
-    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.OK);
-  }
-
-  @Test
-  @DisplayName("get /activities must returns Page<ActivitiesResponseBody> when found successfully")
-  void getActivities_MustReturnsPageActivitiesResponseBody_WhenFoundSuccessfully() {
-    Activity activityToBeSaved1 = ActivityCreator.withoutIdAndWithNameAndDescription(
-        "Finances API", "A simple project");
-    Activity activityToBeSaved2 = ActivityCreator.withoutIdAndWithNameAndDescription(
-        "Transaction Analyzer", "A simple project");
-    activityRepository.save(activityToBeSaved1);
-    activityRepository.save(activityToBeSaved2);
-
-    HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
-    ResponseEntity<PageableResponse<ActivityResponse>> responseEntity = testRestTemplate.exchange(
-        ACTIVITIES_URI, HttpMethod.GET, requestEntity, new ParameterizedTypeReference<>() {
-        });
-    Page<ActivityResponse> actualBody = responseEntity.getBody();
-
-    Assertions.assertThat(actualBody).isNotNull().hasSize(2);
-    Assertions.assertThat(actualBody.getContent().get(0).getName()).isEqualTo("Finances API");
-    Assertions.assertThat(actualBody.getContent().get(1).getName()).isEqualTo("Transaction Analyzer");
-    Assertions.assertThat(actualBody.getContent().get(0).getDescription()).isEqualTo("A simple project");
-    Assertions.assertThat(actualBody.getContent().get(1).getDescription()).isEqualTo("A simple project");
-  }
-
-  @Test
-  @DisplayName("get /activities must returns only enabled activities when exists activities disabled")
-  void getActivities_MustReturnsOnlyEnabledActivities_WhenExistsActivitiesDisabled() {
-    Activity activityToBeSaved1 = ActivityCreator.withoutIdAndWithNameAndDescription(
-        "Finances API", "A simple project");
-    Activity activityToBeSaved2 = ActivityCreator.withoutIdAndWithNameAndDescription(
-        "Transaction Analyzer", "A simple project");
-    activityToBeSaved2.setStatus(Status.DELETED);
-    activityRepository.save(activityToBeSaved1);
-    activityRepository.save(activityToBeSaved2);
-    HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
-
-    ResponseEntity<PageableResponse<ActivityResponse>> responseEntity = testRestTemplate.exchange(
-        ACTIVITIES_URI, HttpMethod.GET, requestEntity, new ParameterizedTypeReference<>() {
-        });
-    Page<ActivityResponse> actualBody = responseEntity.getBody();
-    ActivityResponse actualActivityRespBody = actualBody.getContent().get(0);
-
-    Assertions.assertThat(actualBody).isNotNull().hasSize(1);
-    Assertions.assertThat(actualActivityRespBody.getName()).isEqualTo("Finances API");
-    Assertions.assertThat(actualActivityRespBody.getDescription()).isEqualTo("A simple project");
-    Assertions.assertThat(actualActivityRespBody.getStatus()).isEqualByComparingTo(Status.ACTIVE);
-  }
-
-  @Test
-  @DisplayName("get /activities must returns status 200 when user doesn't have activities")
-  void getActivities_MustReturnsStatus200_WhenUserDoesntHaveActivities() {
-    HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
-    ResponseEntity<ExceptionDetails> responseEntity = testRestTemplate.exchange(
-        ACTIVITIES_URI, HttpMethod.GET, requestEntity, new ParameterizedTypeReference<>() {
-        });
-
-    HttpStatus actualStatus = responseEntity.getStatusCode();
-
-    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.OK);
-  }
-
-  @Test
-  @DisplayName("get /activities must returns empty Page when user doesn't have activities")
-  void getActivities_MustReturnsEmptyPage_WhenUserDoesntHaveActivities() {
-    HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
-    ResponseEntity<PageableResponse<ActivityResponse>> responseEntity = testRestTemplate.exchange(
-        ACTIVITIES_URI, HttpMethod.GET, requestEntity, new ParameterizedTypeReference<>() {
-        });
-
-    PageableResponse<ActivityResponse> actualBody = responseEntity.getBody();
-
-    Assertions.assertThat(actualBody).isNotNull().isEmpty();
-  }
-
-  @Test
-  @DisplayName("get /activities must returns status 401 when authorization header is invalid")
-  void getActivities_MustReturnsStatus401_WhenAuthorizationHeaderIsInvalid() {
-    ResponseEntity<ExceptionDetails> responseEntity = testRestTemplate.exchange(
-        ACTIVITIES_URI, HttpMethod.GET, null, new ParameterizedTypeReference<>() {
-        });
-
-    HttpStatus actualStatus = responseEntity.getStatusCode();
-
-    Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.UNAUTHORIZED);
-  }
+//  @BeforeEach
+//  public void addHeader() {
+//    HttpEntity<LoginRequest> requestBody = new HttpEntity<>(new LoginRequest("lorem@email.com", "1234"));
+//
+//    ResponseEntity<TokenResponse> response = testRestTemplate.exchange(
+//        "/signin", HttpMethod.POST, requestBody, new ParameterizedTypeReference<>() {
+//        });
+//
+//    headers = new HttpHeaders();
+//    headers.add("Authorization", "Bearer " + response.getBody().getToken());
+//  }
 
   @Test
   @DisplayName("post /activities must returns status 201 when saved successfully")
@@ -864,6 +761,21 @@ class ActivityControllerIT {
         .createdAt(LocalDateTime.parse("2022-10-27T10:00:00"))
         .build();
     return activityRepository.save(activity);
+  }
+
+  private HttpHeaders getAuthToken() {
+    headers = new HttpHeaders();
+    headers.add("Authorization", "Bearer " + attemptSignIn());
+    return headers;
+  }
+
+  private String attemptSignIn() {
+    HttpEntity<LoginRequest> requestBody = new HttpEntity<>(new LoginRequest("lorem@email.com", "1234"));
+
+    ResponseEntity<TokenResponse> response = testRestTemplate.exchange(
+        "/signin", HttpMethod.POST, requestBody, new ParameterizedTypeReference<>() {
+        });
+    return Objects.requireNonNull(response.getBody()).getToken();
   }
 
 }

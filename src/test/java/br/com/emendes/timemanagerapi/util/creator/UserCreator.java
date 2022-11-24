@@ -13,7 +13,7 @@ public class UserCreator {
     roles.add(new Role(1, "ROLE_USER"));
 
     return User.builder()
-        .name("user")
+        .name("sql/user")
         .email("user@email.com")
         .password("123456")
         .roles(roles)
@@ -26,7 +26,7 @@ public class UserCreator {
 
     return User.builder()
         .id(1L)
-        .name("user")
+        .name("sql/user")
         .email("user@email.com")
         .password("123456")
         .roles(roles)

@@ -131,7 +131,7 @@ class SignupControllerIT {
   }
 
   @ParameterizedTest
-  @ValueSource(strings = {"user", "useremail.com", "user@"})
+  @ValueSource(strings = {"sql/user", "useremail.com", "user@"})
   @DisplayName("post /signup must returns ValidationExceptionDetails when email is invalid")
   void postSignup_MustReturnsValidationExceptionDetails_WhenEmailIsInvalid(String email) {
     SignupRequest signupRequest = new SignupRequest(VALID_NAME, email, VALID_PASSWORD, VALID_CONFIRM);

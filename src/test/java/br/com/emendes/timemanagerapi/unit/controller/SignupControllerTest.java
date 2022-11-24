@@ -33,14 +33,14 @@ class SignupControllerTest {
   @BeforeEach
   void setUp(){
     BDDMockito.when(userServiceMock
-        .save(SignupRequestCreator.withNameEmailAndPassword("user", "user@email.com", "123456")))
-        .thenReturn(UserResponseCreator.withNameAndEmail("user", "user@email.com"));
+        .save(SignupRequestCreator.withNameEmailAndPassword("sql/user", "user@email.com", "123456")))
+        .thenReturn(UserResponseCreator.withNameAndEmail("sql/user", "user@email.com"));
   }
 
   @Test
   @DisplayName("signup must returns status 201 when signup successfully")
   void signup_MustReturnsStatus201_WhenSignupSuccessfully(){
-    SignupRequest signupRequest = new SignupRequest("user", "user@email.com", "123456", "123456");
+    SignupRequest signupRequest = new SignupRequest("sql/user", "user@email.com", "123456", "123456");
 
     ResponseEntity<UserResponse> response = signupController.signup(signupRequest, URI_BUILDER);
     HttpStatus actualStatus = response.getStatusCode();
@@ -51,13 +51,13 @@ class SignupControllerTest {
   @Test
   @DisplayName("signup must returns UserResponse when signup successfully")
   void signup_MustReturnsUserResponse_WhenSignupSuccessfully(){
-    SignupRequest signupRequest = new SignupRequest("user", "user@email.com", "123456", "123456");
+    SignupRequest signupRequest = new SignupRequest("sql/user", "user@email.com", "123456", "123456");
 
     ResponseEntity<UserResponse> response = signupController.signup(signupRequest, URI_BUILDER);
     UserResponse actualBody = response.getBody();
 
     Assertions.assertThat(actualBody).isNotNull();
-    Assertions.assertThat(actualBody.getName()).isEqualTo("user");
+    Assertions.assertThat(actualBody.getName()).isEqualTo("sql/user");
     Assertions.assertThat(actualBody.getEmail()).isEqualTo("user@email.com");
   }
 
