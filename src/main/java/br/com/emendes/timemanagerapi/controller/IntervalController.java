@@ -33,7 +33,6 @@ public class IntervalController implements IntervalControllerOpenApi {
     return ResponseEntity.ok(intervalService.find(activityId, pageable));
   }
 
-  //  TODO: Fazer um handler para lidar com tentativa de converter algo que não seja long para long.
   @Override
   @PostMapping
   public ResponseEntity<IntervalResponse> create(

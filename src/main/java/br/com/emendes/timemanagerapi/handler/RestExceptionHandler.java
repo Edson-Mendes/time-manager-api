@@ -5,6 +5,7 @@ import br.com.emendes.timemanagerapi.dto.response.detail.ExceptionDetails;
 import br.com.emendes.timemanagerapi.dto.response.detail.ValidationExceptionDetails;
 import br.com.emendes.timemanagerapi.exception.IntervalCreationException;
 import br.com.emendes.timemanagerapi.exception.IntervalNotFoundException;
+import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +40,14 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
   @ExceptionHandler(IntervalCreationException.class)
   public ResponseEntity<ExceptionDetails> handleIntervalCreation(IntervalCreationException ex) {
+    ExceptionDetails responseBody = generateExceptionDetails(ex.getMessage());
+
+    return ResponseEntity.badRequest().body(responseBody);
+  }
+
+  @Override
+  protected ResponseEntity<Object> handleTypeMismatch(
+      TypeMismatchException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
     ExceptionDetails responseBody = generateExceptionDetails(ex.getMessage());
 
     return ResponseEntity.badRequest().body(responseBody);
