@@ -2,7 +2,7 @@ package br.com.emendes.timemanagerapi.unit.controller;
 
 import br.com.emendes.timemanagerapi.controller.IntervalController;
 import br.com.emendes.timemanagerapi.dto.request.IntervalRequest;
-import br.com.emendes.timemanagerapi.dto.response.IntervalResponseBody;
+import br.com.emendes.timemanagerapi.dto.response.IntervalResponse;
 import br.com.emendes.timemanagerapi.service.ActivityService;
 import br.com.emendes.timemanagerapi.service.IntervalService;
 import br.com.emendes.timemanagerapi.util.creator.ActivityCreator;
@@ -43,9 +43,9 @@ class IntervalControllerTest {
 
   @BeforeEach
   void setUp(){
-    IntervalResponseBody intervalResp = IntervalResponseBodyCreator
+    IntervalResponse intervalResp = IntervalResponseBodyCreator
         .withIdAndStartedAtAndElapsedTime(EXISTENT_ACTIVITY_ID, "2022-08-16T15:07:00", "00:30:00");
-    Page<IntervalResponseBody> intervalRespBodyPage = new PageImpl<>(List.of(intervalResp), DEFAULT_PAGEABLE, 1);
+    Page<IntervalResponse> intervalRespBodyPage = new PageImpl<>(List.of(intervalResp), DEFAULT_PAGEABLE, 1);
 
     BDDMockito.when(intervalServiceMock.create(EXISTENT_ACTIVITY_ID, IntervalRequestBodyCreator.validIntervalRequest()))
         .thenReturn(IntervalResponseBodyCreator.intervalRBForTests());
@@ -67,7 +67,7 @@ class IntervalControllerTest {
       IntervalRequest requestBody = new IntervalRequest(
           "2022-08-16T15:07:00", "00:30:00");
 
-      ResponseEntity<IntervalResponseBody> response = intervalController
+      ResponseEntity<IntervalResponse> response = intervalController
           .create(EXISTENT_ACTIVITY_ID, requestBody, URI_BUILDER);
       HttpStatus actualStatusCode = response.getStatusCode();
 
@@ -80,9 +80,9 @@ class IntervalControllerTest {
       IntervalRequest requestBody = new IntervalRequest(
           "2022-08-16T15:07:00", "00:30:00");
 
-      ResponseEntity<IntervalResponseBody> response = intervalController
+      ResponseEntity<IntervalResponse> response = intervalController
           .create(EXISTENT_ACTIVITY_ID, requestBody, URI_BUILDER);
-      IntervalResponseBody actualResponseBody = response.getBody();
+      IntervalResponse actualResponseBody = response.getBody();
 
       Assertions.assertThat(actualResponseBody).isNotNull();
       Assertions.assertThat(actualResponseBody.getId()).isPositive();
@@ -96,7 +96,7 @@ class IntervalControllerTest {
       IntervalRequest requestBody = new IntervalRequest(
           "2022-08-16T15:07:00", "00:30:00");
 
-      ResponseEntity<IntervalResponseBody> response = intervalController
+      ResponseEntity<IntervalResponse> response = intervalController
           .create(EXISTENT_ACTIVITY_ID, requestBody, URI_BUILDER);
 
       Assertions.assertThat(response.getHeaders().getLocation()).isNotNull();
@@ -113,7 +113,7 @@ class IntervalControllerTest {
     @Test
     @DisplayName("find must returns status 200 when found successfully")
     void find_MustReturnsStatus200_WhenFoundSuccessfully(){
-      ResponseEntity<Page<IntervalResponseBody>> response = intervalController
+      ResponseEntity<Page<IntervalResponse>> response = intervalController
           .find(EXISTENT_ACTIVITY_ID, DEFAULT_PAGEABLE);
       HttpStatus actualStatusCode = response.getStatusCode();
 
@@ -123,11 +123,11 @@ class IntervalControllerTest {
     @Test
     @DisplayName("find must returns ResponseEntity<Page<IntervalResponseBody>> when found successfuly")
     void find_MustReturnsResponseEntityPageIntervalResponseBody_WhenFoundSuccessfully(){
-      ResponseEntity<Page<IntervalResponseBody>> response = intervalController
+      ResponseEntity<Page<IntervalResponse>> response = intervalController
           .find(EXISTENT_ACTIVITY_ID, DEFAULT_PAGEABLE);
-      Page<IntervalResponseBody> actualBody = response.getBody();
+      Page<IntervalResponse> actualBody = response.getBody();
 
-      IntervalResponseBody expectedIntervalRespBody = IntervalResponseBodyCreator
+      IntervalResponse expectedIntervalRespBody = IntervalResponseBodyCreator
           .withIdAndStartedAtAndElapsedTime(EXISTENT_ACTIVITY_ID, "2022-08-16T15:07:00", "00:30:00");
 
       Assertions.assertThat(actualBody)
@@ -142,9 +142,9 @@ class IntervalControllerTest {
       BDDMockito.when(intervalServiceMock.find(999L, DEFAULT_PAGEABLE))
           .thenReturn(Page.empty(DEFAULT_PAGEABLE));
 
-      ResponseEntity<Page<IntervalResponseBody>> response = intervalController
+      ResponseEntity<Page<IntervalResponse>> response = intervalController
           .find(999L, DEFAULT_PAGEABLE);
-      Page<IntervalResponseBody> actualBody = response.getBody();
+      Page<IntervalResponse> actualBody = response.getBody();
 
       Assertions.assertThat(actualBody).isEmpty();
     }

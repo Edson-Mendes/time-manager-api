@@ -11,13 +11,13 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @EqualsAndHashCode
 @ToString
-public class IntervalResponseBody {
+public class IntervalResponse {
 
   private long id;
   private LocalDateTime startedAt;
   private LocalTime elapsedTime;
 
-  public IntervalResponseBody(Interval interval){
+  public IntervalResponse(Interval interval){
     this.id = interval.getId();
     this.startedAt = interval.getStartedAt();
     this.elapsedTime = interval.getElapsedTime();

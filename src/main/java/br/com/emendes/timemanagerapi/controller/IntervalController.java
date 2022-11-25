@@ -2,7 +2,7 @@ package br.com.emendes.timemanagerapi.controller;
 
 import br.com.emendes.timemanagerapi.controller.openapi.IntervalControllerOpenApi;
 import br.com.emendes.timemanagerapi.dto.request.IntervalRequest;
-import br.com.emendes.timemanagerapi.dto.response.IntervalResponseBody;
+import br.com.emendes.timemanagerapi.dto.response.IntervalResponse;
 import br.com.emendes.timemanagerapi.service.IntervalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -27,7 +27,7 @@ public class IntervalController implements IntervalControllerOpenApi {
 
   @Override
   @GetMapping
-  public ResponseEntity<Page<IntervalResponseBody>> find(
+  public ResponseEntity<Page<IntervalResponse>> find(
       @PathVariable long activityId,
       @PageableDefault(direction = Sort.Direction.DESC, sort = "startedAt") Pageable pageable) {
     return ResponseEntity.ok(intervalService.find(activityId, pageable));
@@ -36,12 +36,12 @@ public class IntervalController implements IntervalControllerOpenApi {
   //  TODO: Fazer um handler para lidar com tentativa de converter algo que não seja long para long.
   @Override
   @PostMapping
-  public ResponseEntity<IntervalResponseBody> create(
+  public ResponseEntity<IntervalResponse> create(
       @PathVariable long activityId, @RequestBody @Valid IntervalRequest requestBody, UriComponentsBuilder uriBuilder) {
-    IntervalResponseBody intervalResponseBody = intervalService.create(activityId, requestBody);
+    IntervalResponse intervalResponse = intervalService.create(activityId, requestBody);
 
-    URI uri = uriBuilder.path("/activities/{activityId}/intervals/{id}").build(activityId, intervalResponseBody.getId());
-    return ResponseEntity.created(uri).body(intervalResponseBody);
+    URI uri = uriBuilder.path("/activities/{activityId}/intervals/{id}").build(activityId, intervalResponse.getId());
+    return ResponseEntity.created(uri).body(intervalResponse);
   }
 
   @Override

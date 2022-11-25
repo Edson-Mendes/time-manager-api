@@ -1,7 +1,7 @@
 package br.com.emendes.timemanagerapi.controller.openapi;
 
 import br.com.emendes.timemanagerapi.dto.request.IntervalRequest;
-import br.com.emendes.timemanagerapi.dto.response.IntervalResponseBody;
+import br.com.emendes.timemanagerapi.dto.response.IntervalResponse;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -25,7 +25,7 @@ public interface IntervalControllerOpenApi {
       @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
       @ApiResponse(responseCode = "404", description = "Activity não encontrada", content = @Content),
   })
-  ResponseEntity<Page<IntervalResponseBody>> find(long activityId, @ParameterObject Pageable pageable);
+  ResponseEntity<Page<IntervalResponse>> find(long activityId, @ParameterObject Pageable pageable);
 
   @Operation(summary = "Salvar um Interval", tags = {"Interval"})
   @ApiResponses(value = {
@@ -34,7 +34,7 @@ public interface IntervalControllerOpenApi {
       @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
       @ApiResponse(responseCode = "404", description = "Activity não encontrada", content = @Content),
   })
-  ResponseEntity<IntervalResponseBody> create(
+  ResponseEntity<IntervalResponse> create(
       long activityId, IntervalRequest requestBody, UriComponentsBuilder uriBuilder);
 
   @Operation(summary = "Deletar Interval por id", tags = {"Interval"})

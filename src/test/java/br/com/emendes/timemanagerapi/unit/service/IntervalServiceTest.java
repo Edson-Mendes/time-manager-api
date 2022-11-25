@@ -1,7 +1,7 @@
 package br.com.emendes.timemanagerapi.unit.service;
 
 import br.com.emendes.timemanagerapi.dto.request.IntervalRequest;
-import br.com.emendes.timemanagerapi.dto.response.IntervalResponseBody;
+import br.com.emendes.timemanagerapi.dto.response.IntervalResponse;
 import br.com.emendes.timemanagerapi.exception.ActivityNotFoundException;
 import br.com.emendes.timemanagerapi.exception.IntervalCreationException;
 import br.com.emendes.timemanagerapi.exception.IntervalNotFoundException;
@@ -86,7 +86,7 @@ class IntervalServiceTest {
     @Test
     @DisplayName("create must returns IntervalResponseBody when created successfully")
     void create_MustReturnsIntervalResponseBody_WhenCreatedSuccessfully(){
-      IntervalResponseBody actualIntervalRespBody = intervalService.create(
+      IntervalResponse actualIntervalRespBody = intervalService.create(
           EXISTENT_ACTIVITY_ID, new IntervalRequest("2022-08-16T15:07:00", "00:30:00"));
 
       Assertions.assertThat(actualIntervalRespBody).isNotNull();
@@ -148,9 +148,9 @@ class IntervalServiceTest {
     @Test
     @DisplayName("find must returns Page<IntervalResponseBody> when ActivityId exists")
     void find_MustReturnsPageIntervalResponseBody_WhenActivityIdExists(){
-      Page<IntervalResponseBody> intervalsPage = intervalService.find(EXISTENT_ACTIVITY_ID, DEFAULT_PAGEABLE);
+      Page<IntervalResponse> intervalsPage = intervalService.find(EXISTENT_ACTIVITY_ID, DEFAULT_PAGEABLE);
 
-      IntervalResponseBody expectedIntervalRespBody = IntervalResponseBodyCreator
+      IntervalResponse expectedIntervalRespBody = IntervalResponseBodyCreator
           .withIdAndStartedAtAndElapsedTime(100L, "2022-08-16T15:07:00", "00:30:00");
 
       Assertions.assertThat(intervalsPage).hasSize(1);
@@ -168,9 +168,9 @@ class IntervalServiceTest {
       BDDMockito.when(intervalRepositoryMock.findByActivity(activityFound, DEFAULT_PAGEABLE))
           .thenReturn(new PageImpl<>(List.of(intervalFound), DEFAULT_PAGEABLE, 1));
 
-      Page<IntervalResponseBody> intervalsPage = intervalService.find(EXISTENT_ACTIVITY_ID, DEFAULT_PAGEABLE);
+      Page<IntervalResponse> intervalsPage = intervalService.find(EXISTENT_ACTIVITY_ID, DEFAULT_PAGEABLE);
 
-      IntervalResponseBody expectedIntervalResponse = IntervalResponseBodyCreator
+      IntervalResponse expectedIntervalResponse = IntervalResponseBodyCreator
           .withIdAndStartedAtAndElapsedTime(100L, "2022-08-16T15:07:00", "00:30:00");
 
       Assertions.assertThat(intervalsPage).hasSize(1);
@@ -183,7 +183,7 @@ class IntervalServiceTest {
       BDDMockito.when(intervalRepositoryMock.findByActivity(DEFAULT_ACTIVITY, DEFAULT_PAGEABLE))
           .thenReturn(Page.empty(DEFAULT_PAGEABLE));
 
-      Page<IntervalResponseBody> intervalsPage = intervalService.find(EXISTENT_ACTIVITY_ID, DEFAULT_PAGEABLE);
+      Page<IntervalResponse> intervalsPage = intervalService.find(EXISTENT_ACTIVITY_ID, DEFAULT_PAGEABLE);
 
       Assertions.assertThat(intervalsPage).isEmpty();
     }

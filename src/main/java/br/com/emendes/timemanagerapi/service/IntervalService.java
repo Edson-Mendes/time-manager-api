@@ -1,7 +1,7 @@
 package br.com.emendes.timemanagerapi.service;
 
 import br.com.emendes.timemanagerapi.dto.request.IntervalRequest;
-import br.com.emendes.timemanagerapi.dto.response.IntervalResponseBody;
+import br.com.emendes.timemanagerapi.dto.response.IntervalResponse;
 import br.com.emendes.timemanagerapi.exception.ActivityNotFoundException;
 import br.com.emendes.timemanagerapi.exception.IntervalCreationException;
 import br.com.emendes.timemanagerapi.exception.IntervalNotFoundException;
@@ -21,7 +21,7 @@ public class IntervalService {
   private final ActivityService activityService;
   private final IntervalRepository intervalRepository;
 
-  public IntervalResponseBody create(long activityId, IntervalRequest requestBody) {
+  public IntervalResponse create(long activityId, IntervalRequest requestBody) {
     Activity activity = activityService.findById(activityId);
     if(activity.getStatus() != Status.ACTIVE){
       throw new IntervalCreationException("Cannot create interval on non active activity");
@@ -29,17 +29,17 @@ public class IntervalService {
     Interval intervalToBeSaved = requestBody.toInterval(activity);
     Interval intervalSaved = intervalRepository.save(intervalToBeSaved);
 
-    return new IntervalResponseBody(intervalSaved);
+    return new IntervalResponse(intervalSaved);
   }
 
-  public Page<IntervalResponseBody> find(long activityId, Pageable pageable) {
+  public Page<IntervalResponse> find(long activityId, Pageable pageable) {
     Activity activity = activityService.findById(activityId);
     if(activity.getStatus() == Status.DELETED){
       throw new ActivityNotFoundException("Activity not found for id: " + activityId);
     }
     Page<Interval> intervalPage = intervalRepository.findByActivity(
         activity, pageable);
-    return intervalPage.map(IntervalResponseBody::new);
+    return intervalPage.map(IntervalResponse::new);
   }
 
   //  TODO: Pensar em por as três queries abaixo em uma única query.
