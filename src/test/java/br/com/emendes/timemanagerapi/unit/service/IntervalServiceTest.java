@@ -10,7 +10,7 @@ import br.com.emendes.timemanagerapi.model.entity.Activity;
 import br.com.emendes.timemanagerapi.model.entity.Interval;
 import br.com.emendes.timemanagerapi.repository.IntervalRepository;
 import br.com.emendes.timemanagerapi.service.ActivityService;
-import br.com.emendes.timemanagerapi.service.IntervalService;
+import br.com.emendes.timemanagerapi.service.impl.IntervalServiceImpl;
 import br.com.emendes.timemanagerapi.util.creator.ActivityCreator;
 import br.com.emendes.timemanagerapi.util.creator.IntervalCreator;
 import br.com.emendes.timemanagerapi.util.creator.IntervalResponseBodyCreator;
@@ -35,7 +35,7 @@ import java.util.List;
 class IntervalServiceTest {
 
   @InjectMocks
-  private IntervalService intervalService;
+  private IntervalServiceImpl intervalService;
   @Mock
   private ActivityService activityServiceMock;
   @Mock
@@ -49,7 +49,7 @@ class IntervalServiceTest {
   private final Activity DEFAULT_ACTIVITY = ActivityCreator.withIdAndName(EXISTENT_ACTIVITY_ID, "Lorem Ipsum Activity");
 
   @BeforeEach
-  void setUp(){
+  void setUp() {
     Interval intervalToBeSaved = Interval.builder()
         .activity(DEFAULT_ACTIVITY)
         .startedAt(LocalDateTime.parse("2022-08-16T15:07:00"))
@@ -72,10 +72,10 @@ class IntervalServiceTest {
     BDDMockito.when(intervalRepositoryMock.findByActivity(DEFAULT_ACTIVITY, DEFAULT_PAGEABLE))
         .thenReturn(intervalPage);
 
-    BDDMockito.willThrow(new IntervalNotFoundException("Interval not found for id: "+NONEXISTENT_INTERVAL_ID))
+    BDDMockito.willThrow(new IntervalNotFoundException("Interval not found for id: " + NONEXISTENT_INTERVAL_ID))
         .given(intervalRepositoryMock).findById(NONEXISTENT_INTERVAL_ID);
 
-    BDDMockito.willThrow(new ActivityNotFoundException("Activity not found for id: "+NONEXISTENT_ACTIVITY_ID))
+    BDDMockito.willThrow(new ActivityNotFoundException("Activity not found for id: " + NONEXISTENT_ACTIVITY_ID))
         .given(activityServiceMock).findById(NONEXISTENT_ACTIVITY_ID);
   }
 
@@ -85,7 +85,7 @@ class IntervalServiceTest {
 
     @Test
     @DisplayName("create must returns IntervalResponseBody when created successfully")
-    void create_MustReturnsIntervalResponseBody_WhenCreatedSuccessfully(){
+    void create_MustReturnsIntervalResponseBody_WhenCreatedSuccessfully() {
       IntervalResponse actualIntervalRespBody = intervalService.create(
           EXISTENT_ACTIVITY_ID, new IntervalRequest("2022-08-16T15:07:00", "00:30:00"));
 
@@ -104,12 +104,12 @@ class IntervalServiceTest {
       Assertions.assertThatExceptionOfType(ActivityNotFoundException.class)
           .isThrownBy(() -> intervalService.create(
               NONEXISTENT_ACTIVITY_ID, validIntervalRequest))
-          .withMessage("Activity not found for id: "+NONEXISTENT_ACTIVITY_ID);
+          .withMessage("Activity not found for id: " + NONEXISTENT_ACTIVITY_ID);
     }
 
     @Test
     @DisplayName("create must throws IntervalCreationException when activity status is concluded")
-    void create_MustThrowsIntervalCreationException_WhenActivityStatusIsConcluded(){
+    void create_MustThrowsIntervalCreationException_WhenActivityStatusIsConcluded() {
       final long ACTIVITY_ID_CONCLUDED = 100L;
       BDDMockito.when(activityServiceMock.findById(ACTIVITY_ID_CONCLUDED))
           .thenReturn(ActivityCreator.withStatus(Status.CONCLUDED));
@@ -125,7 +125,7 @@ class IntervalServiceTest {
 
     @Test
     @DisplayName("create must throws IntervalCreationException when activity status is deleted")
-    void create_MustThrowsIntervalCreationException_WhenActivityStatusIsDeleted(){
+    void create_MustThrowsIntervalCreationException_WhenActivityStatusIsDeleted() {
       final long ACTIVITY_ID_DELETED = 100L;
       BDDMockito.when(activityServiceMock.findById(ACTIVITY_ID_DELETED))
           .thenReturn(ActivityCreator.withStatus(Status.DELETED));
@@ -147,7 +147,7 @@ class IntervalServiceTest {
 
     @Test
     @DisplayName("find must returns Page<IntervalResponseBody> when ActivityId exists")
-    void find_MustReturnsPageIntervalResponseBody_WhenActivityIdExists(){
+    void find_MustReturnsPageIntervalResponseBody_WhenActivityIdExists() {
       Page<IntervalResponse> intervalsPage = intervalService.find(EXISTENT_ACTIVITY_ID, DEFAULT_PAGEABLE);
 
       IntervalResponse expectedIntervalRespBody = IntervalResponseBodyCreator
@@ -159,7 +159,7 @@ class IntervalServiceTest {
 
     @Test
     @DisplayName("find must returns Page<IntervalResponseBody> when Activity Status is concluded")
-    void find_MustReturnsPageIntervalResponseBody_WhenActivityStatusIsConcluded(){
+    void find_MustReturnsPageIntervalResponseBody_WhenActivityStatusIsConcluded() {
       Activity activityFound = ActivityCreator.withIdAndStatus(EXISTENT_ACTIVITY_ID, Status.CONCLUDED);
       Interval intervalFound = IntervalCreator.withIdActivityIdStartedAtAndElapsedTime(
           100L, EXISTENT_ACTIVITY_ID, "2022-08-16T15:07:00", "00:30:00");
@@ -179,7 +179,7 @@ class IntervalServiceTest {
 
     @Test
     @DisplayName("find must returns empty Page<IntervalResponseBody> when Activity doesn't have Intervals")
-    void find_MustReturnsEmptyPageIntervalResponseBody_WhenActivityDoesntHaveIntervals(){
+    void find_MustReturnsEmptyPageIntervalResponseBody_WhenActivityDoesntHaveIntervals() {
       BDDMockito.when(intervalRepositoryMock.findByActivity(DEFAULT_ACTIVITY, DEFAULT_PAGEABLE))
           .thenReturn(Page.empty(DEFAULT_PAGEABLE));
 
@@ -194,7 +194,7 @@ class IntervalServiceTest {
       Assertions.assertThatExceptionOfType(ActivityNotFoundException.class)
           .isThrownBy(() -> intervalService.find(
               NONEXISTENT_ACTIVITY_ID, DEFAULT_PAGEABLE))
-          .withMessage("Activity not found for id: "+NONEXISTENT_ACTIVITY_ID);
+          .withMessage("Activity not found for id: " + NONEXISTENT_ACTIVITY_ID);
     }
 
     @Test
@@ -206,7 +206,7 @@ class IntervalServiceTest {
       Assertions.assertThatExceptionOfType(ActivityNotFoundException.class)
           .isThrownBy(() -> intervalService.find(
               EXISTENT_ACTIVITY_ID, DEFAULT_PAGEABLE))
-          .withMessage("Activity not found for id: "+EXISTENT_ACTIVITY_ID);
+          .withMessage("Activity not found for id: " + EXISTENT_ACTIVITY_ID);
     }
 
   }
@@ -217,20 +217,20 @@ class IntervalServiceTest {
 
     @Test
     @DisplayName("delete must throws ActivityNotFoundException when activityId doesn't exist")
-    void delete_MustThrowsActivityNotFoundException_WhenActivityIdDoenstExist(){
+    void delete_MustThrowsActivityNotFoundException_WhenActivityIdDoenstExist() {
       Assertions.assertThatExceptionOfType(ActivityNotFoundException.class)
           .isThrownBy(() -> intervalService.delete(
               NONEXISTENT_ACTIVITY_ID, EXISTENT_INTERVAL_ID))
-          .withMessage("Activity not found for id: "+NONEXISTENT_ACTIVITY_ID);
+          .withMessage("Activity not found for id: " + NONEXISTENT_ACTIVITY_ID);
     }
 
     @Test
     @DisplayName("delete must throws IntervalNotFoundException when intervalId doesn't exist")
-    void delete_MustThrowsIntervalNotFoundException_WhenIntervalIdDoenstExist(){
+    void delete_MustThrowsIntervalNotFoundException_WhenIntervalIdDoenstExist() {
       Assertions.assertThatExceptionOfType(IntervalNotFoundException.class)
           .isThrownBy(() -> intervalService.delete(
               EXISTENT_ACTIVITY_ID, NONEXISTENT_INTERVAL_ID))
-          .withMessage("Interval not found for id: "+NONEXISTENT_INTERVAL_ID);
+          .withMessage("Interval not found for id: " + NONEXISTENT_INTERVAL_ID);
     }
 
   }

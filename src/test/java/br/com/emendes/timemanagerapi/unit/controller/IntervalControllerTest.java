@@ -42,7 +42,7 @@ class IntervalControllerTest {
   private final Pageable DEFAULT_PAGEABLE = PageRequest.of(0, 10, Sort.Direction.DESC, "startedAt");
 
   @BeforeEach
-  void setUp(){
+  void setUp() {
     IntervalResponse intervalResp = IntervalResponseBodyCreator
         .withIdAndStartedAtAndElapsedTime(EXISTENT_ACTIVITY_ID, "2022-08-16T15:07:00", "00:30:00");
     Page<IntervalResponse> intervalRespBodyPage = new PageImpl<>(List.of(intervalResp), DEFAULT_PAGEABLE, 1);
@@ -50,7 +50,7 @@ class IntervalControllerTest {
     BDDMockito.when(intervalServiceMock.create(EXISTENT_ACTIVITY_ID, IntervalRequestBodyCreator.validIntervalRequest()))
         .thenReturn(IntervalResponseBodyCreator.intervalRBForTests());
     BDDMockito.when(intervalServiceMock.find(EXISTENT_ACTIVITY_ID, DEFAULT_PAGEABLE))
-            .thenReturn(intervalRespBodyPage);
+        .thenReturn(intervalRespBodyPage);
     BDDMockito.doNothing().when(intervalServiceMock).delete(EXISTENT_ACTIVITY_ID, EXISTENT_INTERVAL_ID);
 
     BDDMockito.when(activityServiceMock.findById(EXISTENT_ACTIVITY_ID))
@@ -92,7 +92,7 @@ class IntervalControllerTest {
 
     @Test
     @DisplayName("create must returns correct location when created successfully")
-    void create_MustReturnsCorrectLocation_WhenCreatedSuccessful(){
+    void create_MustReturnsCorrectLocation_WhenCreatedSuccessful() {
       IntervalRequest requestBody = new IntervalRequest(
           "2022-08-16T15:07:00", "00:30:00");
 
@@ -112,7 +112,7 @@ class IntervalControllerTest {
 
     @Test
     @DisplayName("find must returns status 200 when found successfully")
-    void find_MustReturnsStatus200_WhenFoundSuccessfully(){
+    void find_MustReturnsStatus200_WhenFoundSuccessfully() {
       ResponseEntity<Page<IntervalResponse>> response = intervalController
           .find(EXISTENT_ACTIVITY_ID, DEFAULT_PAGEABLE);
       HttpStatus actualStatusCode = response.getStatusCode();
@@ -122,7 +122,7 @@ class IntervalControllerTest {
 
     @Test
     @DisplayName("find must returns ResponseEntity<Page<IntervalResponseBody>> when found successfuly")
-    void find_MustReturnsResponseEntityPageIntervalResponseBody_WhenFoundSuccessfully(){
+    void find_MustReturnsResponseEntityPageIntervalResponseBody_WhenFoundSuccessfully() {
       ResponseEntity<Page<IntervalResponse>> response = intervalController
           .find(EXISTENT_ACTIVITY_ID, DEFAULT_PAGEABLE);
       Page<IntervalResponse> actualBody = response.getBody();
@@ -138,7 +138,7 @@ class IntervalControllerTest {
 
     @Test
     @DisplayName("find must returns empty ResponseEntity<Page<IntervalResponseBody>> when Activity doesn't have intervals")
-    void find_MustReturnsEmptyPageIntervalResponseBody_WhenActivityDoesntHavaIntervals(){
+    void find_MustReturnsEmptyPageIntervalResponseBody_WhenActivityDoesntHavaIntervals() {
       BDDMockito.when(intervalServiceMock.find(999L, DEFAULT_PAGEABLE))
           .thenReturn(Page.empty(DEFAULT_PAGEABLE));
 
@@ -157,7 +157,7 @@ class IntervalControllerTest {
 
     @Test
     @DisplayName("delete must returns status 204 when deleted successfully")
-    void delete_MustReturnsStatus204_WhenDeletedSuccessfully(){
+    void delete_MustReturnsStatus204_WhenDeletedSuccessfully() {
       ResponseEntity<Void> response = intervalController
           .delete(EXISTENT_ACTIVITY_ID, EXISTENT_INTERVAL_ID);
       HttpStatus actualStatusCode = response.getStatusCode();

@@ -18,7 +18,9 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -39,7 +41,7 @@ class ActivityControllerTest {
       new ActivityRequest("Lorem Ipsum Activity", "A simple project for my portfolio");
   private final Pageable DEFAULT_PAGEABLE = PageableCreator.activityDefaultPageable();
 
-//  Mocks de métodos/actions de activityServiceMock
+  //  Mocks de métodos/actions de activityServiceMock
   @BeforeEach
   public void setUp() {
     List<ActivityResponse> listActivityRespBody =

@@ -3,7 +3,7 @@ package br.com.emendes.timemanagerapi.unit.service;
 import br.com.emendes.timemanagerapi.config.security.service.TokenService;
 import br.com.emendes.timemanagerapi.dto.request.LoginRequest;
 import br.com.emendes.timemanagerapi.dto.response.TokenResponse;
-import br.com.emendes.timemanagerapi.service.SigninService;
+import br.com.emendes.timemanagerapi.service.impl.SigninServiceImpl;
 import br.com.emendes.timemanagerapi.util.creator.TokenResponseCreator;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,19 +25,19 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 class SigninServiceTest {
 
   @InjectMocks
-  private SigninService signinService;
+  private SigninServiceImpl signinService;
   @Mock
   private TokenService tokenServiceMock;
   @Mock
   private AuthenticationManager authManagerMock;
 
   @BeforeEach
-  public void setUp(){
+  public void setUp() {
     UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
         new UsernamePasswordAuthenticationToken("user@email.com", "123456");
 
     BDDMockito.when(authManagerMock.authenticate(usernamePasswordAuthenticationToken))
-            .thenReturn(usernamePasswordAuthenticationToken);
+        .thenReturn(usernamePasswordAuthenticationToken);
     BDDMockito.when(tokenServiceMock.generateToken(ArgumentMatchers.any(Authentication.class)))
         .thenReturn(TokenResponseCreator.validTokenResponse().getToken());
 
@@ -48,7 +48,7 @@ class SigninServiceTest {
 
   @Test
   @DisplayName("signin must returns TokenResponse when signin successfully")
-  void signin_MustReturnsTokenResponse_WhenSigninSuccessfully(){
+  void signin_MustReturnsTokenResponse_WhenSigninSuccessfully() {
     TokenResponse actualTokenResponse = signinService.signin(new LoginRequest("user@email.com", "123456"));
 
     Assertions.assertThat(actualTokenResponse)
@@ -58,7 +58,7 @@ class SigninServiceTest {
 
   @Test
   @DisplayName("signin must throws AuthenticationException when signin fails")
-  void signin_MustThrowsAuthenticationException_WhenSigninFails(){
+  void signin_MustThrowsAuthenticationException_WhenSigninFails() {
     LoginRequest loginRequest = new LoginRequest("user@email.com", "1234");
 
     Assertions.assertThatExceptionOfType(BadCredentialsException.class)

@@ -18,6 +18,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
+
+import static br.com.emendes.timemanagerapi.util.constant.SQLPath.INSERT_USER_PATH;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -30,10 +33,11 @@ class SigninControllerIT {
   private TestRestTemplate testRestTemplate;
   private final String SIGNIN_URI = "/signin";
 
+  @Sql(value = {INSERT_USER_PATH})
   @Test
   @DisplayName("post for /signin must returns status 200 when signin successfully")
   void postForSignin_MustReturnsStatus200_WhenSigninSuccessfully() {
-    HttpEntity<LoginRequest> requestEntity = new HttpEntity<>(new LoginRequest("user@email.com", "1234"));
+    HttpEntity<LoginRequest> requestEntity = new HttpEntity<>(new LoginRequest("lorem@email.com", "1234"));
 
     ResponseEntity<TokenResponse> response =
         testRestTemplate.exchange(SIGNIN_URI, HttpMethod.POST, requestEntity, new ParameterizedTypeReference<>() {
@@ -44,10 +48,11 @@ class SigninControllerIT {
     Assertions.assertThat(actualStatus).isEqualByComparingTo(HttpStatus.OK);
   }
 
+  @Sql(value = {INSERT_USER_PATH})
   @Test
   @DisplayName("post for /signin must returs TokenResponse when signin successfully")
   void postForSignin_MustReturnsTokenResponse_WhenSigninSuccessfully() {
-    HttpEntity<LoginRequest> requestEntity = new HttpEntity<>(new LoginRequest("user@email.com", "1234"));
+    HttpEntity<LoginRequest> requestEntity = new HttpEntity<>(new LoginRequest("lorem@email.com", "1234"));
 
     ResponseEntity<TokenResponse> response =
         testRestTemplate.exchange(SIGNIN_URI, HttpMethod.POST, requestEntity, new ParameterizedTypeReference<>() {

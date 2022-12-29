@@ -29,14 +29,14 @@ class SigninControllerTest {
   private SigninService signinServiceMock;
 
   @BeforeEach
-  void setUp(){
+  void setUp() {
     BDDMockito.when(signinServiceMock.signin(LoginRequestCreator.validLoginRequest()))
         .thenReturn(TokenResponseCreator.validTokenResponse());
   }
 
   @Test
   @DisplayName("signin must returns status 200 when signin successfully")
-  void signin_MustReturnsStatus200_WhenSigninSuccessfully(){
+  void signin_MustReturnsStatus200_WhenSigninSuccessfully() {
     LoginRequest loginRequest = new LoginRequest("user@email.com", "123456");
 
     ResponseEntity<TokenResponse> response = signinController.signin(loginRequest);
@@ -47,7 +47,7 @@ class SigninControllerTest {
 
   @Test
   @DisplayName("signin must returns TokenResponse when signin successfully")
-  void signin_MustReturnsTokenResponse_WhenSigninSuccessfully(){
+  void signin_MustReturnsTokenResponse_WhenSigninSuccessfully() {
     LoginRequest loginRequest = new LoginRequest("user@email.com", "123456");
 
     ResponseEntity<TokenResponse> response = signinController.signin(loginRequest);

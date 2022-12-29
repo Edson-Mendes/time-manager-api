@@ -31,15 +31,15 @@ class SignupControllerTest {
   private final UriComponentsBuilder URI_BUILDER = UriComponentsBuilder.fromHttpUrl("http://localhost:8080");
 
   @BeforeEach
-  void setUp(){
+  void setUp() {
     BDDMockito.when(userServiceMock
-        .save(SignupRequestCreator.withNameEmailAndPassword("sql/user", "user@email.com", "123456")))
+            .save(SignupRequestCreator.withNameEmailAndPassword("sql/user", "user@email.com", "123456")))
         .thenReturn(UserResponseCreator.withNameAndEmail("sql/user", "user@email.com"));
   }
 
   @Test
   @DisplayName("signup must returns status 201 when signup successfully")
-  void signup_MustReturnsStatus201_WhenSignupSuccessfully(){
+  void signup_MustReturnsStatus201_WhenSignupSuccessfully() {
     SignupRequest signupRequest = new SignupRequest("sql/user", "user@email.com", "123456", "123456");
 
     ResponseEntity<UserResponse> response = signupController.signup(signupRequest, URI_BUILDER);
@@ -50,7 +50,7 @@ class SignupControllerTest {
 
   @Test
   @DisplayName("signup must returns UserResponse when signup successfully")
-  void signup_MustReturnsUserResponse_WhenSignupSuccessfully(){
+  void signup_MustReturnsUserResponse_WhenSignupSuccessfully() {
     SignupRequest signupRequest = new SignupRequest("sql/user", "user@email.com", "123456", "123456");
 
     ResponseEntity<UserResponse> response = signupController.signup(signupRequest, URI_BUILDER);

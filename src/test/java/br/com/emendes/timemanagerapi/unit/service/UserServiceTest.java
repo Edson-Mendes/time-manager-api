@@ -4,7 +4,7 @@ import br.com.emendes.timemanagerapi.dto.request.SignupRequest;
 import br.com.emendes.timemanagerapi.dto.response.UserResponse;
 import br.com.emendes.timemanagerapi.model.entity.User;
 import br.com.emendes.timemanagerapi.repository.UserRepository;
-import br.com.emendes.timemanagerapi.service.UserService;
+import br.com.emendes.timemanagerapi.service.impl.UserServiceImpl;
 import br.com.emendes.timemanagerapi.util.creator.UserCreator;
 import br.com.emendes.timemanagerapi.util.creator.UserResponseCreator;
 import org.assertj.core.api.Assertions;
@@ -24,11 +24,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.Optional;
 
 @ExtendWith(SpringExtension.class)
-@DisplayName("Unit tests for ActivityService")
+@DisplayName("Unit tests for UserService")
 class UserServiceTest {
 
   @InjectMocks
-  private UserService userService;
+  private UserServiceImpl userService;
   @Mock
   private UserRepository userRepositoryMock;
   @Mock
@@ -79,7 +79,7 @@ class UserServiceTest {
 
   @Test
   @DisplayName("findByUsername must throws UsernameNotFoundException when not found email")
-  void findByUsername_MustThrowsUsernameNotFoundException_WhenNotFoundEmail(){
+  void findByUsername_MustThrowsUsernameNotFoundException_WhenNotFoundEmail() {
     Assertions.assertThatExceptionOfType(UsernameNotFoundException.class)
         .isThrownBy(() -> userService.findByUsername("nonexistent@email.com"))
         .withMessage("User not found");
@@ -97,7 +97,7 @@ class UserServiceTest {
 
   @Test
   @DisplayName("findUserDetailsById must throws UsernameNotFoundException when not found email")
-  void findUserDetailsById_MustThrowsUsernameNotFoundException_WhenNotFoundById(){
+  void findUserDetailsById_MustThrowsUsernameNotFoundException_WhenNotFoundById() {
     Assertions.assertThatExceptionOfType(UsernameNotFoundException.class)
         .isThrownBy(() -> userService.findUserDetailsById(10000L))
         .withMessage("User not found");

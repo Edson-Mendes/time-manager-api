@@ -8,7 +8,7 @@ import br.com.emendes.timemanagerapi.model.entity.Activity;
 import br.com.emendes.timemanagerapi.model.Status;
 import br.com.emendes.timemanagerapi.model.entity.User;
 import br.com.emendes.timemanagerapi.repository.ActivityRepository;
-import br.com.emendes.timemanagerapi.service.ActivityService;
+import br.com.emendes.timemanagerapi.service.impl.ActivityServiceImpl;
 import br.com.emendes.timemanagerapi.util.creator.ActivityCreator;
 import br.com.emendes.timemanagerapi.util.creator.ActivityResponseBodyCreator;
 import br.com.emendes.timemanagerapi.util.creator.PageableCreator;
@@ -39,7 +39,7 @@ import static org.mockito.Mockito.mock;
 class ActivityServiceTest {
 
   @InjectMocks
-  private ActivityService activityService;
+  private ActivityServiceImpl activityService;
   @Mock
   private ActivityRepository activityRepositoryMock;
 

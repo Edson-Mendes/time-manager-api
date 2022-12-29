@@ -24,7 +24,7 @@ public class SignupController implements SignupControllerOpenApi {
 
   @Override
   @PostMapping
-  public ResponseEntity<UserResponse> signup(@RequestBody @Valid SignupRequest signupRequest, UriComponentsBuilder uriBuilder){
+  public ResponseEntity<UserResponse> signup(@RequestBody @Valid SignupRequest signupRequest, UriComponentsBuilder uriBuilder) {
     UserResponse userResponse = userService.save(signupRequest);
     URI uri = uriBuilder.path("/users/{id}").build(userResponse.getId());
     return ResponseEntity.created(uri).body(userResponse);
