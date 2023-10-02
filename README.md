@@ -134,6 +134,49 @@ Time Manager API é uma aplicação para auxiliar no gerenciamento de tempo gast
   ```
   - `Deletar`: Deletar interval através de um DELETE para **/activities/{activityID}/intervals/{activityID}**, onde *{activityID}* é o identificador da atividade e *{intervalID}* é o identificador do intervalo.
 
+## Diagramas
+
+### Diagrama entidade relacionamento
+
+```mermaid
+    erDiagram
+        USER {
+            bigserial id PK
+            varchar name
+            varchar email
+            varchar password
+            boolean enabled
+            timestamp created_at
+        }
+        ROLE {
+            serial id PK
+            varchar name
+        }
+        USER_ROLES {
+            bigint user_id FK
+            int roles_id FK
+        }
+        ACTIVITY {
+            bigserial id PK
+            varchar name
+            varchar description
+            varchar status
+            timestamp created_at
+            bigint user_id FK
+        }
+        INTERVAL {
+            bigserial id PK
+            timestamp started_at
+            time elapsed_time
+            bigint activity_id FK
+        }
+        
+        USER }o--o{ USER_ROLES : has
+        ROLE }o--o{ USER_ROLES : allows
+        ACTIVITY ||--o{ INTERVAL : contains
+        USER ||--o{ ACTIVITY : makes
+```
+
 ## :toolbox: Tecnologias
 
 - `Intellij`
