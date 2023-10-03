@@ -7,67 +7,137 @@
 ## :book: Resumo do projeto
 
 Time Manager API é uma aplicação para auxiliar no gerenciamento de tempo gasto em atividades (ex. esse projeto).
+Com essa ferramenta o usuário terá total controle de seu tempo aplicado em atividades/projetos.
 
 ## :hammer: Funcionalidades
 
-- `Atividades`
-    - `cadastrar`: Cadastro de atividade através de um POST para **/activities** com as informações de nome e descrição da
-      atividade no corpo da requisição.
-  ```json
-    {
-      "name": "nome da atividade",
-      "description": "descrição da atividade"  
-    }
-  ```
+### :lock: API de gerenciamento de Sign Up
 
-    - `Buscar`: Busca paginada de atividades através de um GET para **/activities**.
-  ```json
+- `Sign Up de usuário - POST /signup`: Cadastro de usuário enviando as informações **name**, **email**, **password** e 
+**confirm** em um JSON no corpo da requisição. Não é necessário estar autenticado.
+
+  O password é salvo criptografado no banco de dados usando BCryp.
+
+    Segue abaixo um exemplo do corpo da requisição<br>
+    ```json
     {
-      "content": [
-        {
-          "id": 1,
-          "name": "nome da atividade",
-          "description": "descrição da atividade",
-          "createdAt": "2022-09-22 16:02:12",
-          "status": "ACTIVE"
-        },
-        {
-          "id": 2,
-          "name": "outra atividade",
-          "description": "descrição da outra atividade",
-          "createdAt": "2022-09-24 10:33:36",
-          "status": "CONCLUDED"
-        }
-      ],
-      "pageable": {
-        "sort": {
-          "empty": false,
-          "unsorted": false,
-          "sorted": true
-        },
-        "offset": 0,
-        "pageNumber": 0,
-        "pageSize": 20,
-        "paged": true,
-        "unpaged": false
+      "name": "Lorem Ipsum",
+      "email": "lorem@email.com",
+      "password": "1234567890",
+      "confirm": "1234567890"
+    }
+    ```
+    Em caso de sucesso a resposta tem status 201 com um JSON no corpo da resposta contendo informações do usuário registrado.
+    Segue abaixo um exemplo do corpo da resposta.<br>
+    ```json
+    {
+      "id": 100,
+      "name": "Lorem Ipsum",
+      "email": "lorem@email.com"
+    }
+    ```
+  
+  
+### :lock: API de gerenciamento de Sign In
+
+- `Sign In de usuário - POST /signin`: Sign in de usuário enviando as informações **email** e **password** 
+em um JSON no corpo da requisição. Não é necessário estar autenticado.
+
+    Segue abaixo um exemplo do corpo da requisição<br>
+    ```json
+    {
+      "email": "lorem@email.com",
+      "password": "1234567890",
+    }
+    ```
+    Em caso de sucesso a resposta tem status 200 com um JSON no corpo da resposta contendo informações do token de autorização do usuário.
+    Segue abaixo um exemplo do corpo da resposta.<br>
+    ```json
+    {
+      "type": "Bearer",
+      "token": "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJUaW1lIE1hbmFnZXIgQVBJIiwic3ViIjoiMSIsImlhdCI6MTY5NjM1OTA1MiwiZXhwIjoxNjk2MzYyNjUyfQ.YkDs4Zu4WveFHnjEghXorkTaKPA6hB4_7rlBcUJFN-8"
+    }
+    ```
+
+### API de gerenciamento de Atividades
+
+- `Cadastrar atividade - POST /activities`: Cadastro de atividade enviando as informações de **name** e **description** da
+      atividade no corpo da requisição. É necessário estar autenticado.
+    
+    Segue abaixo um exemplo do corpo da requisição:<br>
+    ```json
+    {
+      "name": "Desenvolver Time Manager API",
+      "description": "Implementar o backend da aplicação Time Manager utilizando Java e Spring."  
+    }
+    ```
+
+    Em caso de sucesso a resposta tem status 200 com um JSON no corpo da resposta contendo informações do atividade cadastrada.
+    Segue abaixo um exemplo do corpo da resposta.<br>
+    ```json
+    {
+      "id": 10000
+      "name": "Desenvolver Time Manager API",
+      "description": "Implementar o backend da aplicação Time Manager utilizando Java e Spring.",
+      "createdAt": "2023-10-03T18:55:50.788Z",
+      "status": "ACTIVE"
+    }
+    ```
+    
+- `Buscar atividades - GET /activities`: Busca paginada de atividades, o número da página (page), o tamanho da página (size) e o modo de ordenação (sort) podem ser alterados de acordo com a necessidade do cliente. É necessário estar autenticado. É necessário estar autenticado.
+
+    Em caso de sucesso a resposta tem status 200 com um JSON no corpo da resposta contendo as informações das atividades.
+    Segue abaixo um exemplo do corpo da resposta para requisição GET /activities?page=0&size=5&sort=createdAt,DESC<br>    
+  ```json
+  {
+    "content": [
+      {
+        "id": 2,
+        "name": "Estudar Java",
+        "description": "Estudar essa belíssima linguagem verbosa <3.",
+        "createdAt": "2023-10-03 16:14:17",
+        "status": "ACTIVE"
       },
-      "last": true,
-      "totalPages": 1,
-      "totalElements": 2,
-      "size": 20,
-      "number": 0,
+      {
+        "id": 1,
+        "name": "Desenvolver Time Manager API",
+        "description": "Implementar o backend da aplicação Time Manager utilizando Java e Spring.",
+        "createdAt": "2023-10-03 16:13:03",
+        "status": "ACTIVE"
+      }
+    ],
+    "pageable": {
       "sort": {
-        "empty": false,
+        "sorted": true,
         "unsorted": false,
-        "sorted": true
+        "empty": false
       },
-      "first": true,
-      "numberOfElements": 2,
+      "pageNumber": 0,
+      "pageSize": 5,
+      "offset": 0,
+      "paged": true,
+      "unpaged": false
+    },
+    "totalPages": 1,
+    "totalElements": 2,
+    "last": true,
+    "size": 5,
+    "number": 0,
+    "sort": {
+      "sorted": true,
+      "unsorted": false,
       "empty": false
-    }
+    },
+    "numberOfElements": 2,
+    "first": true,
+    "empty": false
+  }
   ```
-    - `Atualizar`: Atualizar atividade através de um PUT para **/activities/{ID}**, onde *{ID}* é o identificador da atividade.
+  
+- `Atualizar atividades - PUT /activities/ID`: Atualizar atividade por **ID**, onde **ID** é o identificador da atividade e
+  enviar as novas informações da atividade no corpo da requisição. É necessário estar autenticado.
 
+  Segue abaixo um exemplo do corpo da requisição:<br>
   ```json
     {
       "name": "novo nome da atividade",
@@ -75,64 +145,98 @@ Time Manager API é uma aplicação para auxiliar no gerenciamento de tempo gast
     }
   ```
 
-    - `Deletar`: Deletar atividade através de um DELETE para **/activities/{ID}**, onde *{ID}* é o identificador da atividade.
-    - `Atualizar Status`: Atualizar status da atividade (ACTIVE ou CONCLUDED), através de um PATCH para **/activities/{ID}**, onde *{ID}* é o identificador da atividade.
+  Em caso de sucesso a resposta tem status 204.
+  
+- `Atualizar status da atividade - PATCH /activities/ID`: Atualizar status da atividade (ACTIVE ou CONCLUDED) por **ID**, onde **{ID}** é o identificador da atividade e
+  enviar as novas informações da atividade no corpo da requisição. É necessário estar autenticado.
+
+  Segue abaixo um exemplo do corpo da requisição:<br>
   ```json
     {
       "status" : "concluded"  
     }
   ```
-- `Intervals`
-  - `cadastrar`: Cadastro de intervalo de execução de uma atividade através de POST para **/activities/{activityID}/intervals**, onde *{activityID}* é o identificador da ativiadade.
+
+  Em caso de sucesso a resposta tem status 204.
+  
+- `Deletar atividade - DELETE /activities/ID`: Deletar atividade por **ID**, onde **{ID}** é o identificador da atividade. É necessário estar autenticado.
+
+  Em caso de sucesso a resposta tem status 204.
+  
+### API de gerenciamento de Intervalos
+
+- `Cadastrar intervalo - POST /activities/ACTIVITY_ID/intervals`: Cadastro de intervalo de execução de uma atividade por ACTIVITY_ID, onde **ACTIVITY_ID** é o identificador da ativiadade e enviar as informações
+  de **startedAT** e **elapsedTime** no corpo da requisição. É necessário estar autenticado.
+
+  Segue abaixo um exemplo do corpo da requisição:<br>
   ```json
-    {
-      "startedAt": "2022-09-25T10:40:00",
-      "elapsedTime": "00:40:00"  
-    }
+  {
+    "startedAt": "2023-10-03T20:00:00",
+    "elapsedTime": "00:45:00"
+  }
   ```
-  - `Buscar`: Busca paginada dos intervals de determinada atividade através de um GET para **/activities/{activityID}/intervals**, onde *{activityID}* é o identificador da ativiadade..
+
+  Em caso de sucesso a resposta tem status 201 e um JSON no corpo da resposta contendo as informações do intervalo cadastrado.
+  Segue abaixo um exemplo do corpo da resposta.<br>
+
   ```json
-    {
-      "content": [
-        {
-          "id": 1,
-          "startedAt": "2022-09-25T10:40:00",
-          "elapsedTime": "00:40:00"  
-        },
-        {
-          "id": 2,
-          "startedAt": "2022-09-26T09:00:00",
-          "elapsedTime": "00:25:00"  
-        }
-      ],
-      "pageable": {
-        "sort": {
-          "empty": false,
-          "unsorted": false,
-          "sorted": true
-        },
-        "offset": 0,
-        "pageNumber": 0,
-        "pageSize": 10,
-        "paged": true,
-        "unpaged": false
+  {
+    "id": 5000000,
+    "startedAt": "2023-10-03T20:00:00",
+    "elapsedTime": "00:45:00"
+  }
+  ```
+- `Buscar intervalos - GET /activities/ACTIVITY_ID/intervals`: Busca paginada de intervalos de uma atividade, onde **ACTIVITY_ID** é o identificador da ativiadade.
+
+  O número da página (page), o tamanho da página (size) e o modo de ordenação (sort) podem ser alterados de acordo com a necessidade do cliente. É necessário estar autenticado.
+
+  Em caso de sucesso a resposta tem status 200 e um JSON no corpo da resposta contendo as informações dos intervalos da atividade.
+  Segue abaixo um exemplo do corpo da resposta:<br>
+  ```json
+  {
+    "content": [
+      {
+        "id": 2,
+        "startedAt": "2023-10-04T10:00:00",
+        "elapsedTime": "00:52:00"
       },
-      "last": true,
-      "totalPages": 1,
-      "totalElements": 2,
-      "size": 10,
-      "number": 0,
+      {
+        "id": 1,
+        "startedAt": "2023-10-03T20:00:00",
+        "elapsedTime": "00:45:00"
+      }
+    ],
+    "pageable": {
       "sort": {
-        "empty": false,
+        "sorted": true,
         "unsorted": false,
-        "sorted": true
+        "empty": false
       },
-      "first": true,
-      "numberOfElements": 2,
+      "pageNumber": 0,
+      "pageSize": 10,
+      "offset": 0,
+      "paged": true,
+      "unpaged": false
+    },
+    "totalPages": 1,
+    "totalElements": 2,
+    "last": true,
+    "size": 10,
+    "number": 0,
+    "sort": {
+      "sorted": true,
+      "unsorted": false,
       "empty": false
-    }
+    },
+    "numberOfElements": 2,
+    "first": true,
+    "empty": false
+  }
   ```
-  - `Deletar`: Deletar interval através de um DELETE para **/activities/{activityID}/intervals/{activityID}**, onde *{activityID}* é o identificador da atividade e *{intervalID}* é o identificador do intervalo.
+
+- `Deletar intervalo - DELETE /activities/ACTIVITY_ID/intervals/INTERVAL_ID`: Deletar intervalo de uma atividade por **ACTIVITY_ID** e **INTERVAL_ID**, onde **ACTIVITY_ID** é o identificador da atividade e **INTERVAL_ID** é o identificador do intervalo.
+
+  Em caso de sucesso a resposta tem status 204.
 
 ## Diagramas
 
@@ -279,19 +383,33 @@ classDiagram
     IntervalServiceImpl --> IntervalRepository
 ```
 
-## :toolbox: Tecnologias
+## :toolbox: Tecnologias e ferramentas
 
-- `Intellij`
-- `Java 17`
-- `Maven`
-- `Spring Boot, Spring MVC, Spring Data JPA, Spring Security`
-- `JWT`
-- `Docker`
-- `PostgreSQL`
-- `Flyway`
-- `Lombok`
-- `Bean Validation`
-- `Postman`
-- `JUnit 5`
-- `Mockito`
-- `TestContainer`
+<a href="https://www.jetbrains.com/idea/" target="_blank"><img src="https://img.shields.io/badge/intellij-000000.svg?&style=for-the-badge&logo=intellijidea&logoColor=white" target="_blank"></a>
+
+<a href="https://pt.wikipedia.org/wiki/Java_(linguagem_de_programa%C3%A7%C3%A3o)" target="_blank"><img src="https://img.shields.io/badge/java%2017-D32323.svg?&style=for-the-badge&logo=java&logoColor=white" target="_blank"></a>
+
+<a href="https://spring.io/projects/spring-boot" target="_blank"><img src="https://img.shields.io/badge/Springboot-6db33f.svg?&style=for-the-badge&logo=springboot&logoColor=white" target="_blank"></a>
+<a href="https://spring.io/projects/spring-data-jpa" target="_blank"><img src="https://img.shields.io/badge/Spring%20Data%20JPA-6db33f.svg?&style=for-the-badge&logo=spring&logoColor=white" target="_blank"></a>
+<a href="https://spring.io/projects/spring-security" target="_blank"><img src="https://img.shields.io/badge/Spring%20Security-6db33f.svg?&style=for-the-badge&logo=spring&logoColor=white" target="_blank"></a>
+
+<a href="https://maven.apache.org/" target="_blank"><img src="https://img.shields.io/badge/Apache%20Maven-b8062e.svg?&style=for-the-badge&logo=apachemaven&logoColor=white" target="_blank"></a>
+
+<a href="https://tomcat.apache.org/" target="_blank"><img src="https://img.shields.io/badge/Apache%20Tomcat-F8DC75.svg?&style=for-the-badge&logo=apachetomcat&logoColor=black" target="_blank"></a>
+
+<a href="https://www.docker.com/" target="_blank"><img src="https://img.shields.io/badge/Docker-2496ED.svg?&style=for-the-badge&logo=docker&logoColor=white" target="_blank"></a>
+<a href="https://www.postgresql.org/" target="_blank"><img src="https://img.shields.io/badge/PostgreSQL-4169E1.svg?&style=for-the-badge&logo=postgresql&logoColor=white" target="_blank"></a>
+<a href="https://flywaydb.org/" target="_blank"><img src="https://img.shields.io/badge/Flyway-CC0200.svg?&style=for-the-badge&logo=flyway&logoColor=white" target="_blank"></a>
+
+<a href="https://projectlombok.org/" target="_blank"><img src="https://img.shields.io/badge/Lombok-a4a4a4.svg?&style=for-the-badge&logo=lombok&logoColor=black" target="_blank"></a>
+<a href="https://github.com/jwtk/jjwt" target="_blank"><img src="https://img.shields.io/badge/JJWT-a4a4a4.svg?&style=for-the-badge&logo=JJWT&logoColor=black" target="_blank"></a>
+
+<a href="https://swagger.io/" target="_blank"><img src="https://img.shields.io/badge/Swagger-85EA2D.svg?&style=for-the-badge&logo=swagger&logoColor=black" target="_blank"></a>
+<a href="https://springdoc.org/" target="_blank"><img src="https://img.shields.io/badge/Spring%20Doc-85EA2D.svg?&style=for-the-badge" target="_blank"></a>
+
+<a href="https://junit.org/junit5/" target="_blank"><img src="https://img.shields.io/badge/JUnit%205-25A162.svg?&style=for-the-badge&logo=junit5&logoColor=white" target="_blank"></a>
+<a href="https://site.mockito.org/" target="_blank"><img src="https://img.shields.io/badge/Mockito-C5D9C8.svg?&style=for-the-badge" target="_blank"></a>
+<a href="https://www.testcontainers.org/" target="_blank"><img src="https://img.shields.io/badge/TestContainers-291A3F.svg?&style=for-the-badge&logo=testcontainers&logoColor=white" target="_blank"></a>
+<a href="https://www.postman.com/" target="_blank"><img src="https://img.shields.io/badge/postman-ff6c37.svg?&style=for-the-badge&logo=postman&logoColor=white" target="_blank"></a>
+<a href="https://en.wikipedia.org/wiki/Unit_testing" target="_blank"><img src="https://img.shields.io/badge/Unit%20Tests-5a61d6.svg?&style=for-the-badge&logo=unittest&logoColor=white" target="_blank"></a>
+<a href="https://en.wikipedia.org/wiki/Integration_testing" target="_blank"><img src="https://img.shields.io/badge/Integration%20Tests-5a61d6.svg?&style=for-the-badge&logo=unittest&logoColor=white" target="_blank"></a>
