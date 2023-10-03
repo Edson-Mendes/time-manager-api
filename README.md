@@ -139,6 +139,9 @@ Time Manager API é uma aplicação para auxiliar no gerenciamento de tempo gast
 ### Diagrama entidade relacionamento
 
 ```mermaid
+---
+    title: Database Schema
+---
     erDiagram
         USER {
             bigserial id PK
@@ -175,6 +178,105 @@ Time Manager API é uma aplicação para auxiliar no gerenciamento de tempo gast
         ROLE }o--o{ USER_ROLES : allows
         ACTIVITY ||--o{ INTERVAL : contains
         USER ||--o{ ACTIVITY : makes
+```
+
+### Diagrama de classes
+```mermaid
+---
+    title: Business layer
+---
+classDiagram
+    class UserService {
+        <<interface>>
+        findByUsername(String username) UserDetails
+        findUserDetailsById(long id) UserDetails
+        save(SignupRequest signupRequest) UserResponse
+    }
+    class IntervalService {
+        <<interface>>
+        create(long activityId, IntervalRequest requestBody) IntervalResponse
+        find(long activityId, Pageable pageable) Page~IntervalResponse~
+        delete(long activityId, long intervalId) void
+    }
+    class ActivityService {
+        <<interface>>
+        find(Pageable pageable) Page~ActivityResponse~
+        findById(long id) Activity
+        create(ActivityRequest activityRequest) ActivityResponse
+        update(long id, ActivityRequest activityRequest) void
+        deleteActivityById(long id) void
+        updateStatusById(long id, UpdateStatusRequest updateStatusRequest) void
+    }
+    class SigninService {
+        <<interface>>
+        signin(LoginRequest loginRequest) TokenResponse
+    }
+    class TokenService {
+        <<interface>>
+    }
+
+    class ModelMapper {
+        <<interface>>
+    }
+    class AuthenticationManager {
+        <<interface>>
+    }
+
+    class UserServiceImpl {
+        -UserRepository userRepository
+        -PasswordEncoder passwordEncoder
+        -ModelMapper mapper
+        +findByUsername(String username) UserDetails
+        +findUserDetailsById(long id) UserDetails
+        +save(SignupRequest signupRequest) UserResponse
+        -getRole() Role
+    }
+    class SigninServiceImpl {
+        -AuthenticationManager authManager
+        -TokenService tokenService
+        +signin(LoginRequest loginRequest) TokenResponse
+    }
+    class ActivityServiceImpl {
+        -ActivityRepository activityRepository
+        +find(Pageable pageable) Page~ActivityResponse~
+        +findById(long id) Activity
+        +create(ActivityRequest activityRequest) ActivityResponse
+        +update(long id, ActivityRequest activityRequest) void
+        +deleteActivityById(long id) void
+        +updateStatusById(long id, UpdateStatusRequest updateStatusRequest) void
+        -findByIdAndNotDeleted(long id) Activity
+        -getCurrentUser() User
+    }
+    class IntervalServiceImpl {
+        -ActivityService activityService
+        -IntervalRepository intervalRepository
+        +create(long activityId, IntervalRequest requestBody) IntervalResponse
+        +find(long activityId, Pageable pageable) Page~IntervalResponse~
+        +delete(long activityId, long intervalId) void
+        -findById(long id) Interval
+    }
+
+    class ActivityRepository {
+        <<interface>>
+    }
+    class UserRepository {
+        <<interface>>
+    }
+    class IntervalRepository {
+        <<interface>>
+    }
+
+    UserServiceImpl ..|> UserService
+    UserServiceImpl --> UserRepository
+    UserServiceImpl --> ModelMapper
+    SigninServiceImpl ..|> SigninService
+    SigninServiceImpl --> AuthenticationManager
+    SigninServiceImpl --> TokenService
+    ActivityServiceImpl ..|> ActivityService
+    ActivityServiceImpl --> ActivityRepository
+    IntervalServiceImpl ..|> IntervalService
+    IntervalServiceImpl --> ActivityService
+    IntervalServiceImpl --> IntervalRepository
 ```
 
 ## :toolbox: Tecnologias
