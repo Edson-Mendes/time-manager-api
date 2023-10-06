@@ -5,6 +5,8 @@ import br.com.emendes.timemanagerapi.model.entity.Interval;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class IntervalCreator {
 
@@ -32,4 +34,25 @@ public class IntervalCreator {
         .elapsedTime(LocalTime.parse(elapsedTime))
         .build();
   }
+
+  public static List<Interval> intervals() {
+    List<Interval> intervals = new ArrayList<>();
+
+    Interval firstInterval = Interval.builder()
+        .id(1_000_000L)
+        .startedAt(LocalDateTime.parse("2023-10-06T15:00:00"))
+        .elapsedTime(LocalTime.parse("00:30:00"))
+        .build();
+    Interval secondInterval = Interval.builder()
+        .id(1_000_001L)
+        .startedAt(LocalDateTime.parse("2023-10-06T22:00:00"))
+        .elapsedTime(LocalTime.parse("00:45:00"))
+        .build();
+
+    intervals.add(firstInterval);
+    intervals.add(secondInterval);
+
+    return intervals;
+  }
+
 }
