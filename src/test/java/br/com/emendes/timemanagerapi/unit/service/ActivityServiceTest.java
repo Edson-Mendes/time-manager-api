@@ -4,13 +4,14 @@ import br.com.emendes.timemanagerapi.dto.request.ActivityRequest;
 import br.com.emendes.timemanagerapi.dto.request.UpdateStatusRequest;
 import br.com.emendes.timemanagerapi.dto.response.ActivityResponse;
 import br.com.emendes.timemanagerapi.exception.ActivityNotFoundException;
-import br.com.emendes.timemanagerapi.model.entity.Activity;
+import br.com.emendes.timemanagerapi.mapper.ActivityMapper;
 import br.com.emendes.timemanagerapi.model.Status;
+import br.com.emendes.timemanagerapi.model.entity.Activity;
 import br.com.emendes.timemanagerapi.model.entity.User;
 import br.com.emendes.timemanagerapi.repository.ActivityRepository;
 import br.com.emendes.timemanagerapi.service.impl.ActivityServiceImpl;
 import br.com.emendes.timemanagerapi.util.creator.ActivityCreator;
-import br.com.emendes.timemanagerapi.util.creator.ActivityResponseBodyCreator;
+import br.com.emendes.timemanagerapi.util.creator.ActivityResponseCreator;
 import br.com.emendes.timemanagerapi.util.creator.PageableCreator;
 import br.com.emendes.timemanagerapi.util.creator.UserCreator;
 import org.assertj.core.api.Assertions;
@@ -23,7 +24,9 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -32,6 +35,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.List;
 import java.util.Optional;
 
+import static br.com.emendes.timemanagerapi.util.creator.ActivityCreator.withIdNameAndDescription;
+import static br.com.emendes.timemanagerapi.util.creator.ActivityCreator.withoutIdAndWithNameAndDescription;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 
 @ExtendWith(SpringExtension.class)
@@ -42,6 +48,8 @@ class ActivityServiceTest {
   private ActivityServiceImpl activityService;
   @Mock
   private ActivityRepository activityRepositoryMock;
+  @Mock
+  private ActivityMapper activityMapperMock;
 
   private final ActivityRequest VALID_ACTIVITY_REQUEST_BODY =
       new ActivityRequest("Lorem Ipsum Activity", "A simple project for my portfolio");
@@ -54,22 +62,25 @@ class ActivityServiceTest {
   @BeforeEach
   public void setUp() {
     List<Activity> activities = List.of(
-        ActivityCreator.withIdAndName(1L, "Lorem Ipsum Activity"),
-        ActivityCreator.withIdAndName(2L, "XPTO Activity"));
+        ActivityCreator.withIdAndName(1L, "Lorem Ipsum Activity"));
 
-    Page<Activity> activitiesPage = new PageImpl<>(activities, DEFAULT_PAGEABLE, 2);
+    Page<Activity> activitiesPage = new PageImpl<>(activities, DEFAULT_PAGEABLE, 1);
 
-    BDDMockito.when(activityRepositoryMock.findByUserAndStatusIsNot(DEFAULT_PAGEABLE, USER, Status.DELETED)).thenReturn(activitiesPage);
+    BDDMockito.when(activityRepositoryMock.findByUserAndStatusIsNot(DEFAULT_PAGEABLE, USER, Status.DELETED))
+        .thenReturn(activitiesPage);
 
     BDDMockito.when(activityRepositoryMock.save(ArgumentMatchers.any(Activity.class)))
-        .thenReturn(ActivityCreator
-            .withIdNameAndDescription(1L, "Lorem Ipsum Activity", "A simple project for my portfolio"));
+        .thenReturn(withIdNameAndDescription(1L, "Lorem Ipsum Activity", "A simple project for my portfolio"));
 
     BDDMockito.when(activityRepositoryMock.findByIdAndUser(NONEXISTENT_ACTIVITY_ID, USER)).thenReturn(Optional.empty());
 
     BDDMockito.when(activityRepositoryMock.findByIdAndUser(EXISTENT_ACTIVITY_ID, USER))
         .thenReturn(Optional.of(ActivityCreator.withIdAndStatus(EXISTENT_ACTIVITY_ID, Status.DELETED)));
 
+    BDDMockito.when(activityMapperMock.toActivity(any()))
+        .thenReturn(withoutIdAndWithNameAndDescription("Lorem Ipsum Activity", "A simple project for my portfolio"));
+    BDDMockito.when(activityMapperMock.toActivityResponse(any()))
+        .thenReturn(ActivityResponseCreator.withIdNameAndDescription(1_000L, "Lorem Ipsum Activity", "A simple project for my portfolio"));
     mockSecurityContextHolder();
   }
 
@@ -95,10 +106,9 @@ class ActivityServiceTest {
 
       Assertions.assertThat(actualActivitiesResponse)
           .isNotEmpty()
-          .hasSize(2);
+          .hasSize(1);
       Assertions.assertThat(actualListActivityResponse)
-          .contains(ActivityResponseBodyCreator.withIdAndName(1L, "Lorem Ipsum Activity"))
-          .contains(ActivityResponseBodyCreator.withIdAndName(2L, "XPTO Activity"));
+          .contains(ActivityResponseCreator.withIdAndName(1_000L, "Lorem Ipsum Activity"));
     }
 
     @Test
@@ -152,7 +162,7 @@ class ActivityServiceTest {
       ActivityResponse actualActivityResponse = activityService.create(VALID_ACTIVITY_REQUEST_BODY);
 
       Assertions.assertThat(actualActivityResponse.getId())
-          .isEqualTo(1L);
+          .isEqualTo(1000L);
       Assertions.assertThat(actualActivityResponse.getName())
           .isNotNull()
           .isEqualTo("Lorem Ipsum Activity");

@@ -5,7 +5,7 @@ import br.com.emendes.timemanagerapi.model.Status;
 
 import java.time.LocalDateTime;
 
-public class ActivityResponseBodyCreator {
+public class ActivityResponseCreator {
 
   private static final LocalDateTime FIXED_DATE_TIME = LocalDateTime
       .of(2022, 8, 23, 10,40,21);

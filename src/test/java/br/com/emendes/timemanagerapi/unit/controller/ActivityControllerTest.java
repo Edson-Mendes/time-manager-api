@@ -6,7 +6,7 @@ import br.com.emendes.timemanagerapi.dto.request.UpdateStatusRequest;
 import br.com.emendes.timemanagerapi.dto.response.ActivityResponse;
 import br.com.emendes.timemanagerapi.model.Status;
 import br.com.emendes.timemanagerapi.service.ActivityService;
-import br.com.emendes.timemanagerapi.util.creator.ActivityResponseBodyCreator;
+import br.com.emendes.timemanagerapi.util.creator.ActivityResponseCreator;
 import br.com.emendes.timemanagerapi.util.creator.PageableCreator;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,14 +45,14 @@ class ActivityControllerTest {
   @BeforeEach
   public void setUp() {
     List<ActivityResponse> listActivityRespBody =
-        List.of(ActivityResponseBodyCreator.withIdAndName(1L, "Lorem Ipsum Activity"),
-            ActivityResponseBodyCreator.withIdAndName(2L, "XPTO Activity"));
+        List.of(ActivityResponseCreator.withIdAndName(1L, "Lorem Ipsum Activity"),
+            ActivityResponseCreator.withIdAndName(2L, "XPTO Activity"));
 
     BDDMockito.when(activityServiceMock.find(DEFAULT_PAGEABLE))
         .thenReturn(new PageImpl<>(listActivityRespBody, DEFAULT_PAGEABLE, 2));
 
     BDDMockito.when(activityServiceMock.create(VALID_ACTIVITY_REQUEST_BODY))
-        .thenReturn(ActivityResponseBodyCreator
+        .thenReturn(ActivityResponseCreator
             .withIdNameAndDescription(1L, "Lorem Ipsum Activity", "A simple project for my portfolio"));
 
     BDDMockito.doNothing().when(activityServiceMock)
@@ -82,9 +82,9 @@ class ActivityControllerTest {
     void find_MustReturnsPageActivityResponseBody_WhenFoundSuccessfully() {
       Page<ActivityResponse> actualBody = activityController.find(DEFAULT_PAGEABLE).getBody();
 
-      ActivityResponse expectedActivityRespBody1 = ActivityResponseBodyCreator
+      ActivityResponse expectedActivityRespBody1 = ActivityResponseCreator
           .withIdAndName(1L, "Lorem Ipsum Activity");
-      ActivityResponse expectedActivityRespBody2 = ActivityResponseBodyCreator
+      ActivityResponse expectedActivityRespBody2 = ActivityResponseCreator
           .withIdAndName(2L, "XPTO Activity");
 
       Assertions.assertThat(actualBody).isNotNull().isNotEmpty().hasSize(2);
