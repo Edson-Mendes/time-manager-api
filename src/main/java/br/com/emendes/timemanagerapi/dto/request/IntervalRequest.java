@@ -4,10 +4,7 @@ import br.com.emendes.timemanagerapi.model.entity.Activity;
 import br.com.emendes.timemanagerapi.model.entity.Interval;
 import br.com.emendes.timemanagerapi.validation.anotation.DateTimeValidation;
 import br.com.emendes.timemanagerapi.validation.anotation.TimeValidation;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
@@ -17,6 +14,7 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
+@Builder
 public class IntervalRequest {
 
   @NotBlank(message = "startedAt must not be null or blank")
