@@ -11,6 +11,7 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @EqualsAndHashCode
 @ToString
+@Builder
 public class IntervalResponse {
 
   private long id;

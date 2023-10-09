@@ -47,11 +47,6 @@ public class Activity {
   @ManyToOne(fetch = FetchType.LAZY)
   private User user;
 
-  public void update(ActivityRequest activityRequest) {
-    this.name = activityRequest.getName();
-    this.description = activityRequest.getDescription();
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
