@@ -4,6 +4,7 @@ import br.com.emendes.timemanagerapi.dto.request.IntervalRequest;
 import br.com.emendes.timemanagerapi.dto.response.IntervalResponse;
 import br.com.emendes.timemanagerapi.mapper.IntervalMapper;
 import br.com.emendes.timemanagerapi.model.entity.Interval;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
@@ -12,6 +13,7 @@ import java.time.LocalTime;
 /**
  * Implementação de {@link IntervalMapper}.
  */
+@Component
 public class IntervalMapperImpl implements IntervalMapper {
 
   /**
