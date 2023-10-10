@@ -5,6 +5,7 @@ import br.com.emendes.timemanagerapi.dto.response.IntervalResponse;
 import br.com.emendes.timemanagerapi.exception.ActivityNotFoundException;
 import br.com.emendes.timemanagerapi.exception.IntervalCreationException;
 import br.com.emendes.timemanagerapi.exception.IntervalNotFoundException;
+import br.com.emendes.timemanagerapi.mapper.IntervalMapper;
 import br.com.emendes.timemanagerapi.model.Status;
 import br.com.emendes.timemanagerapi.model.entity.Activity;
 import br.com.emendes.timemanagerapi.model.entity.Interval;
@@ -30,6 +31,9 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
+import static br.com.emendes.timemanagerapi.util.creator.IntervalResponseBodyCreator.withIdAndStartedAtAndElapsedTime;
+import static org.mockito.ArgumentMatchers.any;
+
 @ExtendWith(SpringExtension.class)
 @DisplayName("Unit tests for IntervalService")
 class IntervalServiceTest {
@@ -40,6 +44,8 @@ class IntervalServiceTest {
   private ActivityService activityServiceMock;
   @Mock
   private IntervalRepository intervalRepositoryMock;
+  @Mock
+  private IntervalMapper intervalMapperMock;
 
   private final long EXISTENT_ACTIVITY_ID = 1L;
   private final long NONEXISTENT_ACTIVITY_ID = 9999L;
@@ -86,6 +92,14 @@ class IntervalServiceTest {
     @Test
     @DisplayName("create must returns IntervalResponseBody when created successfully")
     void create_MustReturnsIntervalResponseBody_WhenCreatedSuccessfully() {
+      Interval interval = Interval.builder()
+          .startedAt(LocalDateTime.parse("2022-08-16T15:07:00"))
+          .elapsedTime(LocalTime.parse("00:30:00"))
+          .build();
+      BDDMockito.when(intervalMapperMock.toInterval(any()))
+          .thenReturn(interval);
+      BDDMockito.when(intervalMapperMock.toIntervalResponse(any()))
+          .thenReturn(withIdAndStartedAtAndElapsedTime(100L, "2022-08-16T15:07:00", "00:30:00"));
       IntervalResponse actualIntervalRespBody = intervalService.create(
           EXISTENT_ACTIVITY_ID, new IntervalRequest("2022-08-16T15:07:00", "00:30:00"));
 
@@ -148,10 +162,11 @@ class IntervalServiceTest {
     @Test
     @DisplayName("find must returns Page<IntervalResponseBody> when ActivityId exists")
     void find_MustReturnsPageIntervalResponseBody_WhenActivityIdExists() {
+      BDDMockito.when(intervalMapperMock.toIntervalResponse(any()))
+          .thenReturn(withIdAndStartedAtAndElapsedTime(100L, "2022-08-16T15:07:00", "00:30:00"));
       Page<IntervalResponse> intervalsPage = intervalService.find(EXISTENT_ACTIVITY_ID, DEFAULT_PAGEABLE);
 
-      IntervalResponse expectedIntervalRespBody = IntervalResponseBodyCreator
-          .withIdAndStartedAtAndElapsedTime(100L, "2022-08-16T15:07:00", "00:30:00");
+      IntervalResponse expectedIntervalRespBody = withIdAndStartedAtAndElapsedTime(100L, "2022-08-16T15:07:00", "00:30:00");
 
       Assertions.assertThat(intervalsPage).hasSize(1);
       Assertions.assertThat(intervalsPage.getContent()).contains(expectedIntervalRespBody);
@@ -163,6 +178,9 @@ class IntervalServiceTest {
       Activity activityFound = ActivityCreator.withIdAndStatus(EXISTENT_ACTIVITY_ID, Status.CONCLUDED);
       Interval intervalFound = IntervalCreator.withIdActivityIdStartedAtAndElapsedTime(
           100L, EXISTENT_ACTIVITY_ID, "2022-08-16T15:07:00", "00:30:00");
+
+      BDDMockito.when(intervalMapperMock.toIntervalResponse(any()))
+          .thenReturn(withIdAndStartedAtAndElapsedTime(100L, "2022-08-16T15:07:00", "00:30:00"));
       BDDMockito.when(activityServiceMock.findById(EXISTENT_ACTIVITY_ID))
           .thenReturn(activityFound);
       BDDMockito.when(intervalRepositoryMock.findByActivity(activityFound, DEFAULT_PAGEABLE))
@@ -170,8 +188,7 @@ class IntervalServiceTest {
 
       Page<IntervalResponse> intervalsPage = intervalService.find(EXISTENT_ACTIVITY_ID, DEFAULT_PAGEABLE);
 
-      IntervalResponse expectedIntervalResponse = IntervalResponseBodyCreator
-          .withIdAndStartedAtAndElapsedTime(100L, "2022-08-16T15:07:00", "00:30:00");
+      IntervalResponse expectedIntervalResponse = withIdAndStartedAtAndElapsedTime(100L, "2022-08-16T15:07:00", "00:30:00");
 
       Assertions.assertThat(intervalsPage).hasSize(1);
       Assertions.assertThat(intervalsPage.getContent()).contains(expectedIntervalResponse);
